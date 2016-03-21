@@ -119,8 +119,13 @@ function rocket_footer_js_inline( $buffer ) {
 			}
 
 			// Build up javascript and remove nodes
-			foreach ( $variable_tags as $tag ) {
-				$js .= ';' . $tag->textContent;
+			foreach ( $variable_tags as $index => $tag ) {
+				$prev = $index > 0 ? $index - 1 : 0;
+				/** @var DOMElement $prev_variable_tag */
+				$prev_variable_tag = $variable_tags[ $prev ];
+				if ( 'application/ld+json' != $prev_variable_tag->getAttribute( 'type' ) ) {
+					$js .= ';' . $tag->textContent;
+				}
 				$tag->parentNode->removeChild( $tag );
 			}
 			// Minify?
