@@ -10,14 +10,6 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       rocket-footer-js
  */
-/*
- * Misc function to return one since wordpress doesn't have __return_one
- * @since 1.0.0
- */
-function _rocket_return_one() {
-	return 1;
-}
-
 /**
  * Finds all inline scripts and puts them right before the closing body tag in the order found
  *
@@ -28,7 +20,8 @@ function _rocket_return_one() {
  * @return mixed
  */
 function rocket_footer_js_inline( $buffer ) {
-
+	//Remove filter to override JS minify option
+	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 	// Only run if JS minify is on
 	if ( get_rocket_option( 'minify_js' ) ) {
 		// Import HTML
@@ -41,8 +34,8 @@ function rocket_footer_js_inline( $buffer ) {
 		// Get body tag
 		$body                   = $document->getElementsByTagName( 'body' )->item( 0 );
 		$tags                   = array();
+		$urls                   = array();
 		$variable_tags          = array();
-		$external_tags          = array();
 		$enqueued_variable_tags = array();
 		// Get all localized scripts
 		foreach ( array_unique( wp_scripts()->queue ) as $item ) {
@@ -54,15 +47,19 @@ function rocket_footer_js_inline( $buffer ) {
 		// Get array list of script DOMElement's. We must build arrays since modifying in-loop does mucky things to the collection and causes items to get lost/skipped.
 		foreach ( $document->getElementsByTagName( 'script' ) as $tag ) {
 			/** @var DOMElement $tag */
-			$src = $tag->getAttribute( 'src' );
-
-			if ( ! empty( $src ) ) {
-				$external_tags[] = $tag;
-			} else if ( in_array( str_replace( "\n", '', $tag->textContent ), $enqueued_variable_tags ) ) {
+			if ( in_array( str_replace( "\n", '', $tag->textContent ), $enqueued_variable_tags ) ) {
 				$variable_tags[] = $tag;
 			} else {
-				$tags[] = $tag;
+				// Skip ld+json and leave it in the header
+				if ( 'application/ld+json' != $tag->getAttribute( 'type' ) ) {
+					$tags[] = $tag;
+				}
 			}
+		}
+		/** @var DOMElement $tag */
+		// Remove all elements from DOM
+		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
+			$tag->parentNode->removeChild( $tag );
 		}
 		// Get inline minify setting and load JSMin if needed
 		$minify_inline_js = get_rocket_option( 'minify_html_inline_js', false );
@@ -70,121 +67,122 @@ function rocket_footer_js_inline( $buffer ) {
 			require( WP_ROCKET_PATH . 'min/lib/JSMin.php' );
 		}
 		$js = '';
-		// We have external scripts
-		if ( $external_tags ) {
-			// Remove existing external tags
-			foreach ( $external_tags as $tag ) {
-				$tag->parentNode->removeChild( $tag );
-			}
-			// Get our domain
-			$domain = parse_url( home_url(), PHP_URL_HOST );
-			// Remote fetch external scripts
-			$cdn_domains = get_rocket_cdn_cnames();
-			// Get the hostname for each CDN CNAME
-			foreach ( $cdn_domains as &$cdn_domain ) {
-				$cdn_domain_parts = parse_url( $cdn_domain );
-				$cdn_domain       = $cdn_domain_parts['host'];
-			}
-			// Cleanup
-			unset( $cdn_domain_parts, $cdn_domain );
-			// Process external JS tags
-			foreach ( $external_tags as $key => $tag ) {
-				$src = $tag->getAttribute( 'src' );
-				if ( false !== strpos( $src, '?' ) ) {
-					$src = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
-					$tag->setAttribute( 'src', $src );
-				}
-				// Get host of tag source
-				$src_host = parse_url( $src, PHP_URL_HOST );
-				// Being remote is defined as not having our home url and not being in the CDN list
-				if ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) {
-					$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
-					if ( ! is_dir( $cache_path ) ) {
-						rocket_mkdir_p( $cache_path );
-					}
-					$file     = wp_remote_get( $src, array(
-						'user-agent' => 'WP-Rocket',
-						'sslverify'  => false,
-					) );
-					$filename = $cache_path . sanitize_title( dirname( $src ) . DIRECTORY_SEPARATOR . basename( $src, 'js' ) ) . '.js';
-					rocket_put_content( $filename, $file['body'] );
-					$tag->setAttribute( 'src', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) );
-				} else if ( in_array( $domain, $cdn_domains ) ) {
-					//Replace the URL back to the origin server and make it relative for the minifier
-					$url_parts         = parse_url( $src );
-					$url_parts['host'] = $domain;
-					$tag->setAttribute( 'src', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $src ) );
-				}
-			}
-			// Keep minifying until we have only 1 file left
-			while ( 1 < count( $external_tags ) ) {
-				$urls = array();
-				foreach ( $external_tags as $external_tag ) {
-					/** @var DOMElement $external_tag */
-					$urls[] = $external_tag->getAttribute( 'src' );
-				}
-				$urls              = array_unique( $urls );
-				$new_tags          = get_rocket_minify_files( $urls );
-				$new_tags_document = new DOMDocument();
-				if ( ! $new_tags_document->loadHTML( $new_tags ) ) {
-					return $buffer;
-				}
-				$external_tags = array();
-				foreach ( $new_tags_document->getElementsByTagName( 'script' ) as $tag ) {
-					$external_tags[] = $tag;
-				}
-			}
-
-			// Build up javascript and remove nodes
-			foreach ( $variable_tags as $index => $tag ) {
-				$prev = $index > 0 ? $index - 1 : 0;
-				/** @var DOMElement $prev_variable_tag */
-				$prev_variable_tag = $variable_tags[ $prev ];
-				if ( 'application/ld+json' != $prev_variable_tag->getAttribute( 'type' ) ) {
-					$js .= ';' . $tag->textContent;
-				}
-				$tag->parentNode->removeChild( $tag );
-			}
-			// Minify?
-			if ( $minify_inline_js && ! empty( $js ) ) {
-				$js = rocket_minify_inline_js( $js );
-			}
-			if ( ! empty( $js ) ) {
-				// Create script element
-				$main_variable_tag = $document->createElement( 'script', $js );
-				$main_variable_tag->setAttribute( 'type', 'text/javascript' );
-				// Add element to footer
-				$body->appendChild( $main_variable_tag );
-				$js = '';
-			}
+		// Get our domain
+		$domain = parse_url( home_url(), PHP_URL_HOST );
+		// Remote fetch external scripts
+		$cdn_domains = get_rocket_cdn_cnames();
+		// Get the hostname for each CDN CNAME
+		foreach ( $cdn_domains as &$cdn_domain ) {
+			$cdn_domain_parts = parse_url( $cdn_domain );
+			$cdn_domain       = $cdn_domain_parts['host'];
+		}
+		// Cleanup
+		unset( $cdn_domain_parts, $cdn_domain );
+		// Get our cache path
+		$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
+		// If we have a user logged in, include user ID in filename to be unique as we may have user only JS content. Otherwise file will be a hash of (minify-global-UNIQUEID).js
+		if ( is_user_logged_in() ) {
+			$filename = $cache_path . md5( 'minify-' . get_current_user_id() . '-' . create_rocket_uniqid() ) . '.js';
 		} else {
-			// Combine back with other tags
-			$tags = array_merge( $variable_tags, $tags );
+			$filename = $cache_path . md5( 'minify-global' . create_rocket_uniqid() ) . '-' . '.js';
 		}
-		// Move all external tags to footer
-		foreach ( $external_tags as $tag ) {
-			if ( ! empty( $tag->parentNode ) ) {
-				$tag->parentNode->removeChild( $tag );
+		// Create cache dir if needed
+		if ( ! is_dir( $cache_path ) ) {
+			rocket_mkdir_p( $cache_path );
+		}
+		// lets process them scripts!
+		foreach ( $tags as $index => $tag ) {
+			// Remove from array by default
+			$remove = true;
+			$src    = $tag->getAttribute( 'src' );
+			// Remove query strings
+			if ( false !== strpos( $src, '?' ) ) {
+				$src = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
 			}
-			$body->appendChild( $document->importNode( $tag ) );
+			// If the last character is not a semicolon, and we have content,add one to prevent syntax errors
+			if ( ';' != substr( $js, - 1, 1 ) && strlen( $js ) > 0 ) {
+				$js .= ';';
+			}
+			// We have a external script?
+			if ( ! empty( $src ) ) {
+				//Has it been processed before?
+				if ( ! in_array( $src, $urls ) ) {
+					// Get host of tag source
+					$src_host = parse_url( $src, PHP_URL_HOST );
+					// Being remote is defined as not having our home url and not being in the CDN list
+					if ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) {
+						$file = wp_remote_get( $src, array(
+							'user-agent' => 'WP-Rocket',
+							'sslverify'  => false,
+						) );
+						$js .= rocket_minify_inline_js( rocket_footer_get_content( $file['body'] ) );
+					} else {
+						// Break up url
+						$url_parts = parse_url( $src );
+						if ( in_array( $domain, $cdn_domains ) ) {
+							//Replace the URL back to the origin server and make it relative for the minifier
+							$url_parts['host'] = $domain;
+						}
+						/*
+						 * Check and see what version of php-http we have.
+						 * 1.x uses procedural functions.
+						 * 2.x uses OOP classes with a http namespace.
+						 * Convert the address to a path, minify, and add to buffer.
+						 */
+						if ( function_exists( 'http_build_url' ) ) {
+							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, http_build_url( $url_parts ) ) ) );
+						} else if ( class_exists( 'http\Url' ) ) {
+							$url = new \http\Url( $url_parts );
+							$url = $url->toString();
+							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $url ) ) );
+						}
+					}
+					//Add to array so we don't process again
+					$urls[] = $src;
+				}
+
+			} else {
+				//Add inline JS to buffer
+				$js_part = $tag->textContent;
+				if ( $minify_inline_js ) {
+					$js_part = rocket_minify_inline_js( $js_part );
+				}
+				$js .= $js_part;
+			}
+			// For later, if we dont want the tag removed so it get processed below
+			if ( $remove ) {
+				unset( $tags[ $index ] );
+			}
 		}
+		$inline_js = '';
 		//Combine all inline tags to one
-		foreach ( $tags as $tag ) {
-			$js .= ';' . $tag->textContent;
-			$tag->parentNode->removeChild( $tag );
+		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
+			// If the last character is not a semicolon, and we have content,add one to prevent syntax errors
+			if ( ';' != substr( $inline_js, - 1, 1 ) && strlen( $inline_js ) > 0 ) {
+				$js .= ';';
+			}
+			$inline_js .= ';' . $tag->textContent;
 		}
 		// Minify?
-		if ( $minify_inline_js && ! empty( $js ) ) {
-			$js = rocket_minify_inline_js( $js );
+		if ( $minify_inline_js && ! empty( $inline_js ) ) {
+			$inline_js = rocket_minify_inline_js( $js );
 		}
-		if ( ! empty( $js ) ) {
+		if ( ! empty( $inline_js ) ) {
 			//Create script tag
-			$main_tag = $document->createElement( 'script', $js );
-			$main_tag->setAttribute( 'type', 'text/javascript' );
+			$inline_tag = $document->createElement( 'script', $inline_js );
+			$inline_tag->setAttribute( 'type', 'text/javascript' );
 			// Add element to footer
-			$body->appendChild( $main_tag );
+			$body->appendChild( $inline_tag );
 		}
-
+		rocket_put_content( $filename, $js );
+		$src = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
+		// Create script element
+		$external_tag = $document->createElement( 'script' );
+		$external_tag->setAttribute( 'type', 'text/javascript' );
+		$external_tag->setAttribute( 'src', $src );
+		$external_tag->setAttribute( 'data-minify', '1' );
+		// Add element to footer
+		$body->appendChild( $external_tag );
 		//Get HTML
 		$buffer = $document->saveHTML();
 		// If HTML minify is on, process it
@@ -297,6 +295,19 @@ function rocket_footer_js_init() {
 	}
 }
 
+/**
+ * @param $file
+ *
+ * @return bool|string
+ */
+function rocket_footer_get_content( $file ) {
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php' );
+	require_once( ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php' );
+	$direct_filesystem = new WP_Filesystem_Direct( new StdClass() );
+
+	return $direct_filesystem->get_contents( $file );
+}
+
 /*
  * wp_print_scripts and wp_footer hooks can be used to force enqueue JS in the footer, but may not be compatible with bad plugins that don't register their JS properly. Will remain here for the time that this may improve. DOMDocument parsing will be used until then.
  */
@@ -305,7 +316,10 @@ function rocket_footer_js_init() {
 add_action( 'plugins_loaded', 'rocket_footer_js_plugins_loaded' );
 add_action( 'init', 'rocket_footer_js_init' );
 add_filter( 'rocket_buffer', 'rocket_footer_js_inline', PHP_INT_MAX );
-add_filter( 'pre_get_rocket_option_minify_js_combine_all', '_rocket_return_one' );
-
+add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
+//Only override JS Minify option of front end
+if ( ! is_admin() ) {
+	add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
+}
 
 register_activation_hook( __FILE__, 'rocket_footer_js_activate' );
