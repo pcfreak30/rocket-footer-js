@@ -1,7 +1,7 @@
 === Plugin Name ===
 
 Contributors: pcfreak30
-Donate link: http://example.com/
+Donate link: http://www.paypal.me/pcfreak30
 Tags: optimize, wp-rocket, footer javascript
 Requires at least: 4.2.0
 Tested up to: 4.2.2
