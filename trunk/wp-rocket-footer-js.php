@@ -81,6 +81,10 @@ function rocket_footer_js_inline( $buffer ) {
 			// Remote fetch external scripts
 			foreach ( $external_tags as $key => $tag ) {
 				$src = $tag->getAttribute( 'src' );
+				if ( false !== strpos( $src, '?' ) ) {
+					$src = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
+					$tag->setAttribute( 'src', $src );
+				}
 				if ( parse_url( $src, PHP_URL_HOST ) != $domain ) {
 					$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
 					if ( ! is_dir( $cache_path ) ) {
@@ -97,7 +101,6 @@ function rocket_footer_js_inline( $buffer ) {
 			}
 			// Keep minifying until we have only 1 file left
 			while ( 1 < count( $external_tags ) ) {
-
 				$urls = array();
 				foreach ( $external_tags as $external_tag ) {
 					/** @var DOMElement $external_tag */
@@ -199,7 +202,7 @@ function rocket_force_js_footer() {
 }
 
 /*
- * This is a workaround to remove dummy script tags for script aliases
+ * This is a workaround to remove dummy script tags for script aliases. Pending core bug report on dependencies
  * */
 function rocket_remove_empty_footer_js() {
 	global $rocket_enqueue_js_in_footer;
@@ -272,8 +275,11 @@ function rocket_footer_js_init() {
 	}
 }
 
-add_action( 'wp_print_scripts', 'rocket_force_js_footer' );
-add_action( 'wp_footer', 'rocket_remove_empty_footer_js', 21 );
+/*
+ * wp_print_scripts and wp_footer hooks can be used to force enqueue JS in the footer, but may not be compatible with bad plugins that don't register their JS properly. Will remain here for the time that this may improve. DOMDocument parsing will be used until then.
+ */
+//add_action( 'wp_print_scripts', 'rocket_force_js_footer' );
+//add_action( 'wp_footer', 'rocket_remove_empty_footer_js', 21 );
 add_action( 'plugins_loaded', 'rocket_footer_js_plugins_loaded' );
 add_action( 'init', 'rocket_footer_js_init' );
 add_filter( 'rocket_buffer', 'rocket_footer_js_inline', PHP_INT_MAX );
