@@ -11,7 +11,7 @@
  * Text Domain:       rocket-footer-js
  */
 /**
- * Finds all inline scripts and puts them right before the closing body tag in the order found
+ * Main function to combine all inline scripts and external into one file. Excludes "localized" scripts.
  *
  * @since 1.0.0
  *
@@ -197,6 +197,8 @@ function rocket_footer_js_inline( $buffer ) {
 /**
  * Processes all enqueued scripts and forces them to the footer
  *
+ * @since 1.0.0
+ *
  */
 function rocket_force_js_footer() {
 	/** @var WP_Scripts $wp_scripts */
@@ -223,6 +225,9 @@ function rocket_force_js_footer() {
 
 /*
  * This is a workaround to remove dummy script tags for script aliases. Pending core bug report on dependencies
+ *
+ * @since 1.0.0
+ *
  * */
 function rocket_remove_empty_footer_js() {
 	global $rocket_enqueue_js_in_footer;
@@ -238,6 +243,9 @@ function rocket_remove_empty_footer_js() {
 
 /**
  * Throw error if WP-Rocket Doesn't exist, but auto-activate it if it does and not enabled
+ *
+ * @since 1.0.0
+ *
  */
 function rocket_footer_js_activate() {
 	if ( ! is_plugin_active( 'wp-rocket/wp-rocket.php' ) ) {
@@ -247,6 +255,9 @@ function rocket_footer_js_activate() {
 
 /**
  * Deactivate and show error if WP-Rocket is missing
+ *
+ * @since 1.0.0
+ *
  */
 function rocket_footer_js_plugins_loaded() {
 	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
@@ -254,9 +265,14 @@ function rocket_footer_js_plugins_loaded() {
 	if ( validate_plugin( 'wp-rocket/wp-rocket.php' ) ) {
 		$error = true;
 		add_action( 'admin_notices', 'rocket_footer_js_activate_error_no_wprocket' );
-	} else if ( ! class_exists( 'DOMDocument' ) ) {
+	}
+	if ( ! class_exists( 'DOMDocument' ) ) {
 		$error = true;
 		add_action( 'admin_notices', 'rocket_footer_js_activate_error_no_domdocument' );
+	}
+	if ( ! function_exists( 'http_build_url' ) && ! class_exists( 'http\Url' ) ) {
+		$error = true;
+		add_action( 'admin_notices', 'rocket_footer_js_activate_error_no_http' );
 	}
 	if ( $error ) {
 		deactivate_plugins( basename( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR . basename( __FILE__ ) );
@@ -265,6 +281,9 @@ function rocket_footer_js_plugins_loaded() {
 
 /**
  * Error function if WP Rocket is missing
+ *
+ * @since 1.0.0
+ *
  */
 function rocket_footer_js_activate_error_no_wprocket() {
 	$info = get_plugin_data( __FILE__ );
@@ -276,6 +295,9 @@ function rocket_footer_js_activate_error_no_wprocket() {
 
 /**
  * Error function if PHP XML is not enabled
+ *
+ * @since 1.0.0
+ *
  */
 function rocket_footer_js_activate_error_no_domdocument() {
 	$info = get_plugin_data( __FILE__ );
@@ -286,7 +308,25 @@ function rocket_footer_js_activate_error_no_domdocument() {
 }
 
 /**
+ * Error function if PHP HTTP is not enabled
+ *
+ * @since 1.1.0
+ *
+ */
+function rocket_footer_js_activate_error_no_http() {
+	$info = get_plugin_data( __FILE__ );
+	_e( sprintf( '
+	<div class="error notice">
+		<p>Opps! %s requires PHP HTTP extension! Please contact your web host or system administrator to get this installed.</p>
+	</div>', $info['Name'] ) );
+}
+
+
+/**
  * Check if disable emoji is on, and if not, move emoji to footer
+ *
+ * @since 1.0.0
+ *
  */
 function rocket_footer_js_init() {
 	if ( function_exists( 'get_rocket_option' ) && ! get_rocket_option( 'emoji', 0 ) ) {
@@ -297,6 +337,8 @@ function rocket_footer_js_init() {
 
 /**
  * @param $file
+ *
+ * @since 1.0.0
  *
  * @return bool|string
  */
