@@ -94,7 +94,7 @@ function rocket_footer_js_inline( $buffer ) {
 						'user-agent' => 'WP-Rocket',
 						'sslverify'  => false,
 					) );
-					$filename = $cache_path . wp_unique_filename( $cache_path, basename( $src ) );
+					$filename = $cache_path . sanitize_title( $src );
 					rocket_put_content( $filename, $file['body'] );
 					$tag->setAttribute( 'src', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) );
 				}
