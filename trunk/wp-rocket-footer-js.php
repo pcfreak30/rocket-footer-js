@@ -28,6 +28,7 @@ function _rocket_return_one() {
  * @return mixed
  */
 function rocket_footer_js_inline( $buffer ) {
+
 	// Only run if JS minify is on
 	if ( get_rocket_option( 'minify_js' ) ) {
 		// Import HTML
@@ -57,9 +58,7 @@ function rocket_footer_js_inline( $buffer ) {
 
 			if ( ! empty( $src ) ) {
 				$external_tags[] = $tag;
-				continue;
-			}
-			if ( in_array( str_replace( "\n", '', $tag->textContent ), $enqueued_variable_tags ) ) {
+			} else if ( in_array( str_replace( "\n", '', $tag->textContent ), $enqueued_variable_tags ) ) {
 				$variable_tags[] = $tag;
 			} else {
 				$tags[] = $tag;
@@ -73,29 +72,80 @@ function rocket_footer_js_inline( $buffer ) {
 		$js = '';
 		// We have external scripts
 		if ( $external_tags ) {
+			// Remove existing external tags
+			foreach ( $external_tags as $tag ) {
+				$tag->parentNode->removeChild( $tag );
+			}
+			// Get our domain
+			$domain = parse_url( home_url(), PHP_URL_HOST );
+			// Remote fetch external scripts
+			foreach ( $external_tags as $key => $tag ) {
+				$src = $tag->getAttribute( 'src' );
+				if ( parse_url( $src, PHP_URL_HOST ) != $domain ) {
+					$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
+					if ( ! is_dir( $cache_path ) ) {
+						rocket_mkdir_p( $cache_path );
+					}
+					$file     = wp_remote_get( $src, array(
+						'user-agent' => 'WP-Rocket',
+						'sslverify'  => false,
+					) );
+					$filename = $cache_path . wp_unique_filename( $cache_path, basename( $src ) );
+					rocket_put_content( $filename, $file['body'] );
+					$tag->setAttribute( 'src', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) );
+				}
+			}
+			// Keep minifying until we have only 1 file left
+			while ( 1 < count( $external_tags ) ) {
+
+				$urls = array();
+				foreach ( $external_tags as $external_tag ) {
+					/** @var DOMElement $external_tag */
+					$urls[] = $external_tag->getAttribute( 'src' );
+				}
+				$urls              = array_unique( $urls );
+				$new_tags          = get_rocket_minify_files( $urls );
+				$new_tags_document = new DOMDocument();
+				if ( ! $new_tags_document->loadHTML( $new_tags ) ) {
+					return $buffer;
+				}
+				$external_tags = array();
+				foreach ( $new_tags_document->getElementsByTagName( 'script' ) as $tag ) {
+					$external_tags[] = $tag;
+				}
+			}
+
 			// Build up javascript and remove nodes
 			foreach ( $variable_tags as $tag ) {
 				$js .= ';' . $tag->textContent;
 				$tag->parentNode->removeChild( $tag );
 			}
 			// Minify?
-			if ( $minify_inline_js ) {
+			if ( $minify_inline_js && ! empty( $js ) ) {
 				$js = rocket_minify_inline_js( $js );
 			}
-			// Create script element
-			$main_variable_tag = $document->createElement( 'script', $js );
-			$main_variable_tag->setAttribute( 'type', 'text/javascript' );
-			// Add element to footer
-			$body->appendChild( $main_variable_tag );
-			$js = '';
+			if ( ! empty( $js ) ) {
+				// Create script element
+				$main_variable_tag = $document->createElement( 'script', $js );
+				$main_variable_tag->setAttribute( 'type', 'text/javascript' );
+				// Add element to footer
+				$body->appendChild( $main_variable_tag );
+				$js = '';
+			}
 		} else {
 			// Combine back with other tags
 			$tags = array_merge( $variable_tags, $tags );
 		}
 		// Move all external tags to footer
 		foreach ( $external_tags as $tag ) {
-			$tag->parentNode->removeChild( $tag );
-			$body->appendChild( $tag );
+			if ( ! empty( $tag->parentNode ) ) {
+				$tag->parentNode->removeChild( $tag );
+			}
+			$new_tag = $document->createElement( 'script' );
+			foreach ( $tag->attributes as $attribute ) {
+				$new_tag->setAttribute( $attribute->name, $tag->getAttribute( $attribute->name ) );
+			}
+			$body->appendChild( $new_tag );
 		}
 		//Combine all inline tags to one
 		foreach ( $tags as $tag ) {
@@ -103,14 +153,17 @@ function rocket_footer_js_inline( $buffer ) {
 			$tag->parentNode->removeChild( $tag );
 		}
 		// Minify?
-		if ( $minify_inline_js ) {
+		if ( $minify_inline_js && ! empty( $js ) ) {
 			$js = rocket_minify_inline_js( $js );
 		}
-		//Create script tag
-		$main_tag = $document->createElement( 'script', $js );
-		$main_tag->setAttribute( 'type', 'text/javascript' );
-		// Add element to footer
-		$body->appendChild( $main_tag );
+		if ( ! empty( $js ) ) {
+			//Create script tag
+			$main_tag = $document->createElement( 'script', $js );
+			$main_tag->setAttribute( 'type', 'text/javascript' );
+			// Add element to footer
+			$body->appendChild( $main_tag );
+		}
+
 		//Get HTML
 		$buffer = $document->saveHTML();
 		// If HTML minify is on, process it
