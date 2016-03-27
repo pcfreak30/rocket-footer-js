@@ -141,11 +141,7 @@ function rocket_footer_js_inline( $buffer ) {
 			if ( ! empty( $tag->parentNode ) ) {
 				$tag->parentNode->removeChild( $tag );
 			}
-			$new_tag = $document->createElement( 'script' );
-			foreach ( $tag->attributes as $attribute ) {
-				$new_tag->setAttribute( $attribute->name, $tag->getAttribute( $attribute->name ) );
-			}
-			$body->appendChild( $new_tag );
+			$body->appendChild( $document->importNode( $tag ) );
 		}
 		//Combine all inline tags to one
 		foreach ( $tags as $tag ) {
