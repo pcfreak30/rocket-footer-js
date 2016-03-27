@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name:       WP-Rocket Footer JS
- * Plugin URI:       https://github.com/pcfreak30/wp-rocket-footer-js
+ * Plugin Name:       Rocket Footer JS
+ * Plugin URI:       https://github.com/pcfreak30/rocket-footer-js
  * Description:       Force all JS both external and inline to the footer
  * Version:           1.0.0
  * Author:            Derrick Hammer
  * Author URI:        https://www.derrickhammer.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       wp-rocket-footer-js
+ * Text Domain:       rocket-footer-js
  */
 /*
  * Misc function to return one since wordpress doesn't have __return_one
