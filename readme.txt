@@ -21,7 +21,7 @@ This plugin will combine all inline and external JS in the order found on the pa
 
 This section describes how to install the plugin and get it working.
 
-1. Upload the plugin files to the `/wp-content/plugins/wp-rocket-footer-js` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/rocket-footer-js` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 4. Clear WP-Rocket cache and view HTML source!
 
