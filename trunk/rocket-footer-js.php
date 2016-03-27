@@ -79,13 +79,25 @@ function rocket_footer_js_inline( $buffer ) {
 			// Get our domain
 			$domain = parse_url( home_url(), PHP_URL_HOST );
 			// Remote fetch external scripts
+			$cdn_domains = get_rocket_cdn_cnames();
+			// Get the hostname for each CDN CNAME
+			foreach ( $cdn_domains as &$cdn_domain ) {
+				$cdn_domain_parts = parse_url( $cdn_domain );
+				$cdn_domain       = $cdn_domain_parts['host'];
+			}
+			// Cleanup
+			unset( $cdn_domain_parts, $cdn_domain );
+			// Process external JS tags
 			foreach ( $external_tags as $key => $tag ) {
 				$src = $tag->getAttribute( 'src' );
 				if ( false !== strpos( $src, '?' ) ) {
 					$src = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
 					$tag->setAttribute( 'src', $src );
 				}
-				if ( parse_url( $src, PHP_URL_HOST ) != $domain ) {
+				// Get host of tag source
+				$src_host = parse_url( $src, PHP_URL_HOST );
+				// Being remote is defined as not having our home url and not being in the CDN list
+				if ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) {
 					$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
 					if ( ! is_dir( $cache_path ) ) {
 						rocket_mkdir_p( $cache_path );
@@ -97,6 +109,11 @@ function rocket_footer_js_inline( $buffer ) {
 					$filename = $cache_path . sanitize_title( $src );
 					rocket_put_content( $filename, $file['body'] );
 					$tag->setAttribute( 'src', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) );
+				} else if ( in_array( $domain, $cdn_domains ) ) {
+					//Replace the URL back to the origin server and make it relative for the minifier
+					$url_parts         = parse_url( $src );
+					$url_parts['host'] = $domain;
+					$tag->setAttribute( 'src', str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $src ) );
 				}
 			}
 			// Keep minifying until we have only 1 file left
