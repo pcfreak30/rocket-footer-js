@@ -84,7 +84,7 @@ function rocket_footer_js_inline( $buffer ) {
 		if ( is_user_logged_in() ) {
 			$filename = $cache_path . md5( 'minify-' . get_current_user_id() . '-' . create_rocket_uniqid() ) . '.js';
 		} else {
-			$filename = $cache_path . md5( 'minify-global' . create_rocket_uniqid() ) . '-' . '.js';
+			$filename = $cache_path . md5( 'minify-global' . create_rocket_uniqid() ) . '.js';
 		}
 		// Create cache dir if needed
 		if ( ! is_dir( $cache_path ) ) {
