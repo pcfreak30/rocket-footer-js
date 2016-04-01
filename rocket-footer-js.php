@@ -88,6 +88,11 @@ function rocket_footer_js_inline( $buffer ) {
 		if ( ! is_dir( $cache_path ) ) {
 			rocket_mkdir_p( $cache_path );
 		}
+		/** @var DOMElement $tag */
+		// Remove all elements from DOM
+		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
+			$tag->parentNode->removeChild( $tag );
+		}
 		// lets process them scripts!
 		foreach ( $tags as $index => $tag ) {
 			// Remove from array by default
@@ -151,11 +156,6 @@ function rocket_footer_js_inline( $buffer ) {
 			if ( $remove ) {
 				unset( $tags[ $index ] );
 			}
-		}
-		/** @var DOMElement $tag */
-		// Remove all elements from DOM
-		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
-			$tag->parentNode->removeChild( $tag );
 		}
 		$inline_js = '';
 		//Combine all inline tags to one
