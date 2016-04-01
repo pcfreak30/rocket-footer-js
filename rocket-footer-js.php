@@ -47,6 +47,9 @@ function rocket_footer_js_inline( $buffer ) {
 		// Get array list of script DOMElement's. We must build arrays since modifying in-loop does mucky things to the collection and causes items to get lost/skipped.
 		foreach ( $document->getElementsByTagName( 'script' ) as $tag ) {
 			/** @var DOMElement $tag */
+			if ( '1' == $tag->getAttribute( 'data-no-minify' ) ) {
+				continue;
+			}
 			if ( in_array( str_replace( "\n", '', $tag->textContent ), $enqueued_variable_tags ) ) {
 				$variable_tags[] = $tag;
 			} else {
