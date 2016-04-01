@@ -56,11 +56,6 @@ function rocket_footer_js_inline( $buffer ) {
 				}
 			}
 		}
-		/** @var DOMElement $tag */
-		// Remove all elements from DOM
-		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
-			$tag->parentNode->removeChild( $tag );
-		}
 		// Get inline minify setting and load JSMin if needed
 		$minify_inline_js = get_rocket_option( 'minify_html_inline_js', false );
 		if ( ! class_exists( 'JSMin' ) && $minify_inline_js ) {
@@ -154,6 +149,11 @@ function rocket_footer_js_inline( $buffer ) {
 				unset( $tags[ $index ] );
 			}
 		}
+		/** @var DOMElement $tag */
+		// Remove all elements from DOM
+		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
+			$tag->parentNode->removeChild( $tag );
+		}
 		$inline_js = '';
 		//Combine all inline tags to one
 		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
@@ -161,11 +161,11 @@ function rocket_footer_js_inline( $buffer ) {
 			if ( ';' != substr( $inline_js, - 1, 1 ) && strlen( $inline_js ) > 0 ) {
 				$js .= ';';
 			}
-			$inline_js .= ';' . $tag->textContent;
+			$inline_js .= $tag->textContent;
 		}
 		// Minify?
 		if ( $minify_inline_js && ! empty( $inline_js ) ) {
-			$inline_js = rocket_minify_inline_js( $js );
+			$inline_js = rocket_minify_inline_js( $inline_js );
 		}
 		if ( ! empty( $inline_js ) ) {
 			//Create script tag
