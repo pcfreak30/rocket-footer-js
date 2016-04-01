@@ -29,7 +29,6 @@ This section describes how to install the plugin and get it working.
 
 ### 1.1.2 ###
 
-* Remove tags after main processing so any tags that are to be skipped don't get removed
 * Minified wrong JS buffer for inline JS
 * Don't prepend semicolon since its already conditionally prepended for inline JS
 
