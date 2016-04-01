@@ -3,7 +3,7 @@
  * Plugin Name:       Rocket Footer JS
  * Plugin URI:       https://github.com/pcfreak30/rocket-footer-js
  * Description:       Unofficial WP-Rocket addon to force all JS both external and inline to the footer
- * Version:           1.1.1
+ * Version:           1.1.2
  * Author:            Derrick Hammer
  * Author URI:        https://www.derrickhammer.com
  * License:           GPL-2.0+
