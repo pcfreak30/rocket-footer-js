@@ -184,6 +184,7 @@ function rocket_footer_js_inline( $buffer ) {
 		$external_tag->setAttribute( 'type', 'text/javascript' );
 		$external_tag->setAttribute( 'src', $src );
 		$external_tag->setAttribute( 'data-minify', '1' );
+		$external_tag->setAttribute( 'async', false );
 		// Add element to footer
 		$body->appendChild( $external_tag );
 		//Get HTML
