@@ -132,12 +132,15 @@ function rocket_footer_js_inline( $buffer ) {
 						 * 2.x uses OOP classes with a http namespace.
 						 * Convert the address to a path, minify, and add to buffer.
 						 */
-						if ( function_exists( 'http_build_url' ) ) {
-							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, http_build_url( $url_parts ) ) ) );
-						} else if ( class_exists( 'http\Url' ) ) {
+						if ( class_exists( 'http\Url' ) ) {
 							$url = new \http\Url( $url_parts );
 							$url = $url->toString();
 							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $url ) ) );
+						} else {
+							if ( ! function_exists( 'http_build_url' ) ) {
+								require __DIR__ . '/http_build_url.php';
+							}
+							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, http_build_url( $url_parts ) ) ) );
 						}
 					}
 					//Add to array so we don't process again
@@ -274,10 +277,6 @@ function rocket_footer_js_plugins_loaded() {
 		$error = true;
 		add_action( 'admin_notices', 'rocket_footer_js_activate_error_no_domdocument' );
 	}
-	if ( ! function_exists( 'http_build_url' ) && ! class_exists( 'http\Url' ) ) {
-		$error = true;
-		add_action( 'admin_notices', 'rocket_footer_js_activate_error_no_http' );
-	}
 	if ( $error ) {
 		deactivate_plugins( basename( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR . basename( __FILE__ ) );
 	}
@@ -310,21 +309,6 @@ function rocket_footer_js_activate_error_no_domdocument() {
 		<p>Opps! %s requires PHP XML extension! Please contact your web host or system administrator to get this installed.</p>
 	</div>', $info['Name'] ) );
 }
-
-/**
- * Error function if PHP HTTP is not enabled
- *
- * @since 1.1.0
- *
- */
-function rocket_footer_js_activate_error_no_http() {
-	$info = get_plugin_data( __FILE__ );
-	_e( sprintf( '
-	<div class="error notice">
-		<p>Opps! %s requires PHP HTTP extension! Please contact your web host or system administrator to get this installed.</p>
-	</div>', $info['Name'] ) );
-}
-
 
 /**
  * Check if disable emoji is on, and if not, move emoji to footer
