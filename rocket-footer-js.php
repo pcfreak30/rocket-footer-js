@@ -3,7 +3,7 @@
  * Plugin Name:       Rocket Footer JS
  * Plugin URI:       https://github.com/pcfreak30/rocket-footer-js
  * Description:       Unofficial WP-Rocket addon to force all JS both external and inline to the footer
- * Version:           1.1.4
+ * Version:           1.1.5
  * Author:            Derrick Hammer
  * Author URI:        https://www.derrickhammer.com
  * License:           GPL-2.0+
@@ -65,8 +65,10 @@ function rocket_footer_js_inline( $buffer ) {
 			require( WP_ROCKET_PATH . 'min/lib/JSMin.php' );
 		}
 		$js = '';
+		//Get home URL
+		$home = home_url();
 		// Get our domain
-		$domain = parse_url( home_url(), PHP_URL_HOST );
+		$domain = parse_url( $home, PHP_URL_HOST );
 		// Remote fetch external scripts
 		$cdn_domains = get_rocket_cdn_cnames();
 		// Get the hostname for each CDN CNAME
@@ -135,12 +137,12 @@ function rocket_footer_js_inline( $buffer ) {
 						if ( class_exists( 'http\Url' ) ) {
 							$url = new \http\Url( $url_parts );
 							$url = $url->toString();
-							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, $url ) ) );
+							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) ) );
 						} else {
 							if ( ! function_exists( 'http_build_url' ) ) {
 								require __DIR__ . '/http_build_url.php';
 							}
-							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( WP_CONTENT_URL, WP_CONTENT_DIR, http_build_url( $url_parts ) ) ) );
+							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) ) );
 						}
 					}
 					//Add to array so we don't process again
