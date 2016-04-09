@@ -120,14 +120,11 @@ function rocket_footer_js_inline( $buffer ) {
 							'user-agent' => 'WP-Rocket',
 							'sslverify'  => false,
 						) );
-						$js .= rocket_minify_inline_js( rocket_footer_get_content( $file['body'] ) );
+						$js .= rocket_minify_inline_js( $file['body'] );
 					} else {
 						// Break up url
-						$url_parts = parse_url( $src );
-						if ( in_array( $domain, $cdn_domains ) ) {
-							//Replace the URL back to the origin server and make it relative for the minifier
-							$url_parts['host'] = $domain;
-						}
+						$url_parts         = parse_url( $src );
+						$url_parts['host'] = $domain;
 						/*
 						 * Check and see what version of php-http we have.
 						 * 1.x uses procedural functions.
