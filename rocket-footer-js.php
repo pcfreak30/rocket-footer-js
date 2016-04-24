@@ -3,7 +3,7 @@
  * Plugin Name:       Rocket Footer JS
  * Plugin URI:       https://github.com/pcfreak30/rocket-footer-js
  * Description:       Unofficial WP-Rocket addon to force all JS both external and inline to the footer
- * Version:           1.1.6
+ * Version:           1.1.7
  * Author:            Derrick Hammer
  * Author URI:        https://www.derrickhammer.com
  * License:           GPL-2.0+
@@ -23,7 +23,7 @@ function rocket_footer_js_inline( $buffer ) {
 	//Remove filter to override JS minify option
 	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 	// Only run if JS minify is on
-	if ( get_rocket_option( 'minify_js' ) ) {
+	if ( get_rocket_option( 'minify_js' ) && ( ! defined( 'DONOTMINIFYJS' ) || ! DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 		// Import HTML
 		$document = new DOMDocument();
 		if ( ! @$document->loadHTML( $buffer ) ) {
