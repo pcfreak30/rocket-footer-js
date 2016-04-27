@@ -3,7 +3,7 @@
  * Plugin Name:       Rocket Footer JS
  * Plugin URI:       https://github.com/pcfreak30/rocket-footer-js
  * Description:       Unofficial WP-Rocket addon to force all JS both external and inline to the footer
- * Version:           1.1.7
+ * Version:           1.1.8
  * Author:            Derrick Hammer
  * Author URI:        https://www.derrickhammer.com
  * License:           GPL-2.0+
@@ -114,8 +114,8 @@ function rocket_footer_js_inline( $buffer ) {
 				if ( ! in_array( $src, $urls ) ) {
 					// Get host of tag source
 					$src_host = parse_url( $src, PHP_URL_HOST );
-					// Being remote is defined as not having our home url and not being in the CDN list
-					if ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) {
+					// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
+					if ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
 						$file = wp_remote_get( $src, array(
 							'user-agent' => 'WP-Rocket',
 							'sslverify'  => false,
@@ -147,11 +147,13 @@ function rocket_footer_js_inline( $buffer ) {
 				}
 
 			} else {
-				//Add inline JS to buffer
-				$js_part = $tag->textContent;
+				// Remove any conditional comments for IE that somehow was put in the script tag
+				$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
+				//Minify ?
 				if ( $minify_inline_js ) {
 					$js_part = rocket_minify_inline_js( $js_part );
 				}
+				//Add inline JS to buffer
 				$js .= $js_part;
 			}
 			// For later, if we dont want the tag removed so it get processed below
@@ -167,10 +169,6 @@ function rocket_footer_js_inline( $buffer ) {
 				$js .= ';';
 			}
 			$inline_js .= $tag->textContent;
-		}
-		// Minify?
-		if ( $minify_inline_js && ! empty( $inline_js ) ) {
-			$inline_js = rocket_minify_inline_js( $inline_js );
 		}
 		if ( ! empty( $inline_js ) ) {
 			//Create script tag
