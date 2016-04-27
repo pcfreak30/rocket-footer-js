@@ -27,6 +27,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.1.8 ###
+
+* Web fetch dynamic scripts being defined as not having a JS extension
+* Add regex to remove broken conditional comments out of inline js
+
 ### 1.1.7 ###
 
 * Add constant DONOTMINIFYJS and function is_rocket_post_excluded_option to minify status check
