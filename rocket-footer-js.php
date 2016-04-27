@@ -114,8 +114,8 @@ function rocket_footer_js_inline( $buffer ) {
 				if ( ! in_array( $src, $urls ) ) {
 					// Get host of tag source
 					$src_host = parse_url( $src, PHP_URL_HOST );
-					// Being remote is defined as not having our home url and not being in the CDN list
-					if ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) ) {
+					// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
+					if ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
 						$file = wp_remote_get( $src, array(
 							'user-agent' => 'WP-Rocket',
 							'sslverify'  => false,
