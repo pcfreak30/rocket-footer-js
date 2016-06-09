@@ -20,6 +20,9 @@
  * @return mixed
  */
 function rocket_footer_js_inline( $buffer ) {
+	//Get debug status
+	$disply_errors = ini_get( 'display_errors' );
+	$disply_errors = ! empty( $disply_errors );
 	//Remove filter to override JS minify option
 	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 	// Only run if JS minify is on
@@ -129,7 +132,7 @@ function rocket_footer_js_inline( $buffer ) {
 								), $file['code'] ) )
 						) {
 							// Only log if debug mode is on
-							if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+							if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $disply_errors ) {
 								error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
 							}
 						} else {
@@ -155,8 +158,12 @@ function rocket_footer_js_inline( $buffer ) {
 							}
 							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) );
 						}
-						$js_part = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? $js_part : rocket_minify_inline_js( $js_part );
+						$js_part = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $disply_errors ) ? $js_part : rocket_minify_inline_js( $js_part );
 						$js .= $js_part;
+					}
+					//Debug log URL
+					if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $disply_errors ) {
+						error_log( 'Processed URL: ' . $src );
 					}
 					//Add to array so we don't process again
 					$urls[] = $src;
@@ -167,7 +174,7 @@ function rocket_footer_js_inline( $buffer ) {
 				$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
 				//Minify ?
 				if ( $minify_inline_js ) {
-					$js_part = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? $js_part : rocket_minify_inline_js( $js_part );
+					$js_part = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $disply_errors ) ? $js_part : rocket_minify_inline_js( $js_part );
 				}
 				//Add inline JS to buffer
 				$js .= $js_part;
