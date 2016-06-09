@@ -124,10 +124,10 @@ function rocket_footer_js_inline( $buffer ) {
 							'sslverify'  => false,
 						) );
 						// Catch Error
-						if ( $file instanceof \WP_Error || ( is_array( $file ) && ! in_array( $file['response']['code'], array(
-									200,
-									304
-								) ) )
+						if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
+										200,
+										304
+									) ) ) )
 						) {
 							// Only log if debug mode is on
 							if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) {
