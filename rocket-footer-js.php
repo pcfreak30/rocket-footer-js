@@ -110,6 +110,8 @@ function rocket_footer_js_inline( $buffer ) {
 			}
 			// We have a external script?
 			if ( ! empty( $src ) ) {
+				//Handle no protocol urls
+				$src = rocket_add_url_protocol( $src );
 				//Has it been processed before?
 				if ( ! in_array( $src, $urls ) ) {
 					// Get host of tag source
@@ -120,7 +122,19 @@ function rocket_footer_js_inline( $buffer ) {
 							'user-agent' => 'WP-Rocket',
 							'sslverify'  => false,
 						) );
-						$js .= rocket_minify_inline_js( $file['body'] );
+						// Catch Error
+						if ( $file instanceof \WP_Error || ( is_array( $file ) && ! in_array( array(
+									200,
+									304
+								), $file['code'] ) )
+						) {
+							// Only log if debug mode is on
+							if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+								error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
+							}
+						} else {
+							$js .= rocket_minify_inline_js( $file['body'] );
+						}
 					} else {
 						// Break up url
 						$url_parts         = parse_url( $src );
