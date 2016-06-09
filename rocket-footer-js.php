@@ -133,7 +133,7 @@ function rocket_footer_js_inline( $buffer ) {
 								error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
 							}
 						} else {
-							$js .= rocket_minify_inline_js( $file['body'] );
+							$js .= ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? $file['body'] : rocket_minify_inline_js( $file['body'] );
 						}
 					} else {
 						// Break up url
@@ -146,15 +146,17 @@ function rocket_footer_js_inline( $buffer ) {
 						 * Convert the address to a path, minify, and add to buffer.
 						 */
 						if ( class_exists( 'http\Url' ) ) {
-							$url = new \http\Url( $url_parts );
-							$url = $url->toString();
-							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) ) );
+							$url     = new \http\Url( $url_parts );
+							$url     = $url->toString();
+							$js_part = rocket_footer_get_content( rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) ) );
 						} else {
 							if ( ! function_exists( 'http_build_url' ) ) {
 								require __DIR__ . '/http_build_url.php';
 							}
-							$js .= rocket_minify_inline_js( rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) ) );
+							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) );
 						}
+						$js_part = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? $js_part : rocket_minify_inline_js( $js_part );
+						$js .= $js_part;
 					}
 					//Add to array so we don't process again
 					$urls[] = $src;
@@ -165,7 +167,7 @@ function rocket_footer_js_inline( $buffer ) {
 				$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
 				//Minify ?
 				if ( $minify_inline_js ) {
-					$js_part = rocket_minify_inline_js( $js_part );
+					$js_part = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? $js_part : rocket_minify_inline_js( $js_part );
 				}
 				//Add inline JS to buffer
 				$js .= $js_part;
