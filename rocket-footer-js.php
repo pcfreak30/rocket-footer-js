@@ -138,8 +138,13 @@ function rocket_footer_js_inline( $buffer ) {
 							$js .= $debug ? $file['body'] : rocket_minify_inline_js( $file['body'] );
 						}
 					} else {
+						// Remove query strings
+						$src_file = $src;
+						if ( false !== strpos( $src, '?' ) ) {
+							$src_file = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
+						}
 						// Break up url
-						$url_parts         = parse_url( $src );
+						$url_parts         = parse_url( $src_file );
 						$url_parts['host'] = $domain;
 						/*
 						 * Check and see what version of php-http we have.
@@ -150,7 +155,7 @@ function rocket_footer_js_inline( $buffer ) {
 						if ( class_exists( 'http\Url' ) ) {
 							$url     = new \http\Url( $url_parts );
 							$url     = $url->toString();
-							$js_part = rocket_footer_get_content( rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) ) );
+							$js_part = rocket_footer_get_content( rocket_footer_get_content( str_replace( $home, ABSPATH, $src_file ) ) );
 						} else {
 							if ( ! function_exists( 'http_build_url' ) ) {
 								require __DIR__ . '/http_build_url.php';
