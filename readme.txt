@@ -4,8 +4,8 @@ Contributors: pcfreak30
 Donate link: http://www.paypal.me/pcfreak30
 Tags: optimize, wp-rocket, footer javascript
 Requires at least: 4.2.0
-Tested up to: 4.5.1
-Stable tag: 1.1.8
+Tested up to: 4.5.2
+Stable tag: 1.1.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,14 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 1.1.9 ###
+
+* Catch errors if WP_Error is returned or status code is not 200 or 304 or its empty
+* Log errors if debug mode is enabled or PHP display_errors is enabled
+* Disable minify when debug is on regardless of settings
+* Log processed scripts in debug mode
+* Move query string check to only run for local files
 
 ### 1.1.8 ###
 
