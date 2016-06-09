@@ -23,6 +23,7 @@ function rocket_footer_js_inline( $buffer ) {
 	//Get debug status
 	$display_errors = ini_get( 'display_errors' );
 	$display_errors = ! empty( $display_errors );
+	$debug          = ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors );
 	//Remove filter to override JS minify option
 	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 	// Only run if JS minify is on
@@ -130,11 +131,11 @@ function rocket_footer_js_inline( $buffer ) {
 									) ) ) )
 						) {
 							// Only log if debug mode is on
-							if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) {
+							if ( $debug ) {
 								error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
 							}
 						} else {
-							$js .= ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors ) ? $file['body'] : rocket_minify_inline_js( $file['body'] );
+							$js .= $debug ? $file['body'] : rocket_minify_inline_js( $file['body'] );
 						}
 					} else {
 						// Break up url
@@ -156,7 +157,7 @@ function rocket_footer_js_inline( $buffer ) {
 							}
 							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) );
 						}
-						$js_part = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) ? $js_part : rocket_minify_inline_js( $js_part );
+						$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
 						$js .= $js_part;
 					}
 					//Debug log URL
@@ -172,7 +173,7 @@ function rocket_footer_js_inline( $buffer ) {
 				$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
 				//Minify ?
 				if ( $minify_inline_js ) {
-					$js_part = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) ? $js_part : rocket_minify_inline_js( $js_part );
+					$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
 				}
 				//Add inline JS to buffer
 				$js .= $js_part;
