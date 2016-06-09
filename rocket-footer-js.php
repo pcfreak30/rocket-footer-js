@@ -183,6 +183,9 @@ function rocket_footer_js_inline( $buffer ) {
 				unset( $tags[ $index ] );
 			}
 		}
+		if ( $debug ) {
+			error_log( 'Processed URL list: ' . var_export( $urls, true ) );
+		}
 		$inline_js = '';
 		//Combine all inline tags to one
 		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
