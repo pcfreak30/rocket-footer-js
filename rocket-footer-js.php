@@ -22,7 +22,7 @@
 function rocket_footer_js_inline( $buffer ) {
 	//Get debug status
 	$display_errors = ini_get( 'display_errors' );
-	$display_errors = ! empty( $display_errors );
+	$display_errors = ! empty( $display_errors ) && 'off' !== $display_errors;
 	$debug          = ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors );
 	//Remove filter to override JS minify option
 	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
