@@ -5,7 +5,7 @@ Donate link: http://www.paypal.me/pcfreak30
 Tags: optimize, wp-rocket, footer javascript
 Requires at least: 4.2.0
 Tested up to: 4.5.2
-Stable tag: 1.1.9
+Stable tag: 1.1.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,6 +26,10 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 1.1.10 ###
+
+* Check for off in display_errors
 
 ### 1.1.9 ###
 
