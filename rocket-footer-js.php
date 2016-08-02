@@ -105,7 +105,7 @@ function rocket_footer_js_inline( $buffer ) {
 			$remove = true;
 			$src    = $tag->getAttribute( 'src' );
 			// If the last character is not a semicolon, and we have content,add one to prevent syntax errors
-			if ( ';' != substr( $js, - 1, 1 ) && strlen( $js ) > 0 ) {
+			if ( ! in_array( substr( $js, - 1, 1 ), array( ';', "\n" ) ) && strlen( $js ) > 0 ) {
 				$js .= ';';
 			}
 			//Decode html entities
@@ -163,6 +163,11 @@ function rocket_footer_js_inline( $buffer ) {
 							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) );
 						}
 						$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
+						if ( strpos( $js_part, 'sourceMappingURL' ) !== false ) {
+							$js_part .= "\n";
+						} else {
+							$js_part = trim( $js_part );
+						}
 						$js .= $js_part;
 					}
 					//Debug log URL
