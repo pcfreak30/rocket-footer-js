@@ -37,10 +37,10 @@ function rocket_footer_js_inline( $buffer ) {
 		/** @var DOMNode $body */
 		// Get body tag
 		$body                   = $document->getElementsByTagName( 'body' )->item( 0 );
-		$tags                   = array();
-		$urls                   = array();
-		$variable_tags          = array();
-		$enqueued_variable_tags = array();
+		$tags = [];
+		$urls = [];
+		$variable_tags = [];
+		$enqueued_variable_tags = [];
 		// Get all localized scripts
 		foreach ( array_unique( wp_scripts()->queue ) as $item ) {
 			$data = wp_scripts()->print_extra_script( $item, false );
@@ -51,7 +51,12 @@ function rocket_footer_js_inline( $buffer ) {
 		// Get array list of script DOMElement's. We must build arrays since modifying in-loop does mucky things to the collection and causes items to get lost/skipped.
 		foreach ( $document->getElementsByTagName( 'script' ) as $tag ) {
 			/** @var DOMElement $tag */
-			if ( '1' == $tag->getAttribute( 'data-no-minify' ) ) {
+			if ( '1' == $tag->getAttribute( 'data-no-minify' || in_array( $tag->getAttribute( 'type' ), [
+						'x-tmpl-mustache',
+						'text/x-handlebars-template',
+						'text/template',
+					] ) )
+			) {
 				continue;
 			}
 			if ( in_array( str_replace( "\n", '', $tag->textContent ), $enqueued_variable_tags ) ) {
@@ -120,15 +125,15 @@ function rocket_footer_js_inline( $buffer ) {
 					$src_host = parse_url( $src, PHP_URL_HOST );
 					// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
 					if ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
-						$file = wp_remote_get( $src, array(
+						$file = wp_remote_get( $src, [
 							'user-agent' => 'WP-Rocket',
 							'sslverify'  => false,
-						) );
+						] );
 						// Catch Error
-						if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
+						if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], [
 										200,
-										304
-									) ) ) )
+										304,
+									] ) ) )
 						) {
 							// Only log if debug mode is on
 							if ( $debug ) {
@@ -265,7 +270,7 @@ function rocket_force_js_footer() {
  * */
 function rocket_remove_empty_footer_js() {
 	global $rocket_enqueue_js_in_footer;
-	$items = array();
+	$items = [];
 	foreach ( wp_scripts()->done as $item ) {
 		if ( ! empty( $rocket_enqueue_js_in_footer[ $item ] ) ) {
 			$items[ $item ] = $rocket_enqueue_js_in_footer[ $item ];
