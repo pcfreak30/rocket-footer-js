@@ -27,6 +27,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.1.11 ###
+
+* Check for sourcemaps and add a new line to prevent syntax errors
+
 ### 1.1.10 ###
 
 * Check for off in display_errors
