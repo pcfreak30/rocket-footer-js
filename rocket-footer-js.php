@@ -375,13 +375,33 @@ function rocket_footer_get_content( $file ) {
 	return $direct_filesystem->get_contents( $file );
 }
 
+
+/**
+ * @param $scripts
+ *
+ * @since 1.1.13
+ */
+function rocket_footer_deasync_zxcvbn( $scripts ) {
+
+	/** @var WP_Scripts $scripts */
+	if ( ! empty( $scripts->registered['zxcvbn-async'] ) ) {
+		$scripts->registered['zxcvbn-async']->src   = includes_url( '/js/zxcvbn.min.js' );
+		$scripts->registered['zxcvbn-async']->extra = [];
+	}
+}
+
 /*
  * wp_print_scripts and wp_footer hooks can be used to force enqueue JS in the footer, but may not be compatible with bad plugins that don't register their JS properly. Will remain here for the time that this may improve. DOMDocument parsing will be used until then.
  */
 //add_action( 'wp_print_scripts', 'rocket_force_js_footer' );
 //add_action( 'wp_footer', 'rocket_remove_empty_footer_js', 21 );
 add_action( 'plugins_loaded', 'rocket_footer_js_plugins_loaded' );
+
 add_action( 'init', 'rocket_footer_js_init' );
+if ( ! is_admin() ) {
+	// Ensure zxcvbn is loaded normally, not async so it gets minified
+	add_action( 'wp_default_scripts', 'rocket_footer_deasync_zxcvbn' );
+}
 add_filter( 'rocket_buffer', 'rocket_footer_js_inline', PHP_INT_MAX );
 add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 //Only override JS Minify option of front end
