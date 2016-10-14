@@ -160,7 +160,7 @@ function rocket_footer_js_inline( $buffer ) {
 						if ( class_exists( 'http\Url' ) ) {
 							$url     = new \http\Url( $url_parts );
 							$url     = $url->toString();
-							$js_part = rocket_footer_get_content( rocket_footer_get_content( str_replace( $home, ABSPATH, $src_file ) ) );
+							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) );
 						} else {
 							if ( ! function_exists( 'http_build_url' ) ) {
 								require __DIR__ . '/http_build_url.php';
@@ -217,6 +217,7 @@ function rocket_footer_js_inline( $buffer ) {
 			// Add element to footer
 			$body->appendChild( $inline_tag );
 		}
+
 		rocket_put_content( $filename, $js );
 		$src = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
 		// Create script element
