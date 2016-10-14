@@ -111,7 +111,7 @@ function rocket_footer_js_inline( $buffer ) {
 			$src    = $tag->getAttribute( 'src' );
 			// If the last character is not a semicolon, and we have content,add one to prevent syntax errors
 			if ( ! in_array( substr( $js, - 1, 1 ), [ ';', "\n" ] ) && strlen( $js ) > 0 ) {
-				$js .= ';';
+				$js .= ";\n";
 			}
 			//Decode html entities
 			$src = html_entity_decode( preg_replace( '/((?<!&)#.*;)/', '&$1', $src ) );
