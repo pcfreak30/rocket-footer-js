@@ -51,11 +51,11 @@ function rocket_footer_js_inline( $buffer ) {
 		// Get array list of script DOMElement's. We must build arrays since modifying in-loop does mucky things to the collection and causes items to get lost/skipped.
 		foreach ( $document->getElementsByTagName( 'script' ) as $tag ) {
 			/** @var DOMElement $tag */
-			if ( '1' == $tag->getAttribute( 'data-no-minify' || in_array( $tag->getAttribute( 'type' ), [
-						'x-tmpl-mustache',
-						'text/x-handlebars-template',
-						'text/template',
-					] ) )
+			if ( '1' == $tag->getAttribute( 'data-no-minify' ) || in_array( $tag->getAttribute( 'type' ), [
+					'x-tmpl-mustache',
+					'text/x-handlebars-template',
+					'text/template',
+				] )
 			) {
 				continue;
 			}
