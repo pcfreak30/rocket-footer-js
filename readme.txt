@@ -17,6 +17,8 @@ This is NOT an official addon to WP-Rocket!
 
 This plugin will combine all inline and external JS in the order found on the page and save it to WP-Rocket's cache folder as a new file. All *localized* scripts are excluded and combined to one script, placed before the external script tag.
 
+If you need dedicated/professional assistance with this plugin or just want an expert to get your site to run the fastest it can be, you may hire me at [Codeable](https://codeable.io/developers/derrick-hammer/?ref=rvtGZ)
+
 == Installation ==
 
 This section describes how to install the plugin and get it working.
