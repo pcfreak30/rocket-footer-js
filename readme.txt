@@ -5,7 +5,7 @@ Donate link: http://www.paypal.me/pcfreak30
 Tags: optimize, wp-rocket, footer javascript
 Requires at least: 4.2.0
 Tested up to: 4.6.1
-Stable tag: 1.1.15
+Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
