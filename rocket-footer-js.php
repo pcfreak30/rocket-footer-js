@@ -124,7 +124,7 @@ function rocket_footer_js_inline( $buffer ) {
 					// Get host of tag source
 					$src_host = parse_url( $src, PHP_URL_HOST );
 					// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
-					if ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
+					if ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) && 0 != strpos( $src, '/' ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) {
 						$file = wp_remote_get( $src, [
 							'user-agent' => 'WP-Rocket',
 							'sslverify'  => false,
@@ -318,6 +318,9 @@ function rocket_footer_js_plugins_loaded() {
 	if ( $error ) {
 		deactivate_plugins( basename( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR . basename( __FILE__ ) );
 	}
+	if ( class_exists( 'CWS_PageLinksTo' ) ) {
+		add_action( 'init', 'rocket_footer_js_disable_page_links_to_buffer', 12 );
+	}
 }
 
 /**
@@ -389,6 +392,11 @@ function rocket_footer_deasync_zxcvbn( $scripts ) {
 		$scripts->registered['zxcvbn-async']->src   = includes_url( '/js/zxcvbn.min.js' );
 		$scripts->registered['zxcvbn-async']->extra = [];
 	}
+}
+
+function rocket_footer_js_disable_page_links_to_buffer() {
+	remove_action( 'wp_enqueue_scripts', array( CWS_PageLinksTo::$instance, 'start_buffer' ), - 9999 );
+	remove_action( 'wp_head', array( CWS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
 }
 
 /*
