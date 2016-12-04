@@ -24,8 +24,9 @@ function rocket_footer_js_inline( $buffer ) {
 	$display_errors = ini_get( 'display_errors' );
 	$display_errors = ! empty( $display_errors ) && 'off' !== $display_errors;
 	$debug          = ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors );
-	//Remove filter to override JS minify option
+	//Remove filter to override JS & HTML minify option
 	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
+	remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
 	// Only run if JS minify is on
 	if ( get_rocket_option( 'minify_js' ) && ( ! defined( 'DONOTMINIFYJS' ) || ! DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 		// Import HTML
@@ -37,10 +38,11 @@ function rocket_footer_js_inline( $buffer ) {
 		/** @var DOMNode $body */
 		// Get body tag
 		$body                   = $document->getElementsByTagName( 'body' )->item( 0 );
-		$tags = [];
-		$urls = [];
-		$variable_tags = [];
-		$enqueued_variable_tags = [];
+		$tags = array();
+		$urls = array();
+		$cache_list = array();
+		$variable_tags = array();
+		$enqueued_variable_tags = array();
 		// Get all localized scripts
 		foreach ( array_unique( wp_scripts()->queue ) as $item ) {
 			$data = wp_scripts()->print_extra_script( $item, false );
@@ -65,7 +67,33 @@ function rocket_footer_js_inline( $buffer ) {
 				// Skip ld+json and leave it in the header
 				if ( 'application/ld+json' != $tag->getAttribute( 'type' ) ) {
 					$tags[] = $tag;
+					$src = $tag->getAttribute( 'src' );
+					if ( ! empty( $src ) ) {
+						$cache_list['external'][] = $src;
+					} else if ( ! empty( $tag->textContent ) ) {
+						$cache_list['inline'][] = $tag->textContent;
+					}
 				}
+			}
+		}
+		//Check post cache
+		$post_cache_id_hash = md5( serialize( $cache_list ) );
+		$post_cache_id      = 'wp_rocket_footer_js_script_';
+		if ( is_singular() ) {
+			$post_cache_id .= 'post_' . get_the_ID();
+		} else if ( is_tag() || is_category() || is_tax() ) {
+			$post_cache_id .= 'tax_' . get_queried_object()->term_id;
+		} else if ( is_author() ) {
+			$post_cache_id .= 'author_' . get_the_author_meta( 'ID' );
+		} else {
+			$post_cache_id .= 'generic';
+		}
+		$post_cache_id .= '_' . $post_cache_id_hash;
+		$post_cache = get_transient( $post_cache_id );
+		if ( ! empty( $post_cache ) ) {
+			// Cached file is gone, we dont have cache
+			if ( ! file_exists( $post_cache['filename'] ) ) {
+				$post_cache = false;
 			}
 		}
 		// Get inline minify setting and load JSMin if needed
@@ -78,32 +106,35 @@ function rocket_footer_js_inline( $buffer ) {
 		$home = home_url();
 		// Get our domain
 		$domain = parse_url( $home, PHP_URL_HOST );
-		// Remote fetch external scripts
-		$cdn_domains = get_rocket_cdn_cnames();
-		// Get the hostname for each CDN CNAME
-		foreach ( $cdn_domains as &$cdn_domain ) {
-			$cdn_domain_parts = parse_url( $cdn_domain );
-			$cdn_domain       = $cdn_domain_parts['host'];
-		}
-		// Cleanup
-		unset( $cdn_domain_parts, $cdn_domain );
-		// Get our cache path
-		$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
-		// If we have a user logged in, include user ID in filename to be unique as we may have user only JS content. Otherwise file will be a hash of (minify-global-UNIQUEID).js
-		if ( is_user_logged_in() ) {
-			$filename = $cache_path . md5( 'minify-' . get_current_user_id() . '-' . create_rocket_uniqid() ) . '.js';
-		} else {
-			$filename = $cache_path . md5( 'minify-global' . create_rocket_uniqid() ) . '.js';
-		}
-		// Create cache dir if needed
-		if ( ! is_dir( $cache_path ) ) {
-			rocket_mkdir_p( $cache_path );
+		if ( empty( $post_cache ) ) {
+			// Remote fetch external scripts
+			$cdn_domains = get_rocket_cdn_cnames();
+			// Get the hostname for each CDN CNAME
+			foreach ( $cdn_domains as &$cdn_domain ) {
+				$cdn_domain_parts = parse_url( $cdn_domain );
+				$cdn_domain       = $cdn_domain_parts['host'];
+			}
+			// Cleanup
+			unset( $cdn_domain_parts, $cdn_domain );
+			// Get our post_cache path
+			$cache_path = WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
+			// If we have a user logged in, include user ID in filename to be unique as we may have user only JS content. Otherwise file will be a hash of (minify-global-UNIQUEID).js
+			if ( is_user_logged_in() ) {
+				$filename = $cache_path . md5( 'minify-' . get_current_user_id() . '-' . create_rocket_uniqid() ) . '.js';
+			} else {
+				$filename = $cache_path . md5( 'minify-global' . create_rocket_uniqid() ) . '.js';
+			}
+			// Create post_cache dir if needed
+			if ( ! is_dir( $cache_path ) ) {
+				rocket_mkdir_p( $cache_path );
+			}
 		}
 		/** @var DOMElement $tag */
 		// Remove all elements from DOM
 		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
 			$tag->parentNode->removeChild( $tag );
 		}
+
 		// lets process them scripts!
 		foreach ( $tags as $index => $tag ) {
 			// Remove from array by default
@@ -117,83 +148,115 @@ function rocket_footer_js_inline( $buffer ) {
 			$src = html_entity_decode( preg_replace( '/((?<!&)#.*;)/', '&$1', $src ) );
 			// We have a external script?
 			if ( ! empty( $src ) ) {
-				if ( 0 === strpos( $src, '//' ) ) {
-					//Handle no protocol urls
-					$src = rocket_add_url_protocol( $src );
-				}
-				//Has it been processed before?
-				if ( ! in_array( $src, $urls ) ) {
-					// Get host of tag source
-					$src_host = parse_url( $src, PHP_URL_HOST );
-					// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
-					if ( 0 != strpos( $src, '/' ) && ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) ) {
-						$file = wp_remote_get( $src, [
-							'user-agent' => 'WP-Rocket',
-							'sslverify'  => false,
-						] );
-						// Catch Error
-						if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], [
-										200,
-										304,
-									] ) ) )
-						) {
-							// Only log if debug mode is on
-							if ( $debug ) {
-								error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
+				// Only run if there is no post cache
+				if ( empty( $post_cache ) ) {
+					if ( 0 === strpos( $src, '//' ) ) {
+						//Handle no protocol urls
+						$src = rocket_add_url_protocol( $src );
+					}
+					//Has it been processed before?
+					if ( ! in_array( $src, $urls ) ) {
+						// Get host of tag source
+						$src_host = parse_url( $src, PHP_URL_HOST );
+						// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
+						if ( 0 != strpos( $src, '/' ) && ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) ) {
+							// Check item cache
+							$item_cache_id = md5( $src );
+							$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
+							$item_cache    = get_transient( $item_cache_id );
+							// Only run if there is no item cache
+							if ( empty( $item_cache ) ) {
+								$file = wp_remote_get( $src, [
+									'user-agent' => 'WP-Rocket',
+									'sslverify'  => false,
+								] );
+								// Catch Error
+								if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], [
+												200,
+												304,
+											] ) ) )
+								) {
+									// Only log if debug mode is on
+									if ( $debug ) {
+										error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
+									}
+								} else {
+									$js_part = rocket_minify_inline_js( $file['body'] );
+									set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
+									$js .= $debug ? $file['body'] : rocket_minify_inline_js( $file['body'] );
+								}
+							} else {
+								$js .= $item_cache;
 							}
 						} else {
-							$js .= $debug ? $file['body'] : rocket_minify_inline_js( $file['body'] );
-						}
-					} else {
-						if ( 0 == strpos( $src, '/' ) ) {
-							$src = $home . $src;
-						}
-						// Remove query strings
-						$src_file = $src;
-						if ( false !== strpos( $src, '?' ) ) {
-							$src_file = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
-						}
-						// Break up url
-						$url_parts         = parse_url( $src_file );
-						$url_parts['host'] = $domain;
-						/*
-						 * Check and see what version of php-http we have.
-						 * 1.x uses procedural functions.
-						 * 2.x uses OOP classes with a http namespace.
-						 * Convert the address to a path, minify, and add to buffer.
-						 */
-						if ( class_exists( 'http\Url' ) ) {
-							$url     = new \http\Url( $url_parts );
-							$url     = $url->toString();
-							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) );
-						} else {
-							if ( ! function_exists( 'http_build_url' ) ) {
-								require __DIR__ . '/http_build_url.php';
+							if ( 0 == strpos( $src, '/' ) ) {
+								$src = $home . $src;
 							}
-							$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) );
+							// Check item cache
+							$item_cache_id = md5( $src );
+							$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
+							$item_cache    = get_transient( $item_cache_id );
+							// Only run if there is no item cache
+							if ( empty( $item_cache ) ) {
+								// Remove query strings
+								$src_file = $src;
+								if ( false !== strpos( $src, '?' ) ) {
+									$src_file = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
+								}
+								// Break up url
+								$url_parts         = parse_url( $src_file );
+								$url_parts['host'] = $domain;
+								/*
+								 * Check and see what version of php-http we have.
+								 * 1.x uses procedural functions.
+								 * 2.x uses OOP classes with a http namespace.
+								 * Convert the address to a path, minify, and add to buffer.
+								 */
+								if ( class_exists( 'http\Url' ) ) {
+									$url     = new \http\Url( $url_parts );
+									$url     = $url->toString();
+									$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) );
+								} else {
+									if ( ! function_exists( 'http_build_url' ) ) {
+										require __DIR__ . '/http_build_url.php';
+									}
+									$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, http_build_url( $url_parts ) ) );
+								}
+								$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
+								if ( strpos( $js_part, 'sourceMappingURL' ) !== false ) {
+									$js_part .= "\n";
+								} else {
+									$js_part = trim( $js_part );
+								}
+								$js .= $js_part;
+								set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
+							} else {
+								$js .= $item_cache;
+							}
 						}
-						$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
-						if ( strpos( $js_part, 'sourceMappingURL' ) !== false ) {
-							$js_part .= "\n";
-						} else {
-							$js_part = trim( $js_part );
+						//Debug log URL
+						if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) {
+							error_log( 'Processed URL: ' . $src );
 						}
-						$js .= $js_part;
+						//Add to array so we don't process again
+						$urls[] = $src;
 					}
-					//Debug log URL
-					if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) {
-						error_log( 'Processed URL: ' . $src );
-					}
-					//Add to array so we don't process again
-					$urls[] = $src;
 				}
-
 			} else {
-				// Remove any conditional comments for IE that somehow was put in the script tag
-				$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
-				//Minify ?
-				if ( $minify_inline_js ) {
-					$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
+				// Check item cache
+				$item_cache_id = md5( $tag->textContent );
+				$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
+				$item_cache    = get_transient( $item_cache_id );
+				// Only run if there is no item cache
+				if ( empty( $item_cache ) ) {
+					// Remove any conditional comments for IE that somehow was put in the script tag
+					$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
+					//Minify ?
+					if ( $minify_inline_js ) {
+						$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
+					}
+				} else {
+					$js_part = $item_cache;
 				}
 				//Add inline JS to buffer
 				$js .= $js_part;
@@ -206,6 +269,7 @@ function rocket_footer_js_inline( $buffer ) {
 		if ( $debug ) {
 			error_log( 'Processed URL list: ' . var_export( $urls, true ) );
 		}
+
 		$inline_js = '';
 		//Combine all inline tags to one
 		foreach ( array_merge( $variable_tags, $tags ) as $tag ) {
@@ -213,7 +277,8 @@ function rocket_footer_js_inline( $buffer ) {
 			if ( ';' != substr( $inline_js, - 1, 1 ) && strlen( $inline_js ) > 0 ) {
 				$js .= ';';
 			}
-			$inline_js .= $tag->textContent;
+			// Remove any conditional comments for IE that somehow was put in the script tag
+			$inline_js .= preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
 		}
 		if ( ! empty( $inline_js ) ) {
 			//Create script tag
@@ -222,9 +287,13 @@ function rocket_footer_js_inline( $buffer ) {
 			// Add element to footer
 			$body->appendChild( $inline_tag );
 		}
-
-		rocket_put_content( $filename, $js );
-		$src = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
+		if ( empty( $post_cache ) ) {
+			rocket_put_content( $filename, $js );
+			$src = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
+			set_transient( $post_cache_id, compact( 'src', 'filename' ), get_rocket_purge_cron_interval() );
+		} else {
+			extract( $post_cache );
+		}
 		// Create script element
 		$external_tag = $document->createElement( 'script' );
 		$external_tag->setAttribute( 'type', 'text/javascript' );
@@ -233,6 +302,7 @@ function rocket_footer_js_inline( $buffer ) {
 		$external_tag->setAttribute( 'async', false );
 		// Add element to footer
 		$body->appendChild( $external_tag );
+
 		//Get HTML
 		$buffer = $document->saveHTML();
 		// If HTML minify is on, process it
@@ -404,6 +474,18 @@ function rocket_footer_js_disable_page_links_to_buffer() {
 	remove_action( 'wp_head', array( CWS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
 }
 
+function rocket_footer_js_prune_transients() {
+	global $wpdb;
+	$wpdb->get_results( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", '_transient_wp_rocket_footer_js_script_%', '_transient_timeout_wp_rocket_footer_js_script_%' ) );
+	wp_cache_flush();
+}
+
+function rocket_footer_js_prune_post_transients( $post ) {
+	global $wpdb;
+	$wpdb->get_results( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", "_transient_wp_rocket_footer_js_script_{$post->ID}%", "_transient_timeout_wp_rocket_footer_js_script_{$post->ID}%" ) );
+	wp_cache_flush();
+}
+
 /*
  * wp_print_scripts and wp_footer hooks can be used to force enqueue JS in the footer, but may not be compatible with bad plugins that don't register their JS properly. Will remain here for the time that this may improve. DOMDocument parsing will be used until then.
  */
@@ -421,6 +503,11 @@ add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 //Only override JS Minify option of front end
 if ( ! is_admin() ) {
 	add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
+	add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
 }
+
+
+add_action( 'after_rocket_clean_domain', 'rocket_footer_js_prune_transients' );
+add_action( 'after_rocket_clean_post', 'rocket_footer_js_prune_post_transients' );
 
 register_activation_hook( __FILE__, 'rocket_footer_js_activate' );
