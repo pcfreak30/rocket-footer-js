@@ -29,9 +29,24 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
-### 1.1.15 ###
+### 1.2.0 ###
+
+* Correct/improve relative URL logic
+* Prevent html from being minified before JS to prevent issues with detection
+* Add new minify cache system to reduce computation time required to minify a page
+
+**Notice: This new cache system could cause unknown issues. While it has been tested, not every situation can be accounted for. Contact me if you hit a problem.**
+
+**Notice: Cache is stored in transients, so only a normal wp-rocket purge will clear everything**
+
+### 1.1.16 ###
 
 * Fix logic bug in data-no-minify check
+
+### 1.1.15 ###
+
+* Check for relative URL's
+* Add compatibility support for "Page Links To" since it does naughty things with buffering
 
 ### 1.1.14 ###
 
