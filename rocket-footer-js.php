@@ -53,11 +53,11 @@ function rocket_footer_js_inline( $buffer ) {
 		// Get array list of script DOMElement's. We must build arrays since modifying in-loop does mucky things to the collection and causes items to get lost/skipped.
 		foreach ( $document->getElementsByTagName( 'script' ) as $tag ) {
 			/** @var DOMElement $tag */
-			if ( '1' == $tag->getAttribute( 'data-no-minify' ) || in_array( $tag->getAttribute( 'type' ), [
+			if ( '1' == $tag->getAttribute( 'data-no-minify' ) || in_array( $tag->getAttribute( 'type' ), array(
 					'x-tmpl-mustache',
 					'text/x-handlebars-template',
 					'text/template',
-				] )
+				) )
 			) {
 				continue;
 			}
@@ -141,7 +141,7 @@ function rocket_footer_js_inline( $buffer ) {
 			$remove = true;
 			$src    = $tag->getAttribute( 'src' );
 			// If the last character is not a semicolon, and we have content,add one to prevent syntax errors
-			if ( ! in_array( substr( $js, - 1, 1 ), [ ';', "\n" ] ) && strlen( $js ) > 0 ) {
+			if ( ! in_array( substr( $js, - 1, 1 ), array( ';', "\n" ) ) && strlen( $js ) > 0 ) {
 				$js .= ";\n";
 			}
 			//Decode html entities
@@ -166,15 +166,15 @@ function rocket_footer_js_inline( $buffer ) {
 							$item_cache    = get_transient( $item_cache_id );
 							// Only run if there is no item cache
 							if ( empty( $item_cache ) ) {
-								$file = wp_remote_get( $src, [
+								$file = wp_remote_get( $src, array(
 									'user-agent' => 'WP-Rocket',
 									'sslverify'  => false,
-								] );
+								) );
 								// Catch Error
-								if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], [
+								if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
 												200,
 												304,
-											] ) ) )
+											) ) ) )
 								) {
 									// Only log if debug mode is on
 									if ( $debug ) {
@@ -351,7 +351,7 @@ function rocket_force_js_footer() {
  * */
 function rocket_remove_empty_footer_js() {
 	global $rocket_enqueue_js_in_footer;
-	$items = [];
+	$items = array();
 	foreach ( wp_scripts()->done as $item ) {
 		if ( ! empty( $rocket_enqueue_js_in_footer[ $item ] ) ) {
 			$items[ $item ] = $rocket_enqueue_js_in_footer[ $item ];
@@ -465,7 +465,7 @@ function rocket_footer_deasync_zxcvbn( $scripts ) {
 	/** @var WP_Scripts $scripts */
 	if ( ! empty( $scripts->registered['zxcvbn-async'] ) ) {
 		$scripts->registered['zxcvbn-async']->src   = includes_url( '/js/zxcvbn.min.js' );
-		$scripts->registered['zxcvbn-async']->extra = [];
+		$scripts->registered['zxcvbn-async']->extra = array();
 	}
 }
 
