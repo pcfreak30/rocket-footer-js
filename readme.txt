@@ -29,6 +29,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.2.1 ###
+
+* Tested on WordPress 4.7
+* Ensure PHP 5.3 compatibility
+
 ### 1.2.0 ###
 
 * Correct/improve relative URL logic
