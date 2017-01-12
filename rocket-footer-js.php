@@ -440,6 +440,18 @@ function rocket_footer_js_init() {
 }
 
 /**
+ * Disable minify on AMP pages
+ *
+ * @since 1.2.2
+ *
+ */
+function rocket_footer_js_wp() {
+	if ( defined( 'AMP_QUERY_VAR' ) && function_exists( 'is_amp_endpoint' ) && is_amp_endpoint() ) {
+		remove_filter( 'rocket_buffer', 'rocket_footer_js_inline', PHP_INT_MAX );
+	}
+}
+
+/**
  * @param $file
  *
  * @since 1.0.0
@@ -494,6 +506,7 @@ function rocket_footer_js_prune_post_transients( $post ) {
 add_action( 'plugins_loaded', 'rocket_footer_js_plugins_loaded' );
 
 add_action( 'init', 'rocket_footer_js_init' );
+add_action( 'wp', 'rocket_footer_js_wp' );
 if ( ! is_admin() ) {
 	// Ensure zxcvbn is loaded normally, not async so it gets minified
 	add_action( 'wp_default_scripts', 'rocket_footer_deasync_zxcvbn' );
