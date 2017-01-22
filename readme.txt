@@ -29,6 +29,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.2.3 ###
+
+* Ensure url scheme is set correctly when converting from a CDN domain
+
 ### 1.2.2 ###
 
 * Disable minify on AMP pages
