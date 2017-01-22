@@ -206,6 +206,7 @@ function rocket_footer_js_inline( $buffer ) {
 								// Break up url
 								$url_parts         = parse_url( $src_file );
 								$url_parts['host'] = $domain;
+								$url_parts['scheme'] = is_ssl() ? 'https' : 'http';
 								/*
 								 * Check and see what version of php-http we have.
 								 * 1.x uses procedural functions.
