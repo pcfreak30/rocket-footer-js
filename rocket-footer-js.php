@@ -21,9 +21,7 @@
  */
 function rocket_footer_js_inline( $buffer ) {
 	//Get debug status
-	$display_errors = ini_get( 'display_errors' );
-	$display_errors = ! empty( $display_errors ) && 'off' !== $display_errors;
-	$debug          = ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors );
+	$debug = rocket_footer_js_debug_enabled();
 	//Remove filter to override JS & HTML minify option
 	remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 	remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
@@ -168,25 +166,13 @@ function rocket_footer_js_inline( $buffer ) {
 							$item_cache    = get_transient( $item_cache_id );
 							// Only run if there is no item cache
 							if ( empty( $item_cache ) ) {
-								$file = wp_remote_get( $src, array(
-									'user-agent' => 'WP-Rocket',
-									'sslverify'  => false,
-								) );
+								$file = rocket_footer_js_remote_fetch( $src );
 								// Catch Error
-								if ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
-												200,
-												304,
-											) ) ) )
-								) {
-									// Only log if debug mode is on
-									if ( $debug ) {
-										error_log( 'URL: ' . $src . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
-									}
-								} else {
-									$js_part = rocket_footer_js_process_remote_script( $src, $file['body'], $document, $tags );
+								if ( ! empty( $file ) ) {
+									$js_part = rocket_footer_js_process_remote_script( $src, $file, $document, $tags );
 									$js_part = rocket_minify_inline_js( $js_part );
 									set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
-									$js .= $debug ? $file['body'] : rocket_minify_inline_js( $file['body'] );
+									$js .= $debug ? $js_part : rocket_minify_inline_js( $js_part );
 								}
 							} else {
 								$js .= $item_cache;
@@ -241,7 +227,7 @@ function rocket_footer_js_inline( $buffer ) {
 							}
 						}
 						//Debug log URL
-						if ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || $display_errors ) {
+						if ( rocket_footer_js_debug_enabled( true ) ) {
 							error_log( 'Processed URL: ' . $src );
 						}
 						//Add to array so we don't process again
@@ -318,6 +304,19 @@ function rocket_footer_js_inline( $buffer ) {
 	}
 
 	return $buffer;
+}
+
+/**
+ * @param bool $or
+ *
+ * @return bool
+ */
+function rocket_footer_js_debug_enabled( $or = false ) {
+	$display_errors = ini_get( 'display_errors' );
+	$display_errors = ! empty( $display_errors ) && 'off' !== $display_errors;
+
+	return $or ? ( defined( 'WP_DEBUG' ) || WP_DEBUG || $display_errors ) : ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors );
+
 }
 
 /**
@@ -533,25 +532,54 @@ function rocket_footer_js_process_remote_script( $url, $script, $document, $tags
 			if ( class_exists( 'Rocket_Async_Css' ) && method_exists( 'Rocket_Async_Css', 'minify_remote_file' ) && preg_match( '~\w\.href\s*=\s*"(https://cdn\.jsdelivr\.net/emojione/[\d\.]+/assets/css/emojione\.min\.css)"\s*;~', $script, $matches ) ) {
 				$script = str_replace( $matches[0], '', $script );
 				$style  = rocket_footer_get_content( $rocket_async_css_file );
-				$file   = wp_remote_get( $matches[1], array(
-					'user-agent' => 'WP-Rocket',
-					'sslverify'  => false,
-				) );
+				$file   = rocket_footer_js_remote_fetch( $matches[1] );
 				// Do nothing on error
-				if ( ! ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
-								200,
-								304,
-							) ) ) )
-				)
-				) {
+				if ( ! empty( $file ) ) {
 					$style .= Rocket_Async_Css::get_instance()->minify_remote_file( $url, $file['body'] );
 					rocket_put_content( $rocket_async_css_file, $style );
 				}
 			}
 		}
 	}
+	if ( false !== strpos( parse_url( $url, PHP_URL_HOST ), 'agilecrm' ) && false !== strpos( parse_url( $url, PHP_URL_PATH ), 'agile-min.js' ) ) {
+		if ( preg_match_all( '~_agile_require_js\s*\([\'"](.*)[\'"],\s*function\s*\(\s*\)\s*{(.*)}~s', $script, $matches, PREG_SET_ORDER ) ) {
+			$before_script = '';
+			foreach ( $matches as $match ) {
+				$script = str_replace( $match[0], $match[2], $script );
+				$file   = rocket_footer_js_remote_fetch( $url );
+				if ( ! empty( $file ) ) {
+					$before_script .= $file;
+				}
+			}
+			if ( ! empty( $before_script ) ) {
+				$script = $before_script . $script;
+			}
+		}
+	}
 
 	return apply_filters_ref_array( 'rocket_footer_js_process_remote_script', array( $script, $url, $tags ) );
+}
+
+function rocket_footer_js_remote_fetch( $url ) {
+	$debug = rocket_footer_js_debug_enabled();
+	$file  = wp_remote_get( $url, array(
+		'user-agent' => 'WP-Rocket',
+		'sslverify'  => false,
+	) );
+	if ( ! ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
+					200,
+					304,
+				) ) ) )
+	)
+	) {
+		return $file['body'];
+	} else {
+		if ( $debug ) {
+			error_log( 'URL: ' . $url . ' Status:' . ( $file instanceof \WP_Error ? 'N/A' : $file['code'] ) . ' Error:' . ( $file instanceof \WP_Error ? $file->get_error_message() : 'N/A' ) );
+		}
+
+		return false;
+	}
 }
 
 /**
@@ -563,7 +591,7 @@ function rocket_footer_js_process_remote_script( $url, $script, $document, $tags
  * @return mixed
  */
 function rocket_footer_js_process_local_script( $url, $script, $document, $tags ) {
-	return apply_filters_ref_array( 'rocket_footer_js_process_local_script', array( $script, $url, $tags ) );
+	return apply_filters_ref_array( 'rocket_footer_js_process_local_script', array( $script, $url, $document, $tags ) );
 }
 
 /**
