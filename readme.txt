@@ -29,6 +29,20 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.0 ###
+
+* Auto optimize Tawk.to, WP Rockets lazyload, and google analytics to use normal tags instead of javascript loaders so they can get minified
+* If minify is enabled due to LazyLoadXT or A3_Lazy_Load support, then lazy load facebook, twitter, google plus widgets, and avada google maps (if Avada_GoogleMap exists and google maps is on)
+* Enqueue LazyLoadXT widget extension if lazyload is enabled since lazy load plugins don't supply it
+* Improve lazy load regex patterns
+* Split minify to rocket_footer_js_process_remote_script and rocket_footer_js_process_locate_script functions with associated filters to hook into
+* Minify emojione in tawk.to JS
+* Add hook rocket_footer_js_rewrite_js_loaders to allow pre-processing before minification
+* Add support for avada google maps lazy loading
+* Remove duplicate google maps API scripts and prioritize the first one that has an API key
+* Only lazy load google maps if there is any script content
+* Added function rocket_footer_js_lazyload_script to reduce code duplication
+
 ### 1.2.3 ###
 
 * Ensure url scheme is set correctly when converting from a CDN domain
