@@ -29,6 +29,12 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.1 ###
+
+* Move debug code to rocket_footer_js_debug_enabled function
+* Move web fetch code to rocket_footer_js_remote_fetch function
+* Use rocket_add_url_protocol in rocket_footer_js_rewrite_js_loaders
+
 ### 1.3.0 ###
 
 * Auto optimize Tawk.to, WP Rockets lazyload, and google analytics to use normal tags instead of javascript loaders so they can get minified
