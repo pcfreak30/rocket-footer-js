@@ -332,8 +332,10 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 	$google_maps_tag            = null;
 	$google_maps_script_id      = '';
 	$google_maps_script_content = '';
-	$tags                       = iterator_to_array( $document->getElementsByTagName( 'script' ) );
-	$xpath                      = new DOMXPath( $document );
+
+	$tags  = iterator_to_array( $document->getElementsByTagName( 'script' ) );
+	$xpath = new DOMXPath( $document );
+
 	foreach ( $tags as $index => $tag ) {
 		/** @var DOMElement $tag */
 		$src = $tag->getAttribute( 'src' );
@@ -367,7 +369,9 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 		) {
 			continue;
 		}
-		$src     = $tag->getAttribute( 'src' );
+		$src = $tag->getAttribute( 'src' );
+		$src = rocket_add_url_protocol( $src );
+
 		$content = str_replace( "\n", '', $tag->textContent );
 
 		// Tawk.to
@@ -538,21 +542,6 @@ function rocket_footer_js_process_remote_script( $url, $script, $document, $tags
 					$style .= Rocket_Async_Css::get_instance()->minify_remote_file( $url, $file['body'] );
 					rocket_put_content( $rocket_async_css_file, $style );
 				}
-			}
-		}
-	}
-	if ( false !== strpos( parse_url( $url, PHP_URL_HOST ), 'agilecrm' ) && false !== strpos( parse_url( $url, PHP_URL_PATH ), 'agile-min.js' ) ) {
-		if ( preg_match_all( '~_agile_require_js\s*\([\'"](.*)[\'"],\s*function\s*\(\s*\)\s*{(.*)}~s', $script, $matches, PREG_SET_ORDER ) ) {
-			$before_script = '';
-			foreach ( $matches as $match ) {
-				$script = str_replace( $match[0], $match[2], $script );
-				$file   = rocket_footer_js_remote_fetch( $url );
-				if ( ! empty( $file ) ) {
-					$before_script .= $file;
-				}
-			}
-			if ( ! empty( $before_script ) ) {
-				$script = $before_script . $script;
 			}
 		}
 	}
