@@ -29,6 +29,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.2 ###
+
+* Treat google maps as loading async with a typeof timer and load infobox async if it exists
+* Check document.readyState to run map function in case the window load event already ran
+
 ### 1.3.1 ###
 
 * Move debug code to rocket_footer_js_debug_enabled function
