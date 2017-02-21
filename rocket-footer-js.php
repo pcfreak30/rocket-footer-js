@@ -295,8 +295,18 @@ function rocket_footer_js_inline( $buffer ) {
 		// Add element to footer
 		$body->appendChild( $external_tag );
 
+		// Hack to fix a bug with libxml versions earlier than 2.9.x
+		if ( 1 === version_compare( '2.9.0', LIBXML_DOTTED_VERSION ) ) {
+			$body_class = $body->getAttribute( 'class' );
+			if ( empty( $body_class ) ) {
+				$body->setAttribute( 'class', implode( ' ', get_body_class() ) );
+			}
+		}
+
+
 		//Get HTML
 		$buffer = $document->saveHTML();
+
 		// If HTML minify is on, process it
 		if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
 			$buffer = rocket_minify_html( $buffer );
