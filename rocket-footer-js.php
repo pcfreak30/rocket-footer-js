@@ -56,6 +56,7 @@ function rocket_footer_js_inline( $buffer ) {
 					'x-tmpl-mustache',
 					'text/x-handlebars-template',
 					'text/template',
+					'text/html',
 				) )
 			) {
 				continue;
