@@ -29,6 +29,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.3 ###
+
+* Add compatibility hack for older libxml
+* Skip text/html scripts
+
 ### 1.3.2 ###
 
 * Treat google maps as loading async with a typeof timer and load infobox async if it exists
