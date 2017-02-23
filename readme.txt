@@ -29,6 +29,14 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.4 ###
+
+* Ensure lazy load comments don't get stripped by html minify by using tag markers and doing a regex replacement after minification
+* Improve Twitter regex to support another variation
+* Improve Facebook regex to support another variation
+* Add support for DoubleClick GA
+* Add support for Google Adsense lazy loading
+
 ### 1.3.3 ###
 
 * Add compatibility hack for older libxml
