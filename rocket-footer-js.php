@@ -311,10 +311,19 @@ function rocket_footer_js_inline( $buffer ) {
 		// If HTML minify is on, process it
 		if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
 			$buffer = rocket_minify_html( $buffer );
+			$buffer = preg_replace_callback( '~<WP_ROCKET_FOOTER_JS_LAZYLOAD_START\s*/>(.*)<WP_ROCKET_FOOTER_JS_LAZYLOAD_END\s*/>~s', '_rocket_footer_js_lazyload_html_callback', $buffer );
+			$buffer = preg_replace_callback( '~<WP_ROCKET_FOOTER_JS_LAZYLOAD_START></WP_ROCKET_FOOTER_JS_LAZYLOAD_START>(.*)<WP_ROCKET_FOOTER_JS_LAZYLOAD_END></WP_ROCKET_FOOTER_JS_LAZYLOAD_END>~sU', '_rocket_footer_js_lazyload_html_callback', $buffer );
 		}
 	}
 
 	return $buffer;
+}
+
+/**
+ * @param $matches
+ */
+function _rocket_footer_js_lazyload_html_callback( $matches ) {
+	return '<!-- ' . html_entity_decode( $matches[1] ) . ' -->';
 }
 
 /**
@@ -343,6 +352,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 	$google_maps_tag            = null;
 	$google_maps_script_id      = '';
 	$google_maps_script_content = '';
+	$google_adsense_count       = 0;
 
 	$tags  = iterator_to_array( $document->getElementsByTagName( 'script' ) );
 	$xpath = new DOMXPath( $document );
@@ -417,9 +427,25 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			$tag->parentNode->removeChild( $tag );
 		}
 
+		// Double Click Google Analytics
+		if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{\s*var\s*ga\s*=\s*.*\s\'stats\.g\.doubleclick\.net/dc\.js\'.*s\s*.\s*parentNode\s*.\s*insertBefore\s*\(\s*ga\s*,\s*s\);\s*}\s*\)\s*\(\s*\);~', $content, $matches ) ) {
+			preg_match_all( '~_gaq\s*\.\s*push\s*.*;~U', $content, $gaq_calls );
+			$gaq_calls    = call_user_func_array( 'array_merge', $gaq_calls );
+			$external_tag = $document->createElement( 'script', 'var _gaq = _gaq || [];' . implode( "\n", $gaq_calls ) );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'async', false );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', '//stats.g.doubleclick.net/dc.js' );
+			$external_tag->setAttribute( 'async', false );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$tag->parentNode->removeChild( $tag );
+		}
+
 		if ( $lazy_load ) {
 			// Facebook
-			if ( preg_match( '~\(\s*function\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/sdk\.js#xfbml=(\d)&version=[\w\.\d]+&appId=\d*"\s*;.*\s*\'facebook-jssdk\'\s*\)\);~is', $content, $matches ) ) {
+			if ( preg_match( '~\(\s*function\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/sdk\.js#xfbml=(\d)&version=[\w\.\d]+(?:&appId=\d*)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);~is', $content, $matches ) ) {
 				rocket_footer_js_lazyload_script( $document->saveHTML( $tag ), 'facebook-sdk', $tag, $document );
 				/** @var DOMElement $tag */
 				foreach (
@@ -452,7 +478,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 				}
 			}
 			// Twitter
-			if ( preg_match( '~window\.twttr\s*=\s*\(function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*"script"\s*,\s*"twitter-wjs"\s*\)\);~', $content, $matches ) ) {
+			if ( preg_match( '~(?:window\.twttr\s*=\s*\(|!)function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*"script"\s*,\s*"twitter-wjs"\s*(?:\)\);|\);)~', $content, $matches ) ) {
 				rocket_footer_js_lazyload_script( $document->saveHTML( $tag ), 'twitter-sdk', $tag, $document );
 				/** @var DOMElement $tag */
 				foreach (
@@ -475,8 +501,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 					if ( empty( $google_maps_script_id ) ) {
 						$google_maps_script_id = 'avada_fusion_google_maps';
 					}
-					$sub_content = '';
-					$sub_url     = '';
+					$sub_url = '';
 					/** @var DOMElement $sub_tag */
 					foreach ( $document->getElementsByTagName( 'script' ) as $sub_tag ) {
 						$src = $sub_tag->getAttribute( 'src' );
@@ -502,9 +527,28 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 					}
 				}
 			}
-
+			// Google Adsense
+			if ( 'pagead2.googlesyndication.com' == parse_url( $src, PHP_URL_HOST ) ) {
+				$sub_content = $document->saveHTML( $tag );
+				$next_tag    = $tag->nextSibling;
+				while ( XML_ELEMENT_NODE !== $next_tag->nodeType ) {
+					$next_tag = $next_tag->nextSibling;
+				}
+				$ad_node  = $next_tag;
+				$next_tag = $next_tag->nextSibling;
+				while ( XML_ELEMENT_NODE !== $next_tag->nodeType ) {
+					$next_tag = $next_tag->nextSibling;
+				}
+				$js_node     = $next_tag;
+				$sub_content .= $document->saveHTML( $js_node );
+				rocket_footer_js_lazyload_script( $sub_content, "google-adsense-{$google_adsense_count}", $tag, $document );
+				$js_node->parentNode->removeChild( $js_node );
+				$ad_node->setAttribute( 'data-lazy-widget', "google-adsense-{$google_adsense_count}" );
+				$google_adsense_count ++;
+			}
 		}
 	}
+
 	if ( $lazy_load ) {
 		if ( ! empty( $google_maps_tag ) && ! empty( $google_maps_script_content ) ) {
 			rocket_footer_js_lazyload_script( $document->saveHTML( $google_maps_tag ) . $google_maps_script_content, $google_maps_script_id, $google_maps_tag, $document );
@@ -522,11 +566,18 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
  * @param DOMDocument $document
  */
 function rocket_footer_js_lazyload_script( $html, $id, $tag, $document ) {
-	$comment_tag  = $document->createComment( $html );
-	$external_tag = $document->createElement( 'div' );
+	if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
+		$external_tag = $document->createElement( 'div' );
+		$external_tag->appendChild( $document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_START' ) );
+		$external_tag->appendChild( $document->createTextNode( $html ) );
+		$external_tag->appendChild( $document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_END' ) );
+	} else {
+		$comment_tag  = $document->createComment( $html );
+		$external_tag = $document->createElement( 'div' );
+		$external_tag->appendChild( $comment_tag );
+	}
 	$external_tag->setAttribute( 'id', $id );
 	$tag->parentNode->insertBefore( $external_tag, $tag );
-	$external_tag->appendChild( $comment_tag );
 	$tag->parentNode->removeChild( $tag );
 }
 
