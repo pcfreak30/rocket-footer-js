@@ -2,20 +2,34 @@
 
 Contributors: pcfreak30
 Donate link: http://www.paypal.me/pcfreak30
-Tags: optimize, wp-rocket, footer javascript
+Tags: optimize, wp-rocket, footer javascript, lazy load, async js, async javascript, speed
 Requires at least: 4.2.0
 Tested up to: 4.7
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-WordPress plugin to force all JS to the footer including inline scripts. Depends on WP-Rocket
+WordPress plugin to do a better job with your scripts and improve lazy loading. Depends on WP-Rocket
 
 This is NOT an official addon to WP-Rocket!
 
 == Description ==
 
-This plugin will combine all inline and external JS in the order found on the page and save it to WP-Rocket's cache folder as a new file. All *localized* scripts are excluded and combined to one script, placed before the external script tag.
+Thi plugin will do the following:
+
+* Process all inline and external JS to one file, not multiple, and put at the footer with async on
+* Put all *localized* scripts together before the primary script above
+* Automatically optimize popular 3rd party services including:
+ * Tawk.to
+ * WP Rockets lazyload
+ * Google Analytics
+ * Double Click Google Analytics
+* Automatically lazy load popular widgets if https://wordpress.org/plugins/lazy-load-xt/ or https://wordpress.org/plugins/a3-lazy-load/ are active. Services include:
+ * Google Maps with Avada theme
+ * All Facebook social widgets
+ * All Twitter social widgets
+ * All Google Plus social widgets
+ * All Google Adsense advertisements
 
 If you need dedicated/professional assistance with this plugin or just want an expert to get your site to run the fastest it can be, you may hire me at [Codeable](https://codeable.io/developers/derrick-hammer/?ref=rvtGZ)
 
