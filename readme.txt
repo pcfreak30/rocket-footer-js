@@ -43,6 +43,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.5 ###
+
+* Ensure async attribute is compatible with XHTML
+
 ### 1.3.4 ###
 
 * Ensure lazy load comments don't get stripped by html minify by using tag markers and doing a regex replacement after minification
