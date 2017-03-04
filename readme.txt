@@ -30,6 +30,7 @@ Thi plugin will do the following:
  * All Twitter social widgets
  * All Google Plus social widgets
  * All Google Adsense advertisements
+ * Any iframe
 
 If you need dedicated/professional assistance with this plugin or just want an expert to get your site to run the fastest it can be, you may hire me at [Codeable](https://codeable.io/developers/derrick-hammer/?ref=rvtGZ)
 
@@ -42,6 +43,10 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 1.3.6 ###
+
+* Automatically lazy load iframes if they are not lazy loaded already
 
 ### 1.3.5 ###
 
