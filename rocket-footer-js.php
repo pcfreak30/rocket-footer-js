@@ -553,6 +553,16 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 		if ( ! empty( $google_maps_tag ) && ! empty( $google_maps_script_content ) ) {
 			rocket_footer_js_lazyload_script( $document->saveHTML( $google_maps_tag ) . $google_maps_script_content, $google_maps_script_id, $google_maps_tag, $document );
 		}
+		foreach ( $document->getElementsByTagName( 'iframe' ) as $tag ) {
+			$data_src = $tag->getAttribute( 'data-src' );
+			if ( empty( $data_src ) ) {
+				$src = $tag->getAttribute( 'src' );
+				if ( ! empty( $src ) ) {
+					$tag->setAttribute( 'data-src', $src );
+					$tag->removeAttribute( 'src' );
+				}
+			}
+		}
 	}
 	do_action_ref_array( 'rocket_footer_js_rewrite_js_loaders', $document );
 }
