@@ -170,61 +170,76 @@ function rocket_footer_js_inline( $buffer ) {
 								$file = rocket_footer_js_remote_fetch( $src );
 								// Catch Error
 								if ( ! empty( $file ) ) {
-									$js_part = rocket_footer_js_process_remote_script( $src, $file, $document, $tags );
-									$js_part = rocket_minify_inline_js( $js_part );
-									set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
-									$js .= $debug ? $js_part : rocket_minify_inline_js( $js_part );
+									$js_part_cache = rocket_footer_js_process_remote_script( $src, $file, $document, $tags );
+									$js_part       = $debug ? $js_part_cache : rocket_footer_js_minify( $js_part_cache );;
+									if ( $js_part_cache != $file ) {
+										$js_part_cache = $file;
+										$js_part_cache = $debug ? $js_part_cache : rocket_footer_js_minify( $js_part_cache );
+									} else {
+										$js_part_cache = $js_part;
+									}
+									set_transient( $item_cache_id, $js_part_cache, get_rocket_purge_cron_interval() );
+									$js .= $js_part;
 								}
 							} else {
-								$js .= $item_cache;
+								$js .= rocket_footer_js_process_remote_script( $src, $item_cache, $document, $tags );
 							}
 						} else {
 							if ( 0 == strpos( $src, '/' ) ) {
 								$src = $home . $src;
 							}
+							// Remove query strings
+							$src_file = $src;
+							if ( false !== strpos( $src, '?' ) ) {
+								$src_file = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
+							}
+							// Break up url
+							$url_parts           = parse_url( $src_file );
+							$url_parts['host']   = $domain;
+							$url_parts['scheme'] = is_ssl() ? 'https' : 'http';
+							/*
+							 * Check and see what version of php-http we have.
+							 * 1.x uses procedural functions.
+							 * 2.x uses OOP classes with a http namespace.
+							 * Convert the address to a path, minify, and add to buffer.
+							 */
+							if ( class_exists( 'http\Url' ) ) {
+								$url = new \http\Url( $url_parts );
+								$url = $url->toString();
+							} else {
+								if ( ! function_exists( 'http_build_url' ) ) {
+									require __DIR__ . '/http_build_url.php';
+								}
+								$url = http_build_url( $url_parts );
+							}
+
+
 							// Check item cache
 							$item_cache_id = md5( $src );
 							$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
 							$item_cache    = get_transient( $item_cache_id );
 							// Only run if there is no item cache
 							if ( empty( $item_cache ) ) {
-								// Remove query strings
-								$src_file = $src;
-								if ( false !== strpos( $src, '?' ) ) {
-									$src_file = substr( $src, 0, strpos( $src, strrchr( $src, '?' ) ) );
-								}
-								// Break up url
-								$url_parts           = parse_url( $src_file );
-								$url_parts['host']   = $domain;
-								$url_parts['scheme'] = is_ssl() ? 'https' : 'http';
-								/*
-								 * Check and see what version of php-http we have.
-								 * 1.x uses procedural functions.
-								 * 2.x uses OOP classes with a http namespace.
-								 * Convert the address to a path, minify, and add to buffer.
-								 */
-								if ( class_exists( 'http\Url' ) ) {
-									$url = new \http\Url( $url_parts );
-									$url = $url->toString();
-								} else {
-									if ( ! function_exists( 'http_build_url' ) ) {
-										require __DIR__ . '/http_build_url.php';
-									}
-									$url = http_build_url( $url_parts );
-								}
+								$file          = rocket_footer_js_get_content( str_replace( $home, ABSPATH, $url ) );
+								$js_part_cache = rocket_footer_js_process_local_script( $url, $file, $document, $tags_ref );
+								$js_part       = $js_part_cache;
 
-								$js_part = rocket_footer_get_content( str_replace( $home, ABSPATH, $url ) );
-								$js_part = rocket_footer_js_process_local_script( $url, $js_part, $document, $tags_ref );
-								$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
+								$js_part = $debug ? $js_part : rocket_footer_js_minify( $js_part );
+								if ( $js_part_cache != $file ) {
+									$js_part_cache = $file;
+									$js_part_cache = rocket_footer_js_minify( $js_part_cache );
+								} else {
+									$js_part_cache = $js_part;
+								}
 								if ( strpos( $js_part, 'sourceMappingURL' ) !== false ) {
 									$js_part .= "\n";
 								} else {
 									$js_part = trim( $js_part );
 								}
 								$js .= $js_part;
-								set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
+								set_transient( $item_cache_id, $js_part_cache, get_rocket_purge_cron_interval() );
 							} else {
-								$js .= $item_cache;
+								$js .= rocket_footer_js_process_local_script( $url, $item_cache, $document, $tags_ref );
 							}
 						}
 						//Debug log URL
@@ -246,8 +261,9 @@ function rocket_footer_js_inline( $buffer ) {
 					$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
 					//Minify ?
 					if ( $minify_inline_js ) {
-						$js_part = $debug ? $js_part : rocket_minify_inline_js( $js_part );
+						$js_part = $debug ? $js_part : rocket_footer_js_minify( $js_part );
 					}
+					set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
 				} else {
 					$js_part = $item_cache;
 				}
@@ -663,12 +679,21 @@ function rocket_footer_js_process_remote_script( $url, $script, $document, $tags
 		}
 		if ( ! empty( $rocket_async_css_file ) ) {
 			if ( class_exists( 'Rocket_Async_Css' ) && method_exists( 'Rocket_Async_Css', 'minify_remote_file' ) && preg_match( '~\w\.href\s*=\s*"(https://cdn\.jsdelivr\.net/emojione/[\d\.]+/assets/css/emojione\.min\.css)"\s*;~', $script, $matches ) ) {
-				$script = str_replace( $matches[0], '', $script );
-				$style  = rocket_footer_get_content( $rocket_async_css_file );
-				$file   = rocket_footer_js_remote_fetch( $matches[1] );
-				// Do nothing on error
+				$script        = str_replace( $matches[0], '', $script );
+				$style         = rocket_footer_js_get_content( $rocket_async_css_file );
+				$item_cache_id = md5( $matches[1] );
+				$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
+				$file          = get_transient( $item_cache_id );
+				if ( empty( $file ) ) {
+					$file = rocket_footer_js_remote_fetch( $matches[1] );
+					// Do nothing on error
+					if ( ! empty( $file ) ) {
+						$css_part = Rocket_Async_Css::get_instance()->minify_remote_file( $url, $file );
+						$style    .= $css_part;
+						set_transient( $item_cache_id, $css_part, get_rocket_purge_cron_interval() );
+					}
+				}
 				if ( ! empty( $file ) ) {
-					$style .= Rocket_Async_Css::get_instance()->minify_remote_file( $url, $file['body'] );
 					rocket_put_content( $rocket_async_css_file, $style );
 				}
 			}
@@ -917,12 +942,19 @@ function rocket_footer_js_lazy_load_enabled() {
  *
  * @return bool|string
  */
-function rocket_footer_get_content( $file ) {
+function rocket_footer_js_get_content( $file ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php' );
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php' );
 	$direct_filesystem = new WP_Filesystem_Direct( new StdClass() );
 
 	return $direct_filesystem->get_contents( $file );
+}
+
+function rocket_footer_js_minify( $script ) {
+	$script = rocket_minify_inline_js( $script );
+	$script = preg_replace( '~/\*.*\*/~sU', '', $script );
+
+	return $script;
 }
 
 
@@ -945,7 +977,7 @@ function rocket_footer_deasync_zxcvbn( $scripts ) {
  */
 function rocket_footer_js_disable_page_links_to_buffer() {
 	remove_action( 'wp_enqueue_scripts', array( CWS_PageLinksTo::$instance, 'start_buffer' ), - 9999 );
-	remove_action( 'wp_head', array( CWS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
+	remove_action( 'wp_head', array( CWkeptCommentS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
 }
 
 /**
