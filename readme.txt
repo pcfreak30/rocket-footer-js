@@ -44,6 +44,16 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.8 ###
+
+* Remove comments from js since JSMin doesn't do it by using a new function rocket_footer_js_minify
+* Run rocket_footer_js_process_remote_script and rocket_footer_js_process_local_script when using cached data as well
+* If rocket_footer_js_process_remote_script/rocket_footer_js_process_local_script return a modified script, then use the original in the cache but minified so it gets processed again properly the next request
+* Inline scripts were not getting cached
+* Removed duplicate minify call for remote scripts
+* Cache the tawk.to script
+* Fix tawk.to minify call
+
 ### 1.3.7 ###
 
 * Ensure home uses the active URL scheme
