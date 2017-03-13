@@ -44,6 +44,15 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.7 ###
+
+* Ensure home uses the active URL scheme
+* Pass $tags_ref to rocket_footer_js_process_local_script not $tags
+* Change rocket_footer_js_process_local_script signature to use $tags by reference
+* Add support for Facebook Pixel
+* Add support for Pixel Your Site plugin since it stores the pixel code in its own script
+* Add support for Google Web Fonts JS loader
+
 ### 1.3.6 ###
 
 * Automatically lazy load iframes if they are not lazy loaded already
