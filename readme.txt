@@ -44,6 +44,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.3.9 ###
+
+* Extract and minify GA calls
+
 ### 1.3.8 ###
 
 * Remove comments from js since JSMin doesn't do it by using a new function rocket_footer_js_minify
