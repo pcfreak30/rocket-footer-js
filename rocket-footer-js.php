@@ -431,7 +431,9 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 		}
 		// Google Analytics
 		if ( preg_match( '~\(function\(\s*i\s*\s*,s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*\s*m\)\s*{i\[\'GoogleAnalyticsObject\'\]=r;i\[r\]=i\[r\]\|\|function\(\){.*\'(.*//www.google-analytics.com/analytics.js)\'\s*,\s*\'ga\'\s*\);~', $content, $matches ) ) {
-			$external_tag = $document->createElement( 'script', 'window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;' );
+			preg_match_all( '~ga\s*\(\s*.*\s*\)\s*;~U', $content, $ga_calls );
+			$ga_calls     = call_user_func_array( 'array_merge', $ga_calls );
+			$external_tag = $document->createElement( 'script', 'window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ' . implode( "\n", $ga_calls ) );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$tag->parentNode->insertBefore( $external_tag, $tag );
 			$external_tag = $document->createElement( 'script' );
