@@ -954,7 +954,7 @@ function rocket_footer_js_get_content( $file ) {
 
 function rocket_footer_js_minify( $script ) {
 	$script = rocket_minify_inline_js( $script );
-	$script = preg_replace( '~/\*.*\*/~sU', '', $script );
+	$script = preg_replace( '~/\*!?\s+.*\*/~sU', '', $script );
 
 	return $script;
 }
