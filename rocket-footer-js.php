@@ -10,6 +10,10 @@
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       rocket-footer-js
  */
+
+define( 'ROCKET_FOOTER_JS_TRANSIENT_PREFIX', 'rocket_footer_js_' );
+
+
 /**
  * Main function to combine all inline scripts and external into one file. Excludes "localized" scripts.
  *
@@ -78,18 +82,21 @@ function rocket_footer_js_inline( $buffer ) {
 		}
 		//Check post cache
 		$post_cache_id_hash = md5( serialize( $cache_list ) );
-		$post_cache_id      = 'wp_rocket_footer_js_script_';
+		$post_cache_id      = array();
 		if ( is_singular() ) {
-			$post_cache_id .= 'post_' . get_the_ID();
+			$post_cache_id [] = 'post_' . get_the_ID();
 		} else if ( is_tag() || is_category() || is_tax() ) {
-			$post_cache_id .= 'tax_' . get_queried_object()->term_id;
+			$post_cache_id [] = 'tax_' . get_queried_object()->term_id;
 		} else if ( is_author() ) {
-			$post_cache_id .= 'author_' . get_the_author_meta( 'ID' );
+			$post_cache_id [] = 'author_' . get_the_author_meta( 'ID' );
 		} else {
-			$post_cache_id .= 'generic';
+			$post_cache_id [] = 'generic';
 		}
-		$post_cache_id .= '_' . $post_cache_id_hash;
-		$post_cache    = get_transient( $post_cache_id );
+		$post_cache_id [] = $post_cache_id_hash;
+		if ( is_user_logged_in() ) {
+			$post_cache_id [] = wp_get_current_user()->roles[0];
+		}
+		$post_cache = rocket_footer_js__get_cache_fragment( $post_cache_id );
 		if ( ! empty( $post_cache ) ) {
 			// Cached file is gone, we dont have cache
 			if ( ! file_exists( $post_cache['filename'] ) ) {
@@ -162,9 +169,8 @@ function rocket_footer_js_inline( $buffer ) {
 						// Being remote is defined as not having our home url and not being in the CDN list. However if the file does not have a JS extension, assume its a dynamic script generating JS, so we need to web fetch it.
 						if ( 0 != strpos( $src, '/' ) && ( ( $src_host != $domain && ! in_array( $src_host, $cdn_domains ) ) || 'js' != pathinfo( parse_url( $src, PHP_URL_PATH ), PATHINFO_EXTENSION ) ) ) {
 							// Check item cache
-							$item_cache_id = md5( $src );
-							$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
-							$item_cache    = get_transient( $item_cache_id );
+							$item_cache_id = array( md5( $src ) );
+							$item_cache    = rocket_footer_js__get_cache_fragment( $item_cache_id );
 							// Only run if there is no item cache
 							if ( empty( $item_cache ) ) {
 								$file = rocket_footer_js_remote_fetch( $src );
@@ -178,7 +184,7 @@ function rocket_footer_js_inline( $buffer ) {
 									} else {
 										$js_part_cache = $js_part;
 									}
-									set_transient( $item_cache_id, $js_part_cache, get_rocket_purge_cron_interval() );
+									rocket_footer_js_update_cache_fragment( $item_cache_id, $js_part_cache );
 									$js .= $js_part;
 								}
 							} else {
@@ -215,9 +221,8 @@ function rocket_footer_js_inline( $buffer ) {
 
 
 							// Check item cache
-							$item_cache_id = md5( $src );
-							$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
-							$item_cache    = get_transient( $item_cache_id );
+							$item_cache_id = array( md5( $src ) );
+							$item_cache    = rocket_footer_js__get_cache_fragment( $item_cache_id );
 							// Only run if there is no item cache
 							if ( empty( $item_cache ) ) {
 								$file          = rocket_footer_js_get_content( str_replace( $home, ABSPATH, $url ) );
@@ -237,7 +242,7 @@ function rocket_footer_js_inline( $buffer ) {
 									$js_part = trim( $js_part );
 								}
 								$js .= $js_part;
-								set_transient( $item_cache_id, $js_part_cache, get_rocket_purge_cron_interval() );
+								rocket_footer_js_update_cache_fragment( $item_cache_id, $js_part_cache );
 							} else {
 								$js .= rocket_footer_js_process_local_script( $url, $item_cache, $document, $tags_ref );
 							}
@@ -252,9 +257,8 @@ function rocket_footer_js_inline( $buffer ) {
 				}
 			} else {
 				// Check item cache
-				$item_cache_id = md5( $tag->textContent );
-				$item_cache_id = 'wp_rocket_footer_js_script_' . $item_cache_id;
-				$item_cache    = get_transient( $item_cache_id );
+				$item_cache_id = array( md5( $tag->textContent ) );
+				$item_cache    = rocket_footer_js__get_cache_fragment( $item_cache_id );
 				// Only run if there is no item cache
 				if ( empty( $item_cache ) ) {
 					// Remove any conditional comments for IE that somehow was put in the script tag
@@ -263,7 +267,7 @@ function rocket_footer_js_inline( $buffer ) {
 					if ( $minify_inline_js ) {
 						$js_part = $debug ? $js_part : rocket_footer_js_minify( $js_part );
 					}
-					set_transient( $item_cache_id, $js_part, get_rocket_purge_cron_interval() );
+					rocket_footer_js_update_cache_fragment( $item_cache_id, $js_part );
 				} else {
 					$js_part = $item_cache;
 				}
@@ -819,6 +823,7 @@ function rocket_footer_js_activate() {
 	if ( ! is_plugin_active( 'wp-rocket/wp-rocket.php' ) ) {
 		activate_plugins( 'wp-rocket/wp-rocket.php' );
 	}
+	rocket_footer_js_delete_cache_branch();
 }
 
 /**
@@ -982,22 +987,130 @@ function rocket_footer_js_disable_page_links_to_buffer() {
 	remove_action( 'wp_head', array( CWkeptCommentS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
 }
 
-/**
- *
- */
-function rocket_footer_js_prune_transients() {
-	global $wpdb;
-	$wpdb->get_results( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", '_transient_wp_rocket_footer_js_script_%', '_transient_timeout_wp_rocket_footer_js_script_%' ) );
-	wp_cache_flush();
+function rocket_footer_js__get_cache_fragment( $path ) {
+	if ( ! in_array( 'cache', $path ) ) {
+		array_unshift( $path, 'cache' );
+	}
+
+	return get_transient( ROCKET_FOOTER_JS_TRANSIENT_PREFIX . implode( '_', $path ) );
+}
+
+function rocket_footer_js_delete_cache_branch( $path = array() ) {
+	if ( is_array( $path ) ) {
+		if ( ! empty( $path ) ) {
+			$path = ROCKET_FOOTER_JS_TRANSIENT_PREFIX . implode( '_', $path ) . '_';
+		} else {
+			$path = ROCKET_FOOTER_JS_TRANSIENT_PREFIX;
+		}
+	}
+	$counter_transient = "{$path}cache_count";
+	$counter           = get_transient( $counter_transient );
+
+	if ( is_null( $counter ) || false === $counter ) {
+		delete_transient( rtrim( $path, '_' ) );
+
+		return;
+	}
+	for ( $i = 1; $i <= $counter; $i ++ ) {
+		$transient_name = "{$path}cache_{$i}";
+		$cache          = get_transient( "{$path}cache_{$i}" );
+		if ( ! empty( $cache ) ) {
+			foreach ( $cache as $sub_branch ) {
+				rocket_footer_js_delete_cache_branch( "{$sub_branch}_" );
+			}
+			delete_transient( $transient_name );
+		}
+	}
+	delete_transient( $counter_transient );
+}
+
+function rocket_footer_js_update_cache_fragment( $path, $value ) {
+	if ( ! in_array( 'cache', $path ) ) {
+		array_unshift( $path, 'cache' );
+	}
+	rocket_footer_js_build_cache_tree( array_slice( $path, 0, count( $path ) - 1 ) );
+	rocket_footer_js_update_tree_branch( $path, $value );
+}
+
+function rocket_footer_js_build_cache_tree( $path ) {
+	$levels = count( $path );
+	$expire = get_rocket_purge_cron_interval();
+	for ( $i = 0; $i < $levels; $i ++ ) {
+		$transient_id       = ROCKET_FOOTER_JS_TRANSIENT_PREFIX . implode( '_', array_slice( $path, 0, $i + 1 ) );
+		$transient_cache_id = $transient_id;
+		if ( 'cache' != $path[ $i ] ) {
+			$transient_cache_id .= '_cache';
+		}
+		$transient_cache_id .= '_1';
+		$cache              = get_transient( $transient_cache_id );
+		$transient_value    = array();
+		if ( $i + 1 < $levels ) {
+			$transient_value[] = ROCKET_FOOTER_JS_TRANSIENT_PREFIX . implode( '_', array_slice( $path, 0, $i + 2 ) );
+		}
+		if ( ! is_null( $cache ) && false !== $cache ) {
+			$transient_value = array_unique( array_merge( $cache, $transient_value ) );
+		}
+		set_transient( $transient_cache_id, $transient_value, $expire );
+		$transient_counter_id = $transient_id;
+		if ( 'cache' != $path[ $i ] ) {
+			$transient_counter_id .= '_cache';
+		}
+		$transient_counter_id .= '_count';
+		$transient_counter    = get_transient( $transient_counter_id );
+		if ( is_null( $transient_counter ) || false === $transient_counter ) {
+			set_transient( $transient_counter_id, 1, $expire );
+		}
+	}
+}
+
+function rocket_footer_js_update_tree_branch( $path, $value ) {
+	$branch            = ROCKET_FOOTER_JS_TRANSIENT_PREFIX . implode( '_', $path );
+	$parent_path       = array_slice( $path, 0, count( $path ) - 1 );
+	$parent            = ROCKET_FOOTER_JS_TRANSIENT_PREFIX . implode( '_', $parent_path );
+	$counter_transient = $parent;
+	$cache_transient   = $parent;
+	if ( 'cache' != end( $parent_path ) ) {
+		$counter_transient .= '_cache';
+		$cache_transient   .= '_cache';
+	}
+	$counter_transient .= '_count';
+	$counter           = (int) get_transient( $counter_transient );
+	$cache_transient   .= "_{$counter}";
+	$cache             = get_transient( $cache_transient );
+	$count             = count( $cache );
+	$cache_keys        = array_flip( $cache );
+	$expire            = get_rocket_purge_cron_interval();
+	if ( ! isset( $cache_keys[ $branch ] ) ) {
+		if ( $count >= apply_filters( 'rocket_footer_js_max_branch_length', 50 ) ) {
+			$counter ++;
+			set_transient( $counter_transient, $counter, $expire );
+			$cache_transient = $parent;
+			if ( 'cache' != end( $parent_path ) ) {
+				$cache_transient .= '_cache';
+			}
+			$cache_transient .= "_{$counter}";
+			$cache           = array();
+		}
+		$cache[] = $branch;
+		set_transient( $cache_transient, $cache, $expire );
+	}
+	set_transient( $branch, $value, $expire );
 }
 
 /**
  * @param $post
  */
 function rocket_footer_js_prune_post_transients( $post ) {
-	global $wpdb;
-	$wpdb->get_results( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s", "_transient_wp_rocket_footer_js_script_{$post->ID}%", "_transient_timeout_wp_rocket_footer_js_script_{$post->ID}%" ) );
-	wp_cache_flush();
+	rocket_footer_js_delete_cache_branch( array( 'cache', "post_{$post->ID}" ) );
+}
+
+function rocket_footer_js_prune_term_transients( $term ) {
+	rocket_footer_js_delete_cache_branch( array( 'cache', "term_{$term->term_id}" ) );
+}
+
+function rocket_footer_js_prune_url_transients( $url ) {
+	$url = md5( $url );
+	rocket_footer_js_delete_cache_branch( array( 'cache', "url_{$url}" ) );
 }
 
 /*
@@ -1022,7 +1135,10 @@ if ( ! is_admin() ) {
 }
 
 
-add_action( 'after_rocket_clean_domain', 'rocket_footer_js_prune_transients' );
+add_action( 'after_rocket_clean_domain', 'rocket_footer_js_delete_cache_branch', 10, 0 );
 add_action( 'after_rocket_clean_post', 'rocket_footer_js_prune_post_transients' );
+add_action( 'after_rocket_clean_term', 'rocket_footer_js_prune_term_transients' );
+add_action( 'after_rocket_clean_files', 'rocket_footer_js_prune_url_transients' );
 
 register_activation_hook( __FILE__, 'rocket_footer_js_activate' );
+register_deactivation_hook( __FILE__, 'rocket_footer_js_delete_cache_branch', 10, 0 );
