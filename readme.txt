@@ -44,6 +44,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.4.0 ###
+
+* Improve multi-line comment regex
+* Rebuild cache system without using SQL
+
 ### 1.3.9 ###
 
 * Extract and minify GA calls
