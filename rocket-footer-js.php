@@ -513,6 +513,15 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 
 			$tag->parentNode->removeChild( $tag );
 		}
+		// Sumo Me
+		if ( 'load.sumome.com' == parse_url( $src, PHP_URL_HOST ) && '' != $tag->getAttribute( 'data-sumo-site-id' ) ) {
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', $src );
+			$tag->removeAttribute( 'src' );
+			$tag->setAttribute( 'data-no-minify', '1' );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+		}
 		if ( $lazy_load ) {
 			// Facebook
 			if ( preg_match( '~\(\s*function\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/sdk\.js#xfbml=(\d)&version=[\w\.\d]+(?:&appId=\d*)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);~is', $content, $matches ) ) {
