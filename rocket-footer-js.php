@@ -858,6 +858,10 @@ function rocket_footer_js_plugins_loaded() {
 	if ( class_exists( 'CWS_PageLinksTo' ) ) {
 		add_action( 'init', 'rocket_footer_js_disable_page_links_to_buffer', 12 );
 	}
+	if ( class_exists( 'N2Pluggable' ) ) {
+		N2Pluggable::addAction( 'systemglobal', 'rocket_footer_js_n2pluggable_disable' );
+		N2Settings::init();
+	}
 }
 
 /**
@@ -1122,6 +1126,20 @@ function rocket_footer_js_prune_url_transients( $url ) {
 	rocket_footer_js_delete_cache_branch( array( 'cache', "url_{$url}" ) );
 }
 
+function rocket_footer_js_n2pluggable_disable( $referenceKey, &$rows ) {
+	foreach ( array_keys( $rows ) as $key ) {
+		if ( in_array( $rows[ $key ]['referencekey'], array(
+			'async',
+			'combine-js',
+			'minify-js',
+			'protocol-relative',
+			'curl',
+		) ) ) {
+			$rows[ $key ]['value'] = 0;
+		}
+	}
+}
+
 /*
  * wp_print_scripts and wp_footer hooks can be used to force enqueue JS in the footer, but may not be compatible with bad plugins that don't register their JS properly. Will remain here for the time that this may improve. DOMDocument parsing will be used until then.
  */
@@ -1148,6 +1166,5 @@ add_action( 'after_rocket_clean_domain', 'rocket_footer_js_delete_cache_branch',
 add_action( 'after_rocket_clean_post', 'rocket_footer_js_prune_post_transients' );
 add_action( 'after_rocket_clean_term', 'rocket_footer_js_prune_term_transients' );
 add_action( 'after_rocket_clean_files', 'rocket_footer_js_prune_url_transients' );
-
 register_activation_hook( __FILE__, 'rocket_footer_js_activate' );
 register_deactivation_hook( __FILE__, 'rocket_footer_js_delete_cache_branch', 10, 0 );
