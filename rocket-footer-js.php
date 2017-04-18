@@ -434,7 +434,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			$tag->parentNode->removeChild( $tag );
 		}
 		// Google Analytics
-		if ( preg_match( '~\(function\(\s*i\s*\s*,s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*\s*m\)\s*{i\[\'GoogleAnalyticsObject\'\]=r;i\[r\]=i\[r\]\|\|function\(\){.*\'(.*//www.google-analytics.com/analytics.js)\'\s*,\s*\'ga\'\s*\);~', $content, $matches ) ) {
+		if ( preg_match( '~\\(function\s*\(\s*i\s*,\s*s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*m\s*\)\s*{\s*i\[\'GoogleAnalyticsObject\'\]\s*=\s*r;\s*i\[r\]\s*=\s*i\[r\]\s*\|\|\s*function\s*\(\)\s*\{.*\'(.*//(?:www\.)?google-analytics\.com/analytics\.js)\'\s*,\s*\'ga\'\s*\);~', $content, $matches ) ) {
 			preg_match_all( '~ga\s*\(\s*.*\s*\)\s*;~U', $content, $ga_calls );
 			$ga_calls     = call_user_func_array( 'array_merge', $ga_calls );
 			$external_tag = $document->createElement( 'script', 'window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ' . implode( "\n", $ga_calls ) );
@@ -906,6 +906,14 @@ function rocket_footer_js_init() {
 	if ( rocket_footer_js_lazy_load_enabled() ) {
 		add_action( 'wp_enqueue_scripts', 'rocket_footer_js_scripts' );
 	}
+	if ( class_exists( 'Ga_Helper' ) ) {
+		if ( ! is_admin() ) {
+			remove_action( 'wp_footer', 'Ga_Frontend::insert_ga_script' );
+			if ( Ga_Helper::can_add_ga_code() || Ga_Helper::is_all_feature_disabled() ) {
+				add_action( 'wp_enqueue_scripts', 'rocket_footer_js_googleanalytics_enqueue' );
+			}
+		}
+	}
 }
 
 /**
@@ -1140,6 +1148,19 @@ function rocket_footer_js_n2pluggable_disable( $referenceKey, &$rows ) {
 	}
 }
 
+function rocket_footer_js_googleanalytics_enqueue() {
+	$web_property_id = Ga_Frontend::get_web_property_id();
+	if ( Ga_Helper::should_load_ga_javascript( $web_property_id ) ) {
+		$javascript = Ga_View_Core::load( 'ga_code', array(
+			'data' => array(
+				Ga_Admin::GA_WEB_PROPERTY_ID_OPTION_NAME => $web_property_id,
+			),
+		), true );
+		$javascript = strip_tags( $javascript );
+		wp_add_inline_script( 'jquery-core', $javascript );
+	}
+}
+
 /*
  * wp_print_scripts and wp_footer hooks can be used to force enqueue JS in the footer, but may not be compatible with bad plugins that don't register their JS properly. Will remain here for the time that this may improve. DOMDocument parsing will be used until then.
  */
@@ -1147,7 +1168,7 @@ function rocket_footer_js_n2pluggable_disable( $referenceKey, &$rows ) {
 //add_action( 'wp_footer', 'rocket_remove_empty_footer_js', 21 );
 add_action( 'plugins_loaded', 'rocket_footer_js_plugins_loaded' );
 
-add_action( 'init', 'rocket_footer_js_init' );
+add_action( 'init', 'rocket_footer_js_init', 11 );
 add_action( 'wp', 'rocket_footer_js_wp' );
 if ( ! is_admin() ) {
 	// Ensure zxcvbn is loaded normally, not async so it gets minified
