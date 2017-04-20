@@ -15,7 +15,7 @@ This is NOT an official addon to WP-Rocket!
 
 == Description ==
 
-Thi plugin will do the following:
+This plugin will do the following:
 
 * Process all inline and external JS to one file, not multiple, and put at the footer with async on
 * Put all *localized* scripts together before the primary script above
@@ -43,6 +43,16 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 1.4.2 ###
+* Improve UTF-8 character handling
+* Add support for googleanalytics plugin
+* Improve GA regex
+* Add compatibility with N2Extend framework
+
+### 1.4.1 ###
+
+* Add support for Sumo Me
 
 ### 1.4.0 ###
 
