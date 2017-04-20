@@ -33,7 +33,7 @@ function rocket_footer_js_inline( $buffer ) {
 	if ( get_rocket_option( 'minify_js' ) && ( ! defined( 'DONOTMINIFYJS' ) || ! DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 		// Import HTML
 		$document = new DOMDocument();
-		if ( ! @$document->loadHTML( $buffer ) ) {
+		if ( ! @$document->loadHTML( mb_convert_encoding( $buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
 			return $buffer;
 		}
 		rocket_footer_js_rewrite_js_loaders( $document );
