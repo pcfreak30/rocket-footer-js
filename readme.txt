@@ -45,6 +45,9 @@ This section describes how to install the plugin and get it working.
 == Changelog ==
 
 ### 1.4.2 ###
+* Update Page Links To compatibility
+
+### 1.4.2 ###
 * Improve UTF-8 character handling
 * Add support for googleanalytics plugin
 * Improve GA regex
