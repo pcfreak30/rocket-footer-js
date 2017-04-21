@@ -1005,7 +1005,7 @@ function rocket_footer_deasync_zxcvbn( $scripts ) {
  */
 function rocket_footer_js_disable_page_links_to_buffer() {
 	remove_action( 'wp_enqueue_scripts', array( CWS_PageLinksTo::$instance, 'start_buffer' ), - 9999 );
-	remove_action( 'wp_head', array( CWkeptCommentS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
+	remove_action( 'wp_head', array( CWS_PageLinksTo::$instance, 'end_buffer' ), 9999 );
 }
 
 function rocket_footer_js__get_cache_fragment( $path ) {
