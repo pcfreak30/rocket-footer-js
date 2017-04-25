@@ -24,6 +24,7 @@ This plugin will do the following:
  * WP Rockets lazyload
  * Google Analytics
  * Double Click Google Analytics
+ * Avvo.com Tracking
 * Automatically lazy load popular widgets if https://wordpress.org/plugins/lazy-load-xt/ or https://wordpress.org/plugins/a3-lazy-load/ are active. Services include:
  * Google Maps with Avada theme
  * All Facebook social widgets
@@ -44,7 +45,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
-### 1.4.2 ###
+### 1.4.4 ###
+* Add support for Avvo.com tracking
+* Ensure zxcvbn password meter is not changed on login and signup pages
+
+### 1.4.3 ###
 * Update Page Links To compatibility
 
 ### 1.4.2 ###
