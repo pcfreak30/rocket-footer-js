@@ -1180,7 +1180,7 @@ add_action( 'plugins_loaded', 'rocket_footer_js_plugins_loaded' );
 
 add_action( 'init', 'rocket_footer_js_init', 11 );
 add_action( 'wp', 'rocket_footer_js_wp' );
-if ( ! is_admin() ) {
+if ( ! is_admin() && ! in_array( $pagenow, array( 'wp-login.php', 'wp-signup.php' ) ) ) {
 	// Ensure zxcvbn is loaded normally, not async so it gets minified
 	add_action( 'wp_default_scripts', 'rocket_footer_deasync_zxcvbn' );
 }
