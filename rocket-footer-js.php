@@ -522,6 +522,16 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			$tag->setAttribute( 'data-no-minify', '1' );
 			$tag->parentNode->insertBefore( $external_tag, $tag );
 		}
+
+		// Avvo Tracking
+		if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{\s*setTimeout\s*\(\s*function\s*\(\s*\){\s*var\s*s\s*=\s*.*s\s*\.\s*src="((?:https?:)?//ia\s*.avvo\s*.com/tracker/\w+.js)".*}\s*\)\s*\(\s*\)\s*;~s', $content, $matches ) ) {
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', "{$matches[1]}" );
+			$external_tag->setAttribute( 'async', false );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$tag->parentNode->removeChild( $tag );
+		}
 		if ( $lazy_load ) {
 			// Facebook
 			if ( preg_match( '~\(\s*function\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/sdk\.js#xfbml=(\d)&version=[\w\.\d]+(?:&appId=\d*)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);~is', $content, $matches ) ) {
