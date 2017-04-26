@@ -464,33 +464,45 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 		}
 		// Facebook Pixel
 		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'(https://connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $content, $matches ) ) {
-			preg_match_all( '~fbq\s*\(\s*.*\s*\)\s*;~U', $content, $fbq_calls );
-			$fbq_calls    = call_user_func_array( 'array_merge', $fbq_calls );
-			$external_tag = $document->createElement( 'script', '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' . implode( "\n", $fbq_calls ) );
-			$external_tag->setAttribute( 'type', 'text/javascript' );
-			$tag->parentNode->insertBefore( $external_tag, $tag );
-			$external_tag = $document->createElement( 'script' );
-			$external_tag->setAttribute( 'type', 'text/javascript' );
-			$external_tag->setAttribute( 'src', $matches[1] );
-			$external_tag->setAttribute( 'async', false );
-			$tag->parentNode->insertBefore( $external_tag, $tag );
-			$external_tag = $document->createElement( 'script' );
-			$external_tag->setAttribute( 'type', 'text/javascript' );
-			$external_tag->setAttribute( 'src', str_replace( 'fbevents.js', 'fbevents.plugins.identity.js', $matches[1] ) );
-			$external_tag->setAttribute( 'async', false );
-			$tag->parentNode->insertBefore( $external_tag, $tag );
-
-			$content = str_replace( $matches[0], '', $content );
+			preg_match_all( '~fbq\s*\(\s*(.*)\s*,\s*(.*)\s*\)\s*;~U', $content, $fbq_calls, PREG_SET_ORDER );
 			foreach ( $fbq_calls as $fbq_call ) {
-				$content = str_replace( $fbq_call, '', $content );
+				if ( ! empty( $fbq_call[1] ) && 'init' == trim( $fbq_call[1], "'" ) ) {
+					$pixel_id = $fbq_call[2];
+				}
 			}
-			$content = trim( $content );
-			if ( ! empty( $content ) ) {
-				$external_tag = $document->createElement( 'script', $content );
+			if ( ! empty( $pixel_id ) ) {
+				$fbq_calls    = call_user_func_array( 'array_merge', $fbq_calls );
+				$external_tag = $document->createElement( 'script', '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.disableConfigLoading=!0;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' . implode( "\n", $fbq_calls ) );
 				$external_tag->setAttribute( 'type', 'text/javascript' );
 				$tag->parentNode->insertBefore( $external_tag, $tag );
+				$external_tag = $document->createElement( 'script' );
+				$external_tag->setAttribute( 'type', 'text/javascript' );
+				$external_tag->setAttribute( 'src', $matches[1] );
+				$external_tag->setAttribute( 'async', false );
+				$tag->parentNode->insertBefore( $external_tag, $tag );
+				$external_tag = $document->createElement( 'script', 'fbq.registerPlugin("config:"+' . $pixel_id . ', {__fbEventsPlugin: 1,plugin: function(f, i){i.configLoaded(' . $pixel_id . ');}});' );
+				$external_tag->setAttribute( 'type', 'text/javascript' );
+				$tag->parentNode->insertBefore( $external_tag, $tag );
+
+				$external_tag = $document->createElement( 'script' );
+				$external_tag->setAttribute( 'type', 'text/javascript' );
+				$external_tag->setAttribute( 'src', str_replace( 'fbevents.js', 'fbevents.plugins.identity.js', $matches[1] ) );
+				$external_tag->setAttribute( 'async', false );
+				$tag->parentNode->insertBefore( $external_tag, $tag );
+
+				$content = str_replace( $matches[0], '', $content );
+				foreach ( $fbq_calls as $fbq_call ) {
+					$content = str_replace( $fbq_call, '', $content );
+				}
+				$content = trim( $content );
+				if ( ! empty( $content ) ) {
+					$external_tag = $document->createElement( 'script', $content );
+					$external_tag->setAttribute( 'type', 'text/javascript' );
+					$tag->parentNode->insertBefore( $external_tag, $tag );
+				}
+				$tag->parentNode->removeChild( $tag );
 			}
-			$tag->parentNode->removeChild( $tag );
+
 		}
 
 		// Google Web Fonts
@@ -762,13 +774,16 @@ function rocket_footer_js_process_local_script( $url, $script, $document, &$tags
 	// Extract Facebook Pixel from "Pixel Your Site" plugin
 	if ( function_exists( 'pys_free_init' ) && set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite/js/public.js' ) == $url ) {
 		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'(https://connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $script, $matches ) ) {
-			$external_tag = $document->createElement( 'script', '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' );
+			$external_tag = $document->createElement( 'script', '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.disableConfigLoading=!0;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$tags[]       = $external_tag;
 			$external_tag = $document->createElement( 'script' );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$external_tag->setAttribute( 'src', $matches[1] );
 			$external_tag->setAttribute( 'async', false );
+			$tags[]       = $external_tag;
+			$external_tag = $document->createElement( 'script', 'fbq.registerPlugin("config" + pys_events.name, {__fbEventsPlugin: 1,plugin: function(f, i){i.configLoaded(pys_events.name);}});' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$tags[]       = $external_tag;
 			$external_tag = $document->createElement( 'script' );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
