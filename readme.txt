@@ -45,6 +45,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.4.5 ###
+
+* Improve facebook pixel support to prevent possible runtime errors
+
 ### 1.4.4 ###
 * Add support for Avvo.com tracking
 * Ensure zxcvbn password meter is not changed on login and signup pages
