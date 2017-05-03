@@ -366,16 +366,23 @@ function rocket_footer_js_debug_enabled( $or = false ) {
  *
  * @param DOMDocument $document
  */
-function rocket_footer_js_rewrite_js_loaders( &$document ) {
+function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = null ) {
 	$lazy_load                  = rocket_footer_js_lazy_load_enabled();
 	$google_maps_instances      = array();
 	$google_maps_tag            = null;
 	$google_maps_script_id      = '';
 	$google_maps_script_content = '';
 	$google_adsense_count       = 0;
+	$amazon_ads_count           = 0;
+	$facebook_sdk_loaded        = false;
+	static $vshare_counter = 0;
+
+	if ( empty( $content_document ) ) {
+		$content_document = $document;
+	}
 
 	$tags  = iterator_to_array( $document->getElementsByTagName( 'script' ) );
-	$xpath = new DOMXPath( $document );
+	$xpath = new DOMXPath( $content_document );
 
 	foreach ( $tags as $index => $tag ) {
 		/** @var DOMElement $tag */
@@ -413,7 +420,9 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 		$src = $tag->getAttribute( 'src' );
 		$src = rocket_add_url_protocol( $src );
 
-		$content = str_replace( "\n", '', $tag->textContent );
+		$content          = str_replace( "\n", '', $tag->textContent );
+		$content          = str_replace( "\r", '', $content );
+		$content          = trim( $content, '/' );
 
 		// Tawk.to
 		if ( preg_match( '~var\s*Tawk_API\s*=\s*Tawk_API.*s1.src\s*=\s*\'(.*)\';.*s0\.parentNode\.insertBefore\(s1,s0\);\s*}\s*\)\(\);~sU', $content, $matches ) ) {
@@ -434,9 +443,12 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			$tag->parentNode->removeChild( $tag );
 		}
 		// Google Analytics
-		if ( preg_match( '~\\(function\s*\(\s*i\s*,\s*s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*m\s*\)\s*{\s*i\[\'GoogleAnalyticsObject\'\]\s*=\s*r;\s*i\[r\]\s*=\s*i\[r\]\s*\|\|\s*function\s*\(\)\s*\{.*\'(.*//(?:www\.)?google-analytics\.com/analytics\.js)\'\s*,\s*\'ga\'\s*\);~', $content, $matches ) ) {
+		if ( preg_match( '~\\(function\s*\(\s*i\s*,\s*s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*m\s*\)\s*{\s*i\[\'GoogleAnalyticsObject\'\]\s*=\s*r;\s*i\[r\]\s*=\s*i\[r\]\s*\|\|\s*function\s*\(\)\s*\{.*\'(.*//(?:www\.)?google-analytics\.com/analytics\.js)\'\s*,\s*\'ga\'\s*\);~', $content, $matches ) || preg_match( '~\(function\s*\(\s*\) {\s*var\s*ga\s*=\s*document\s*\.\s*createElement.*\.google-analytics\.com/ga\.js.*\}\s*\)\s*\(\s*\);~', $content, $matches ) ) {
 			preg_match_all( '~ga\s*\(\s*.*\s*\)\s*;~U', $content, $ga_calls );
-			$ga_calls     = call_user_func_array( 'array_merge', $ga_calls );
+			$ga_calls = call_user_func_array( 'array_merge', $ga_calls );
+			if ( empty( $matches[1] ) ) {
+				$matches[1] = ( is_ssl() ? 'https://ssl' : 'http://www' ) . '.google-analytics.com/ga.js';
+			}
 			$external_tag = $document->createElement( 'script', 'window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ' . implode( "\n", $ga_calls ) );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$tag->parentNode->insertBefore( $external_tag, $tag );
@@ -463,12 +475,13 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			$tag->parentNode->removeChild( $tag );
 		}
 		// Facebook Pixel
-		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'(https://connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $content, $matches ) ) {
+		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'((?:https?:)?//connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $content, $matches ) ) {
 			preg_match_all( '~fbq\s*\(\s*(.*)\s*,\s*(.*)\s*\)\s*;~U', $content, $fbq_calls, PREG_SET_ORDER );
-			foreach ( $fbq_calls as $fbq_call ) {
+			foreach ( $fbq_calls as $index => $fbq_call ) {
 				if ( ! empty( $fbq_call[1] ) && 'init' == trim( $fbq_call[1], "'" ) ) {
 					$pixel_id = $fbq_call[2];
 				}
+				$fbq_calls[ $index ] = array( $fbq_call[0] );
 			}
 			if ( ! empty( $pixel_id ) ) {
 				$fbq_calls    = call_user_func_array( 'array_merge', $fbq_calls );
@@ -544,43 +557,114 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			$tag->parentNode->insertBefore( $external_tag, $tag );
 			$tag->parentNode->removeChild( $tag );
 		}
+		// Pushcrew Tracking
+		if ( preg_match( '~\!?\(\s*function\s*\(\s*p\s*,\s*u\s*,\s*s\s*,\s*h\s*\)\{\s*.*\'((?:https?:)?//cdn\.pushcrew\.com/js/\w+\.js)\'.*\}\s*\)\s*\(\s*window\s*,\s*document\s*\);~s', $content, $matches ) ) {
+			$external_tag = $document->createElement( 'script', "(function(p,u){p._pcq=p._pcq||[];p._pcq.push(['_currentTime',Date.now()]);})(window);" );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', "{$matches[1]}" );
+			$external_tag->setAttribute( 'async', false );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$tag->parentNode->removeChild( $tag );
+		}
 		if ( $lazy_load ) {
 			// Facebook
-			if ( preg_match( '~\(\s*function\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/sdk\.js#xfbml=(\d)&version=[\w\.\d]+(?:&appId=\d*)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);~is', $content, $matches ) ) {
-				rocket_footer_js_lazyload_script( $document->saveHTML( $tag ), 'facebook-sdk', $tag, $document );
-				/** @var DOMElement $tag */
-				foreach (
-					array(
-						'fb-page',
-						'fb-like',
-						'fb-quote',
-						'fb-send',
-						'fb-share-button',
-						'fb-follow',
-						'fb-video',
-						'fb-post',
-						'fb-comment-embed',
-						'fb-comments',
-					) as $class
-				) {
-					foreach ( $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " ' . $class . ' ")]' ) as $tag ) {
-						$tag->setAttribute( 'data-lazy-widget', 'facebook-sdk' );
+			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js#(?:xfbml=\d|(?:version=[\w\.\d]+)|(?:&appId=\d*)&?)+"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
+				if ( ! $facebook_sdk_loaded ) {
+					$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
+					$tag_content = str_replace( "\r", '', $tag_content );
+					$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
+						'<script>',
+						'</script>',
+					), $tag_content );
+					rocket_footer_js_lazyload_script( $tag_content, 'facebook-sdk', $tag, $document, $content_document );
+					/** @var DOMElement $tag */
+					foreach (
+						array(
+							'fb-page',
+							'fb-like',
+							'fb-quote',
+							'fb-send',
+							'fb-share-button',
+							'fb-follow',
+							'fb-video',
+							'fb-post',
+							'fb-comment-embed',
+							'fb-comments',
+						) as $class
+					) {
+						foreach ( $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " ' . $class . ' ")]' ) as $tag ) {
+							$tag->setAttribute( 'data-lazy-widget', 'facebook-sdk' );
+						}
 					}
+					$facebook_sdk_loaded = true;
+				} else {
+					$tag->parentNode->removeChild( $tag );
 				}
 
 			}
 
 			// Google Plus
-			if ( strpos( $src, 'apis.google.com/js/platform.js' ) ) {
-				rocket_footer_js_lazyload_script( "<script type=\"text/javascript\">    (function() {      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;      po.src = 'https://apis.google.com/js/platform.js';      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);    })();  </script>", 'google-plus-platform', $tag, $document );
+			if ( false !== strpos( $src, 'apis.google.com/js/platform.js' ) ) {
+				rocket_footer_js_lazyload_script( "<script type=\"text/javascript\">    (function() {      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;      po.src = 'https://apis.google.com/js/platform.js';      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);    })();  </script>", 'google-plus-platform', $tag, $document, $content_document );
 				/** @var DOMElement $tag */
-				foreach ( $xpath->query( '//g:plusone|//*[contains(concat(" ", normalize-space(@class), " "), " g-plusone ")]' ) as $tag ) {
-					$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
+				foreach (
+					array(
+						'//g:plusone',
+						'//*[contains(concat(" ", normalize-space(@class), " "), " g-plusone ")]',
+						'//*[contains(concat(" ", normalize-space(@class), " "), " g-plus ")]',
+					) as $expression
+				) {
+					foreach ( $xpath->query( $expression ) as $tag ) {
+						$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
+						if ( 0 == $tag->childNodes->length ) {
+							$img = $content_document->createElement( 'img' );
+							$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
+							$tag->setAttribute( 'data-lazy-widget', "google-plus-platform" );
+							$tag->appendChild( $img );
+						}
+					}
 				}
 			}
+			// Google Plus JS Version
+			if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{.*\(\s*.*po\s*\.\s*src\s*=\s*["\']https://apis\s*.google\s*.com/js/platform.js["\'];.*}\s*\)\s*\(\s*\)\s*;~', $content, $matches ) ) {
+				$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
+				$tag_content = str_replace( "\r", '', $tag_content );
+				$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
+					'<script>',
+					'</script>',
+				), $tag_content );
+				rocket_footer_js_lazyload_script( $tag_content, 'google-plus-platform', $tag, $document, $content_document );
+				/** @var DOMElement $tag */
+				foreach (
+					array(
+						'//g:plusone',
+						'//*[contains(concat(" ", normalize-space(@class), " "), " g-plusone ")]',
+						'//*[contains(concat(" ", normalize-space(@class), " "), " g-plus ")]',
+					) as $expression
+				) {
+					foreach ( $xpath->query( $expression ) as $tag ) {
+						$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
+						if ( 0 == $tag->childNodes->length ) {
+							$img = $content_document->createElement( 'img' );
+							$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
+							$tag->setAttribute( 'data-lazy-widget', "google-plus-platform" );
+							$tag->appendChild( $img );
+						}
+					}
+				}
+
+			}
 			// Twitter
-			if ( preg_match( '~(?:window\.twttr\s*=\s*\(|!)function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*"script"\s*,\s*"twitter-wjs"\s*(?:\)\);|\);)~', $content, $matches ) ) {
-				rocket_footer_js_lazyload_script( $document->saveHTML( $tag ), 'twitter-sdk', $tag, $document );
+			if ( preg_match( '~(?:window\.twttr\s*=\s*\(|!|\()\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*[\'"]script[\'"]\s*,\s*[\'"]twitter-wjs[\'"]\s*(?:\)\);|\);)~', $content, $matches ) ) {
+				$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
+				$tag_content = str_replace( "\r", '', $tag_content );
+				$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
+					'<script>',
+					'</script>',
+				), $tag_content );
+				rocket_footer_js_lazyload_script( $tag_content, 'twitter-sdk', $tag, $document, $content_document );
 				/** @var DOMElement $tag */
 				foreach (
 					array(
@@ -594,6 +678,20 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 					foreach ( $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " ' . $class . ' ")]' ) as $tag ) {
 						$tag->setAttribute( 'data-lazy-widget', 'twitter-sdk' );
 					}
+				}
+			}
+			// Tumbler
+			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*[\'"]script[\'"]\s*,\s*[\'"]tumblr-js[\'"]\s*(?:\)\);|\);)~', $content, $matches ) ) {
+				$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
+				$tag_content = str_replace( "\r", '', $tag_content );
+				$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
+					'<script>',
+					'</script>',
+				), $tag_content );
+				rocket_footer_js_lazyload_script( $tag_content, 'tumblr-share-button-widget', $tag, $document, $content_document );
+				/** @var DOMElement $tag */
+				foreach ( $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " tumblr-share-button ")]' ) as $tag ) {
+					$tag->setAttribute( 'data-lazy-widget', 'twitter-sdk' );
 				}
 			}
 			// Avada Google Maps Support
@@ -631,39 +729,154 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
 			// Google Adsense
 			if ( 'pagead2.googlesyndication.com' == parse_url( $src, PHP_URL_HOST ) ) {
 				$sub_content = $document->saveHTML( $tag );
-				$next_tag    = $tag->nextSibling;
-				while ( XML_ELEMENT_NODE !== $next_tag->nodeType ) {
+				$next_tag    = $tag;
+				do {
 					$next_tag = $next_tag->nextSibling;
+				} while ( ! empty( $next_tag ) && ! ( XML_ELEMENT_NODE == $next_tag->nodeType && 'ins' == strtolower( $next_tag->tagName ) && false !== strpos( $next_tag->getAttribute( 'class' ), 'adsbygoogle' ) ) );
+				$ad_node = $next_tag;
+				if ( empty( $ad_node ) ) {
+					$tag->setAttribute( 'data-no-minify', '1' );
+					$next_tag = $tag;
 				}
-				$ad_node  = $next_tag;
-				$next_tag = $next_tag->nextSibling;
-				while ( XML_ELEMENT_NODE !== $next_tag->nodeType ) {
+				do {
 					$next_tag = $next_tag->nextSibling;
+				} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' == strtolower( $next_tag->tagName ) && isset( $next_tag->textContent ) && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
+				$js_node = $next_tag;
+				if ( ! empty( $ad_node ) ) {
+					$sub_content .= $document->saveHTML( $js_node );
+					$sub_content = str_replace( "\n", '', $sub_content );
+					$sub_content = str_replace( "\r", '', $sub_content );
+					$sub_content = str_replace( array( '<script>//', '//</script>' ), array(
+						'<script>',
+						'</script>',
+					), $sub_content );
+					rocket_footer_js_lazyload_script( $sub_content, "google-adsense-{$google_adsense_count}", $tag, $document, $content_document );
+					$js_node->parentNode->removeChild( $js_node );
+					$ad_node->setAttribute( 'data-lazy-widget', "google-adsense-{$google_adsense_count}" );
+					$google_adsense_count ++;
+				} else {
+					$js_node->setAttribute( 'data-no-minify', '1' );
 				}
-				$js_node     = $next_tag;
-				$sub_content .= $document->saveHTML( $js_node );
-				rocket_footer_js_lazyload_script( $sub_content, "google-adsense-{$google_adsense_count}", $tag, $document );
-				$js_node->parentNode->removeChild( $js_node );
-				$ad_node->setAttribute( 'data-lazy-widget', "google-adsense-{$google_adsense_count}" );
-				$google_adsense_count ++;
 			}
-		}
-	}
+			// Amazon Ads
+			if ( false !== strpos( $src, 'amazon-adsystem.com' ) ) {
+				$prev_tag = $tag->previousSibling;
+				while ( XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' != strtolower( $tag->tagName ) ) {
+					$prev_tag = $prev_tag->previousSibling;
+				}
+				$sub_content = $document->saveHTML( $tag ) . $document->saveHTML( $prev_tag );
+				$img         = $document->createElement( 'img' );
+				$span        = $document->createElement( 'span' );
+				$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
+				$span->setAttribute( 'data-lazy-widget', "vk-share-{$vshare_counter}" );
+				$span->appendChild( $img );
+				$prev_tag->parentNode->removeChild( $prev_tag );
+				$tag->parentNode->insertBefore( $span, $tag );
+				rocket_footer_js_lazyload_script( $sub_content, "amazon-ads-{$amazon_ads_count}", $tag, $document, $content_document );
+				$tag->setAttribute( 'data-lazy-widget', "amazon-ads-{$amazon_ads_count}" );
+				$amazon_ads_count ++;
+			}
+			// Stumble Upon
+			if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{.*[\'"]((?:https?:)?//platform\.stumbleupon\.com/1/widgets.js)[\'"].*\}\s*\)\s*\(\s*\)\s*;~', $content, $matches ) ) {
+				$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
+				$tag_content = str_replace( "\r", '', $tag_content );
+				$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
+					'<script>',
+					'</script>',
+				), $tag_content );
+				rocket_footer_js_lazyload_script( $tag_content, 'stumbleupon', $tag, $document );
+				/** @var DOMElement $tag */
+				foreach ( $document->getElementsByTagName( 'su:badge' ) as $tag ) {
+					$tag->setAttribute( 'data-lazy-widget', 'stumbleupon' );
+				}
+				foreach ( $document->getElementsByTagName( 'su:follow' ) as $tag ) {
+					$tag->setAttribute( 'data-lazy-widget', 'stumbleupon' );
+				}
+			}
+			// VK.com
+			if ( 'vk.com' == parse_url( $src, PHP_URL_HOST ) ) {
+				$next_tag = $tag->nextSibling;
+				while ( XML_ELEMENT_NODE !== $next_tag->nodeType && 'script' != strtolower( $tag->tagName ) ) {
+					$next_tag = $next_tag->nextSibling;
+				}
+				if ( preg_match( '~document\s*.\s*write\s*\(\s*(VK\s*.\s*Share\s*.\s*button.*.\s*\))\s*\);~', $next_tag->textContent, $matches ) ) {
+					$share_script = <<<JS
+(function check () {
+  if (typeof VK === 'undefined') {
+    setTimeout(check, 10);
+  }
+  else {
+    document.querySelector('[data-lazy-widget="vk-share-{$vshare_counter}"]').innerHTML = {$matches[1]};
+  }
+})();
+JS;
 
-	if ( $lazy_load ) {
-		if ( ! empty( $google_maps_tag ) && ! empty( $google_maps_script_content ) ) {
-			rocket_footer_js_lazyload_script( $document->saveHTML( $google_maps_tag ) . $google_maps_script_content, $google_maps_script_id, $google_maps_tag, $document );
+					$share_script = $document->createElement( 'script', $share_script );
+					$span         = $document->createElement( 'span' );
+					$img          = $document->createElement( 'img' );
+					$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
+					$span->setAttribute( 'data-lazy-widget', "vk-share-{$vshare_counter}" );
+					$span->appendChild( $img );
+					if ( empty( $next_tag->nextSibling ) ) {
+						$next_tag->parentNode->appendChild( $span );
+					} else {
+						$next_tag->parentNode->insertBefore( $next_tag->nextSibling, $span );
+					}
+					$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
+					$tag_content = str_replace( "\r", '', $tag_content );
+					$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
+						'<script>',
+						'</script>',
+					), $tag_content );
+
+					rocket_footer_js_lazyload_script( $tag_content . $document->saveHTML( $share_script ), "vk-share-{$vshare_counter}", $tag, $document, $content_document );
+					$next_tag->parentNode->removeChild( $next_tag );
+					$vshare_counter ++;
+				}
+			}
+
 		}
-		foreach ( $document->getElementsByTagName( 'iframe' ) as $tag ) {
-			$data_src = $tag->getAttribute( 'data-src' );
-			if ( empty( $data_src ) ) {
-				$src = $tag->getAttribute( 'src' );
-				if ( ! empty( $src ) ) {
-					$tag->setAttribute( 'data-src', $src );
-					$tag->removeAttribute( 'src' );
+		if ( ! $lazy_load ) {
+			// Google Adsense
+			if ( 'pagead2.googlesyndication.com' == parse_url( $src, PHP_URL_HOST ) ) {
+				$tag->setAttribute( 'data-no-minify', 1 );
+				$next_tag = $tag->nextSibling;
+				while ( XML_ELEMENT_NODE !== $next_tag->nodeType && 'script' != strtolower( $tag->tagName ) ) {
+					$next_tag = $next_tag->nextSibling;
+				}
+				$next_tag->setAttribute( 'data-no-minify', 1 );
+			}
+			// Amazon Ads
+			if ( false !== strpos( $src, 'amazon-adsystem.com' ) ) {
+				$tag->setAttribute( 'data-no-minify', 1 );
+				$prev_tag = $tag->previousSibling;
+				while ( XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' != strtolower( $tag->tagName ) ) {
+					$prev_tag = $prev_tag->previousSibling;
+				}
+				$prev_tag->setAttribute( 'data-no-minify', 1 );
+			}
+			// Google Plus
+			if ( false !== strpos( $src, 'apis.google.com/js/platform.js' ) ) {
+				$tag->setAttribute( 'data-no-minify', 1 );
+			}
+		}
+
+		if ( $lazy_load ) {
+			if ( ! empty( $google_maps_tag ) && ! empty( $google_maps_script_content ) ) {
+				rocket_footer_js_lazyload_script( $document->saveHTML( $google_maps_tag ) . $google_maps_script_content, $google_maps_script_id, $google_maps_tag, $document, $content_document );
+			}
+			foreach ( $document->getElementsByTagName( 'iframe' ) as $tag ) {
+				$data_src = $tag->getAttribute( 'data-src' );
+				if ( empty( $data_src ) ) {
+					$src = $tag->getAttribute( 'src' );
+					if ( ! empty( $src ) ) {
+						$tag->setAttribute( 'data-src', $src );
+						$tag->removeAttribute( 'src' );
+					}
 				}
 			}
 		}
+
 	}
 	do_action_ref_array( 'rocket_footer_js_rewrite_js_loaders', $document );
 }
@@ -676,19 +889,27 @@ function rocket_footer_js_rewrite_js_loaders( &$document ) {
  * @param DOMElement  $tag
  * @param DOMDocument $document
  */
-function rocket_footer_js_lazyload_script( $html, $id, $tag, $document ) {
+function rocket_footer_js_lazyload_script( $html, $id, $tag, $document, $content_document = null ) {
+	if ( empty( $content_document ) ) {
+		$content_document = $document;
+	}
 	if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
-		$external_tag = $document->createElement( 'div' );
-		$external_tag->appendChild( $document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_START' ) );
-		$external_tag->appendChild( $document->createTextNode( $html ) );
-		$external_tag->appendChild( $document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_END' ) );
+		$external_tag = $content_document->createElement( 'div' );
+		$external_tag->appendChild( $content_document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_START' ) );
+		$external_tag->appendChild( $content_document->createTextNode( $html ) );
+		$external_tag->appendChild( $content_document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_END' ) );
 	} else {
-		$comment_tag  = $document->createComment( $html );
-		$external_tag = $document->createElement( 'div' );
+		$comment_tag  = $content_document->createComment( $html );
+		$external_tag = $content_document->createElement( 'div' );
 		$external_tag->appendChild( $comment_tag );
 	}
 	$external_tag->setAttribute( 'id', $id );
-	$tag->parentNode->insertBefore( $external_tag, $tag );
+	if ( $content_document === $document ) {
+
+		$tag->parentNode->insertBefore( $external_tag, $tag );
+	} else {
+		$content_document->getElementsByTagName( 'body' )->item( 0 )->appendChild( $external_tag );
+	}
 	$tag->parentNode->removeChild( $tag );
 }
 
@@ -773,7 +994,7 @@ function rocket_footer_js_remote_fetch( $url ) {
 function rocket_footer_js_process_local_script( $url, $script, $document, &$tags ) {
 	// Extract Facebook Pixel from "Pixel Your Site" plugin
 	if ( function_exists( 'pys_free_init' ) && set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite/js/public.js' ) == $url ) {
-		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'(https://connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $script, $matches ) ) {
+		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'((?:https?:)?//connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $script, $matches ) ) {
 			$external_tag = $document->createElement( 'script', '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.disableConfigLoading=!0;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$tags[]       = $external_tag;
@@ -792,6 +1013,24 @@ function rocket_footer_js_process_local_script( $url, $script, $document, &$tags
 			$tags[] = $external_tag;
 			$script = str_replace( $matches[0], '', $script );
 		}
+	}
+	// Extract scripts from WooCommerce Social Media Share Buttons plugin
+	if ( function_exists( 'toastie_wc_smsb_social_init' ) && set_url_scheme( WP_PLUGIN_URL . '/woocommerce-social-media-share-buttons/smsb_script.js' ) == $url ) {
+		$script = str_replace( "\n", '', $script );
+		if ( preg_match_all( '~\\(function.*(?:\)\)|}\)\(\));~U', $script, $matches ) ) {
+			$doc = new DOMDocument();
+			foreach ( $matches[0] as $match ) {
+				$tag = $doc->createElement( 'script' );
+				$cm  = $doc->createTextNode( "\n//" );
+				$ct  = $doc->createCDATASection( "\n" . $match . "\n//" );
+				$tag->appendChild( $cm );
+				$tag->appendChild( $ct );
+				$doc->appendChild( $tag );
+				$script = str_replace( $match, '', $script );
+			}
+			rocket_footer_js_rewrite_js_loaders( $doc, $document );
+		}
+
 	}
 
 	return apply_filters_ref_array( 'rocket_footer_js_process_local_script', array( $script, $url, $document, $tags ) );
