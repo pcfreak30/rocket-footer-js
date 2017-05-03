@@ -355,7 +355,7 @@ function rocket_footer_js_debug_enabled( $or = false ) {
 	$display_errors = ini_get( 'display_errors' );
 	$display_errors = ! empty( $display_errors ) && 'off' !== $display_errors;
 
-	return $or ? ( defined( 'WP_DEBUG' ) || WP_DEBUG || $display_errors ) : ( defined( 'WP_DEBUG' ) && WP_DEBUG || $display_errors );
+	return $or ? ( ( defined( 'WP_DEBUG_LOG' ) || WP_DEBUG_LOG ) || $display_errors ) : ( ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) || $display_errors );
 
 }
 
@@ -420,9 +420,9 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 		$src = $tag->getAttribute( 'src' );
 		$src = rocket_add_url_protocol( $src );
 
-		$content          = str_replace( "\n", '', $tag->textContent );
-		$content          = str_replace( "\r", '', $content );
-		$content          = trim( $content, '/' );
+		$content = str_replace( "\n", '', $tag->textContent );
+		$content = str_replace( "\r", '', $content );
+		$content = trim( $content, '/' );
 
 		// Tawk.to
 		if ( preg_match( '~var\s*Tawk_API\s*=\s*Tawk_API.*s1.src\s*=\s*\'(.*)\';.*s0\.parentNode\.insertBefore\(s1,s0\);\s*}\s*\)\(\);~sU', $content, $matches ) ) {
