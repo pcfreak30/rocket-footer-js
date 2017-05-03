@@ -25,12 +25,18 @@ This plugin will do the following:
  * Google Analytics
  * Double Click Google Analytics
  * Avvo.com Tracking
+ * Pushcrew Tracking
 * Automatically lazy load popular widgets if https://wordpress.org/plugins/lazy-load-xt/ or https://wordpress.org/plugins/a3-lazy-load/ are active. Services include:
  * Google Maps with Avada theme
  * All Facebook social widgets
  * All Twitter social widgets
  * All Google Plus social widgets
  * All Google Adsense advertisements
+ * Tumbler
+ * Amazon Ads
+ * Stumble Upon
+ * VK.com
+ * WooCommerce Social Media Share Buttons plugin
  * Any iframe
 
 If you need dedicated/professional assistance with this plugin or just want an expert to get your site to run the fastest it can be, you may hire me at [Codeable](https://codeable.io/developers/derrick-hammer/?ref=rvtGZ)
@@ -45,18 +51,41 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 1.4.6 ###
+
+* Strip returns in rocket_footer_js_rewrite_js_loaders
+* Improve Google Analytics to conditionally handle ssl
+* Bug fix hanging of Facebook Pixel fbq calls
+* Add Pushcrew Tracking
+* Ensure Facebook SDK is only loaded 1 time
+* Refactor Google Plus to use simpler xpath queries and set a dummy pixel image to emsure it is picked up by lazy load
+* Add support for Google Plus loaded via JS
+* Improve twitter regex
+* Add Tumbler support
+* Improve Google Adsense support and skip ads where there is no ins tag as this is likely a full page or alternate ad
+* Add Amazon Ads support
+* Add Stumble Upon support
+* Add VK.com support
+* For Google Adsense, Amazon Ads, and Google Plus, if lazy load is off and the scripts are normal tags, flag to not minify so the scripts are not broken
+* Add support for WooCommerce Social Media Share Buttons plugin
+* Use WP_DEBUG_LOG over WP_DEBUG in rocket_footer_js_debug_enabled
+* Fix logic in rocket_footer_js_debug_enabled that may cause debug to be on by mistake
+
 ### 1.4.5 ###
 
 * Improve facebook pixel support to prevent possible runtime errors
 
 ### 1.4.4 ###
+
 * Add support for Avvo.com tracking
 * Ensure zxcvbn password meter is not changed on login and signup pages
 
 ### 1.4.3 ###
+
 * Update Page Links To compatibility
 
 ### 1.4.2 ###
+
 * Improve UTF-8 character handling
 * Add support for googleanalytics plugin
 * Improve GA regex
