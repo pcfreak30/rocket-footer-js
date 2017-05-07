@@ -144,7 +144,11 @@ function rocket_footer_js_inline( $buffer ) {
 
 		// lets process them scripts!
 		$tags_ref = &$tags;
-		foreach ( $tags_ref as $index => $tag ) {
+		for ( $i = 0; $i <= end( array_keys( $tags_ref ) ); $i ++ ) {
+			$tag = $tags_ref[ $i ];
+			if ( empty( $tag ) ) {
+				continue;
+			}
 			// Remove from array by default
 			$remove = true;
 			$src    = $tag->getAttribute( 'src' );
@@ -276,7 +280,7 @@ function rocket_footer_js_inline( $buffer ) {
 			}
 			// For later, if we dont want the tag removed so it get processed below
 			if ( $remove ) {
-				unset( $tags[ $index ] );
+				unset( $tags[ $i ] );
 			}
 		}
 		if ( $debug ) {
@@ -355,7 +359,7 @@ function rocket_footer_js_debug_enabled( $or = false ) {
 	$display_errors = ini_get( 'display_errors' );
 	$display_errors = ! empty( $display_errors ) && 'off' !== $display_errors;
 
-	return $or ? ( ( defined( 'WP_DEBUG_LOG' ) || WP_DEBUG_LOG ) || $display_errors ) : ( ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) || $display_errors );
+	return $or ? ( ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) || $display_errors ) : ( ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) || $display_errors );
 
 }
 
@@ -568,9 +572,10 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 			$tag->parentNode->insertBefore( $external_tag, $tag );
 			$tag->parentNode->removeChild( $tag );
 		}
+
 		if ( $lazy_load ) {
 			// Facebook
-			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js#(?:xfbml=\d|(?:version=[\w\.\d]+)|(?:&appId=\d*)&?)+"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
+			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js#(?:&?xfbml=\d|(?:&?version=[\w\.\d]+)|(?:&?appId=\d*)&?)+"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
 				if ( ! $facebook_sdk_loaded ) {
 					$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
 					$tag_content = str_replace( "\r", '', $tag_content );
@@ -628,7 +633,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 				}
 			}
 			// Google Plus JS Version
-			if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{.*\(\s*.*po\s*\.\s*src\s*=\s*["\']https://apis\s*.google\s*.com/js/platform.js["\'];.*}\s*\)\s*\(\s*\)\s*;~', $content, $matches ) ) {
+			if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{.*\(\s*.*po\s*\.\s*src\s*=\s*["\']https://apis\s*.google\s*.com/js/(?:platform|plusone).js["\'];.*}\s*\)\s*\(\s*\)\s*;~', $content, $matches ) ) {
 				$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
 				$tag_content = str_replace( "\r", '', $tag_content );
 				$tag_content = str_replace( array( '<script>//', '//</script>' ), array(
@@ -834,6 +839,22 @@ JS;
 					$vshare_counter ++;
 				}
 			}
+			if ( 'translate.google.com' == parse_url( $src, PHP_URL_HOST ) ) {
+				$prev_tag = $tag;
+				do {
+					$prev_tag = $prev_tag->previousSibling;
+				} while ( ! empty( $prev_tag ) && ! ( XML_ELEMENT_NODE == $prev_tag->nodeType && 'script' == strtolower( $prev_tag->tagName ) && preg_match( '~google\.translate\.TranslateElement\s*\({.*}\s*,\s*[\'"](.*)[\'"]\s*\)\s*;~', $prev_tag->textContent, $matches ) ) );
+				$js_node = $prev_tag;
+				if ( ! empty( $js_node ) ) {
+					$translate_tag = $document->getElementById( $matches[1] );
+					if ( ! empty( $translate_tag ) ) {
+						rocket_footer_js_lazyload_script( $document->saveHTML( $js_node ) . $document->saveHTML( $tag ), "google-translate", $tag, $document, $content_document );
+						$translate_tag->setAttribute( 'data-lazy-widget', 'google-translate' );
+						$translate_tag->setAttribute( 'style', 'min-width:1px; min-height:1px;background:inherit;' );
+						$js_node->parentNode->removeChild( $js_node );
+					}
+				}
+			}
 
 		}
 		if ( ! $lazy_load ) {
@@ -860,7 +881,17 @@ JS;
 				$tag->setAttribute( 'data-no-minify', 1 );
 			}
 		}
-
+		if ( 'googleadservices.com' == parse_url( $src, PHP_URL_HOST ) ) {
+			$tag->setAttribute( 'data-no-minify', '1' );
+			$prev_tag = $tag;
+			do {
+				$prev_tag = $prev_tag->previousSibling;
+			} while ( ! empty( $prev_tag ) && ! ( XML_ELEMENT_NODE == $prev_tag->nodeType && 'script' == strtolower( $prev_tag->tagName ) && false !== strpos( $prev_tag->textContent, 'google_conversion_id' ) ) );
+			$js_node = $prev_tag;
+			if ( ! empty( $js_node ) ) {
+				$tag->setAttribute( 'data-no-minify', '1' );
+			}
+		}
 		if ( $lazy_load ) {
 			if ( ! empty( $google_maps_tag ) && ! empty( $google_maps_script_content ) ) {
 				rocket_footer_js_lazyload_script( $document->saveHTML( $google_maps_tag ) . $google_maps_script_content, $google_maps_script_id, $google_maps_tag, $document, $content_document );
@@ -877,6 +908,43 @@ JS;
 			}
 		}
 
+	}
+
+	if ( function_exists( 'vidbgpro_init_footer' ) ) {
+		$tag = $document->getElementById( 'vidbgpro-page' );
+		if ( ! empty( $tag ) ) {
+			if ( is_page() || is_single() ) {
+				$the_id = get_the_ID();
+			} elseif ( is_home() && get_option( 'show_on_front' ) == 'page' ) {
+				$the_id = get_option( 'page_for_posts' );
+			}
+			if ( ! empty( $the_id ) ) {
+				$container_field = get_post_meta( $the_id, 'vidbg_metabox_field_container', true );
+				if ( ! empty( $container_field ) ) {
+					$tag = false;
+					switch ( $container_field[0] ) {
+						case '#':
+							$tag = $document->getElementById( $container_field );
+							break;
+						case '.':
+							$result = $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " ' . substr( $container_field, 1 ) . ' ")]' );
+							if ( $result->length ) {
+								$tag = $result->item( 0 );
+							}
+							break;
+						default:
+							$result = $document->getElementsByTagName( $container_field );
+							if ( $result->length ) {
+								$tag = $result->item( 0 );
+							}
+							break;
+					}
+					if ( ! empty( $tag ) ) {
+						$tag->setAttribute( 'data-lazy-widget', 'vidbgpro-page' );
+					}
+				}
+			}
+		}
 	}
 	do_action_ref_array( 'rocket_footer_js_rewrite_js_loaders', $document );
 }
@@ -995,9 +1063,7 @@ function rocket_footer_js_process_local_script( $url, $script, $document, &$tags
 	// Extract Facebook Pixel from "Pixel Your Site" plugin
 	if ( function_exists( 'pys_free_init' ) && set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite/js/public.js' ) == $url ) {
 		if ( preg_match( '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'((?:https?:)?//connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s', $script, $matches ) ) {
-			$external_tag = $document->createElement( 'script', '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.disableConfigLoading=!0;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' );
-			$external_tag->setAttribute( 'type', 'text/javascript' );
-			$tags[]       = $external_tag;
+			$script       = '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.disableConfigLoading=!0;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' . str_replace( $matches[0], '', $script );
 			$external_tag = $document->createElement( 'script' );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
 			$external_tag->setAttribute( 'src', $matches[1] );
@@ -1011,7 +1077,6 @@ function rocket_footer_js_process_local_script( $url, $script, $document, &$tags
 			$external_tag->setAttribute( 'src', str_replace( 'fbevents.js', 'fbevents.plugins.identity.js', $matches[1] ) );
 			$external_tag->setAttribute( 'async', false );
 			$tags[] = $external_tag;
-			$script = str_replace( $matches[0], '', $script );
 		}
 	}
 	// Extract scripts from WooCommerce Social Media Share Buttons plugin
@@ -1125,6 +1190,10 @@ function rocket_footer_js_plugins_loaded() {
 	if ( class_exists( 'N2Pluggable' ) ) {
 		N2Pluggable::addAction( 'systemglobal', 'rocket_footer_js_n2pluggable_disable' );
 		N2Settings::init();
+	}
+	if ( function_exists( 'vidbgpro_init_footer' ) && rocket_footer_js_lazy_load_enabled() ) {
+		remove_action( 'wp_footer', 'vidbgpro_init_footer' );
+		add_action( 'wp_footer', 'rocket_footer_js_video_lazy_load_background_pro' );
 	}
 }
 
@@ -1422,6 +1491,20 @@ function rocket_footer_js_googleanalytics_enqueue() {
 		), true );
 		$javascript = strip_tags( $javascript );
 		wp_add_inline_script( 'jquery-core', $javascript );
+	}
+}
+
+function rocket_footer_js_video_lazy_load_background_pro() {
+	ob_start();
+	vidbgpro_init_footer();
+	$output = ob_get_clean();
+	if ( ! empty( $output ) ) {
+		?>
+        <div id="vidbgpro-page">
+            <!-- <?php echo $output; ?>-->
+
+        </div>
+		<?php
 	}
 }
 
