@@ -573,6 +573,30 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 			$tag->parentNode->removeChild( $tag );
 		}
 
+		// Mouseflow
+		if ( preg_match( '~\(\s*function\s*\(\s*\)\s*{\s*.*mf\s*\.\s*src\s*=\s*"((?:https?:)?//cdn\.mouseflow\.com/projects/[\w-]+\.js)".*}\s*\)\s*\(\s*\)\s*;~s', $content, $matches ) ) {
+			$external_tag = $document->createElement( 'script', 'var _mfq = _mfq || [];' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', "{$matches[1]}" );
+			$external_tag->setAttribute( 'async', false );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$tag->parentNode->removeChild( $tag );
+		}
+		// Clicky Analytics
+		if ( preg_match( '~var\s*clicky_site_ids\s*=\s*clicky_site_ids\s*\|\|\s*\[\s*\]\s*;\s*clicky_site_ids\.push\s*\((\d+)\s*\)\;\s*\(\s*function\s*\(\s*\)\s*\{.*s\s*\.\s*src\s*=\s*\'((?:https?:)?//static\.getclicky\.com/js)\';.*}\s*\)\s*\(\s*\)\s*;~s', $content, $matches ) ) {
+			$external_tag = $document->createElement( 'script', "var clicky_site_ids = clicky_site_ids || [];clicky_site_ids.push({$matches[1]});" );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', "{$matches[1]}" );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', "{$matches[2]}" );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$tag->parentNode->removeChild( $tag );
+		}
 		if ( $lazy_load ) {
 			// Facebook
 			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js#(?:&?xfbml=\d|(?:&?version=[\w\.\d]+)|(?:&?appId=\d*)&?)+"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
