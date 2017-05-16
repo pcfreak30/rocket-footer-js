@@ -885,11 +885,13 @@ JS;
 			// Google Adsense
 			if ( 'pagead2.googlesyndication.com' == parse_url( $src, PHP_URL_HOST ) ) {
 				$tag->setAttribute( 'data-no-minify', 1 );
-				$next_tag = $tag->nextSibling;
-				while ( XML_ELEMENT_NODE !== $next_tag->nodeType && 'script' != strtolower( $tag->tagName ) ) {
+				$next_tag = $tag;
+				do {
 					$next_tag = $next_tag->nextSibling;
+				} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' == strtolower( $next_tag->tagName ) && isset( $next_tag->textContent ) && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
+				if ( ! empty( $js_node ) ) {
+					$next_tag->setAttribute( 'data-no-minify', 1 );
 				}
-				$next_tag->setAttribute( 'data-no-minify', 1 );
 			}
 			// Amazon Ads
 			if ( false !== strpos( $src, 'amazon-adsystem.com' ) ) {
@@ -898,7 +900,9 @@ JS;
 				while ( XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' != strtolower( $tag->tagName ) ) {
 					$prev_tag = $prev_tag->previousSibling;
 				}
-				$prev_tag->setAttribute( 'data-no-minify', 1 );
+				if ( ! empty( $js_node ) ) {
+					$prev_tag->setAttribute( 'data-no-minify', 1 );
+				}
 			}
 			// Google Plus
 			if ( false !== strpos( $src, 'apis.google.com/js/platform.js' ) ) {
