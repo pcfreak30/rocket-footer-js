@@ -61,6 +61,7 @@ function rocket_footer_js_inline( $buffer ) {
 					'text/x-handlebars-template',
 					'text/template',
 					'text/html',
+					'text/css',
 				) )
 			) {
 				continue;
@@ -599,7 +600,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 		}
 		if ( $lazy_load ) {
 			// Facebook
-			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js#(?:&?xfbml=\d|(?:&?version=[\w\.\d]+)|(?:&?appId=\d*)&?)+"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
+			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js(?:#(?:&?xfbml=\d|(?:&?version=[\w\.\d]+)|(?:&?appId=\d*)&?)+)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
 				if ( ! $facebook_sdk_loaded ) {
 					$tag_content = str_replace( "\n", '', $document->saveHTML( $tag ) );
 					$tag_content = str_replace( "\r", '', $tag_content );
@@ -1340,6 +1341,7 @@ function rocket_footer_js_get_content( $file ) {
 }
 
 function rocket_footer_js_minify( $script ) {
+	$script = preg_replace( '~(?<!(?:["\'/]))<!--.*-->(?![\'"/])~Us', '', $script );
 	$script = rocket_minify_inline_js( $script );
 	$script = preg_replace( '~/\*!?\s+.*\*/~sU', '', $script );
 
