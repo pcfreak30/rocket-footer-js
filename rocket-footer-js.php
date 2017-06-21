@@ -598,6 +598,14 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 			$tag->parentNode->insertBefore( $external_tag, $tag );
 			$tag->parentNode->removeChild( $tag );
 		}
+		// Google Tag Mamager
+		if ( preg_match( '~\(\s*function\s*\(\s*w\s*,\s*\s*d,\s*s,\s*l,\s*i\s*\)\s*\{\s*w\s*\[\s*l\s*\]\s*=\s*w\s*\[\s*l\]\s*\|\|\s*\[\s*\]\s*;\s*w\s*\[\s*l\s*\].*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'.*\'\s*,\s*\'(GTM-TPLZ9H)\'\s*\);~s', $content, $matches ) ) {
+			$external_tag = $document->createElement( 'script' );
+			$external_tag->setAttribute( 'type', 'text/javascript' );
+			$external_tag->setAttribute( 'src', add_query_arg( 'id', $matches[1], 'https://www.googletagmanager.com/gtm.js' ) );
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+			$tag->parentNode->removeChild( $tag );
+		}
 		if ( $lazy_load ) {
 			// Facebook
 			if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js(?:#(?:&?xfbml=\d|(?:&?version=[\w\.\d]+)|(?:&?appId=\d*)&?)+)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
@@ -1530,10 +1538,10 @@ function rocket_footer_js_video_lazy_load_background_pro() {
 	$output = ob_get_clean();
 	if ( ! empty( $output ) ) {
 		?>
-        <div id="vidbgpro-page">
-            <!-- <?php echo $output; ?>-->
+		<div id="vidbgpro-page">
+			<!-- <?php echo $output; ?>-->
 
-        </div>
+		</div>
 		<?php
 	}
 }
