@@ -448,7 +448,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 			$tag->parentNode->removeChild( $tag );
 		}
 		// Google Analytics
-		if ( preg_match( '~\\(function\s*\(\s*i\s*,\s*s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*m\s*\)\s*{\s*i\[\'GoogleAnalyticsObject\'\]\s*=\s*r;\s*i\[r\]\s*=\s*i\[r\]\s*\|\|\s*function\s*\(\)\s*\{.*\'(.*//(?:www\.)?google-analytics\.com/analytics\.js)\'\s*,\s*\'ga\'\s*\);~', $content, $matches ) || preg_match( '~\(function\s*\(\s*\) {\s*var\s*ga\s*=\s*document\s*\.\s*createElement.*\.google-analytics\.com/ga\.js.*\}\s*\)\s*\(\s*\);~', $content, $matches ) ) {
+		if ( preg_match( '~\\(function\s*\(\s*i\s*,\s*s\s*,\s*o\s*,\s*g\s*,\s*r\s*,\s*a\s*,\s*m\s*\)\s*{\s*i\[\'GoogleAnalyticsObject\'\]\s*=\s*r;\s*i\[r\]\s*=\s*i\[r\]\s*\|\|\s*function\s*\(\)\s*\{.*\'(.*//(?:www\.)?google-analytics\.com/analytics\.js)\'\s*,\s*\'(?:ga|__gaTracker)\'\s*\);~', $content, $matches ) || preg_match( '~\(function\s*\(\s*\) {\s*var\s*ga\s*=\s*document\s*\.\s*createElement.*\.google-analytics\.com/ga\.js.*\}\s*\)\s*\(\s*\);~', $content, $matches ) ) {
 			preg_match_all( '~ga\s*\(\s*.*\s*\)\s*;~U', $content, $ga_calls );
 			$ga_calls = call_user_func_array( 'array_merge', $ga_calls );
 			if ( empty( $matches[1] ) ) {
