@@ -379,6 +379,7 @@ function rocket_footer_js_rewrite_js_loaders( &$document, &$content_document = n
 	$google_maps_script_content = '';
 	$google_adsense_count       = 0;
 	$amazon_ads_count           = 0;
+	$blogher_ads_count          = 0;
 	$facebook_sdk_loaded        = false;
 	static $vshare_counter = 0;
 
@@ -888,7 +889,17 @@ JS;
 					}
 				}
 			}
-
+			if ( 'ads.blogherads.com' == parse_url( $src, PHP_URL_HOST ) ) {
+				$external_script = $document->createElement( 'script', 'document.old_write=document.old_write||document.write;document.write=function(data){if(document.currentScript)(function check(){if(typeof jQuery==="undefined")setTimeout(10,check);else jQuery(document.currentScript).before(data)})()};' );
+				$span            = $document->createElement( 'span' );
+				$img             = $document->createElement( 'img' );
+				$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
+				$span->setAttribute( 'data-lazy-widget', "blogherads-{$blogher_ads_count}" );
+				$span->appendChild( $img );
+				$tag->parentNode->appendChild( $span );
+				rocket_footer_js_lazyload_script( $document->saveHTML( $external_script ) . $document->saveHTML( $tag ), "blogherads-{$blogher_ads_count}", $tag, $document, $content_document );
+				$blogher_ads_count ++;
+			}
 		}
 		if ( ! $lazy_load ) {
 			// Google Adsense
@@ -928,6 +939,9 @@ JS;
 			if ( ! empty( $js_node ) ) {
 				$tag->setAttribute( 'data-no-minify', '1' );
 			}
+		}
+		if ( 'ads.blogherads.com' == parse_url( $src, PHP_URL_HOST ) ) {
+			$tag->setAttribute( 'data-no-minify', 1 );
 		}
 		if ( $lazy_load ) {
 			if ( ! empty( $google_maps_tag ) && ! empty( $google_maps_script_content ) ) {
