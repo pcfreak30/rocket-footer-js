@@ -1246,6 +1246,9 @@ function rocket_footer_js_plugins_loaded() {
 		remove_action( 'wp_footer', 'vidbgpro_init_footer' );
 		add_action( 'wp_footer', 'rocket_footer_js_video_lazy_load_background_pro' );
 	}
+	if ( function_exists( 'cornerstone_plugin_init' ) ) {
+		add_action( 'wp_enqueue_scripts', 'rocket_footer_js_cornerstone_enqueue', 11 );
+	}
 }
 
 /**
@@ -1544,6 +1547,10 @@ function rocket_footer_js_googleanalytics_enqueue() {
 		$javascript = strip_tags( $javascript );
 		wp_add_inline_script( 'jquery-core', $javascript );
 	}
+}
+
+function rocket_footer_js_cornerstone_enqueue() {
+	wp_add_inline_script( 'cornerstone-site-body', "jQuery(function(){document.dispatchEvent(new Event('DOMContentLoaded'));});" );
 }
 
 function rocket_footer_js_video_lazy_load_background_pro() {
