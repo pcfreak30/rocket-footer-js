@@ -57,9 +57,11 @@ abstract class RewriteAbstract implements RewriteInterface {
 		$this->xpath            = new \DOMXPath( $content_document );
 		$this->before_do_rewrite();
 		while ( $this->tags->valid() ) {
-			$tag     = $this->tags->current();
-			$src     = $tag->getAttribute( 'src' );
-			$src     = rocket_add_url_protocol( $src );
+			$tag = $this->tags->current();
+			$src = $tag->getAttribute( 'src' );
+			if ( ! empty( $src ) ) {
+				$src = rocket_add_url_protocol( $src );
+			}
 			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
 			$content = trim( $content, '/' );
 			$this->do_rewrite( $content, $src );
