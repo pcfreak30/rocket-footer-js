@@ -10,6 +10,7 @@ class Manager extends ManagerAbstract {
 		'Amp',
 		'PageLinksTo',
 		'NExtend',
+		'VidBgPro',
 	];
 
 }
