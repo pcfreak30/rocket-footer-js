@@ -61,7 +61,7 @@ abstract class RewriteAbstract implements RewriteInterface {
 			$src     = rocket_add_url_protocol( $src );
 			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
 			$content = trim( $content, '/' );
-			$this->do_rewrite( $content );
+			$this->do_rewrite( $content, $src );
 			$this->tags->next();
 		}
 	}
@@ -74,9 +74,11 @@ abstract class RewriteAbstract implements RewriteInterface {
 	}
 
 	/**
-	 * @param string $content
+	 * @param string  $content
+	 *
+	 * @param  string $src
 	 *
 	 * @return mixed
 	 */
-	abstract protected function do_rewrite( $content );
+	abstract protected function do_rewrite( $content, $src );
 }
