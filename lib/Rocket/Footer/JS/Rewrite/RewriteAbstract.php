@@ -90,6 +90,7 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 */
 	protected function inject_tag( $tag ) {
 		$this->tags->current()->parentNode->insertBefore( $tag, $this->tags->current() );
+		$this->tags->next();
 	}
 
 	/**
