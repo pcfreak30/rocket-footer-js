@@ -12,6 +12,7 @@ class Manager extends ManagerAbstract {
 		'NExtend',
 		'VidBgPro',
 		'Cornerstone',
+		'GoogleAnalytics',
 	];
 
 }
