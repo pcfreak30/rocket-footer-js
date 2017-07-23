@@ -79,7 +79,7 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 *
 	 * @param  string $src
 	 *
-	 * @return mixed
+	 * @return void
 	 */
 	abstract protected function do_rewrite( $content, $src );
 
