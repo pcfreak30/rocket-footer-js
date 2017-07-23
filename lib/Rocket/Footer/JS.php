@@ -248,8 +248,9 @@ class JS {
 
 			$this->build_inline_scripts();
 
-			list( $src ) = $this->write_cache( $filename );
+			extract( $this->write_cache( $filename ), EXTR_OVERWRITE );
 
+			/** @var string $src */
 			$this->add_main_script( $src );
 
 			$this->fix_old_libxml();
