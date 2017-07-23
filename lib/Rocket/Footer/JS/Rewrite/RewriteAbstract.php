@@ -4,6 +4,7 @@
 namespace Rocket\Footer\JS\Rewrite;
 
 use Rocket\Footer\JS\DOMCollection;
+use Rocket\Footer\JS\DOMElement;
 
 /**
  * Class RewriteAbstract
@@ -81,4 +82,11 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 * @return mixed
 	 */
 	abstract protected function do_rewrite( $content, $src );
+
+	/**
+	 * @param DOMElement $tag
+	 */
+	protected function inject_tag( $tag ) {
+		$this->tags->current()->parentNode->insertBefore( $tag, $this->tags->current() );
+	}
 }
