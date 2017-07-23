@@ -9,9 +9,11 @@ class Tawkto extends RewriteAbstract {
 	/**
 	 * @param string $content
 	 *
+	 * @param string $src
+	 *
 	 * @return mixed
 	 */
-	protected function do_rewrite( $content ) {
+	protected function do_rewrite( $content, $src ) {
 		if ( preg_match( '~var\s*Tawk_API\s*=\s*Tawk_API.*s1.src\s*=\s*\'(.*)\';.*s0\.parentNode\.insertBefore\(s1,s0\);\s*}\s*\)\(\);~sU', $content, $matches ) ) {
 			$external_tag = $this->document->createElement( 'script' );
 			$external_tag->setAttribute( 'type', 'text/javascript' );
