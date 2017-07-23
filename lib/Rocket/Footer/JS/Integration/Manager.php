@@ -9,6 +9,7 @@ class Manager extends ManagerAbstract {
 	protected $modules = [
 		'Amp',
 		'PageLinksTo',
+		'NExtend',
 	];
 
 }
