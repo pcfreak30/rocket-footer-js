@@ -21,6 +21,10 @@ use Rocket\Footer\JS\Rewrite\Manager as RewriteManager;
  */
 class JS {
 	/**
+	 * Plugin version
+	 */
+	const VERSION = '';
+	/**
 	 *
 	 */
 	const TRANSIENT_PREFIX = 'rocket_footer_js_';
