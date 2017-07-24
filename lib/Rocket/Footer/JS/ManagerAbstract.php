@@ -17,7 +17,15 @@ class ManagerAbstract extends ComponentAbstract {
 	public function init() {
 		parent::init();
 		$modules = [];
-		foreach ( $this->modules as $module ) {
+
+		$reflect   = new \ReflectionClass( $this );
+		$class     = strtolower( $reflect->getShortName() );
+		$namespace = $reflect->getNamespaceName();
+		$namespace = str_replace( '\\', '/', $namespace );
+		$component = strtolower( basename( $namespace ) );
+		$filter    = "rocket_footer_js_{$component}_{$class}_modules";
+
+		foreach ( (array) apply_filters( $filter, $this->modules ) as $module ) {
 			$modules[ $module ] = rocket_footer_js_container()->create( $this->namespace . '\\' . $module );
 			$modules[ $module ]->init();
 		}
