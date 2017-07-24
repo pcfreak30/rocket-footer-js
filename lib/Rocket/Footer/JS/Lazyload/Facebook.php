@@ -57,6 +57,6 @@ class Facebook extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload_off( $content, $src ) {
-		$this->tags->current()->setAttribute( 'data-no-minify', '1' );
+		$this->set_no_minify();
 	}
 }
