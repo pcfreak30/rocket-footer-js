@@ -9,5 +9,6 @@ class Manager extends ManagerAbstract {
 		'Tawkto',
 		'WPRocketLazyload',
 		'GoogleAnalytics',
+		'DoubleClickGoogleAnalytics',
 	];
 }
