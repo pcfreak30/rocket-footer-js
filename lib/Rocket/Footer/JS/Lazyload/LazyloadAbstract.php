@@ -61,10 +61,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		}
 		$this->document         = $document;
 		$this->content_document = $content_document;
-		$this->tags             = rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS\\DOMCollection', [
-			$this->content_document,
-			'script',
-		] );
+		$this->tags             = $this->get_script_collection();
 		$this->xpath            = new \DOMXPath( $content_document );
 		$this->before_do_lazyload();
 		while ( $this->tags->valid() ) {
@@ -155,4 +152,8 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 
 		return $img;
 	}
+
+	/**
+	 * @return DOMCollection
+	 */
 }

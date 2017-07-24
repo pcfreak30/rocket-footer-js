@@ -52,10 +52,7 @@ abstract class RewriteAbstract implements RewriteInterface {
 		}
 		$this->document         = $document;
 		$this->content_document = $content_document;
-		$this->tags             = rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS\\DOMCollection', [
-			$this->content_document,
-			'script',
-		] );
+		$this->tags             = $this->get_script_collection();
 		$this->xpath            = new \DOMXPath( $content_document );
 		$this->before_do_rewrite();
 		while ( $this->tags->valid() ) {
