@@ -14,6 +14,7 @@ class Manager extends ManagerAbstract {
 		'AvadaGoogleMaps',
 		'Iframe',
 		'GoogleAdsense',
+		'AmazonAds',
 	];
 
 	public function is_enabled() {
