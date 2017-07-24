@@ -139,4 +139,14 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		}
 		$tag->parentNode->removeChild( $tag );
 	}
+
+	/**
+	 * @return DOMElement
+	 */
+	protected function create_pixel_image() {
+		$img = $this->create_tag( 'img' );
+		$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
+
+		return $img;
+	}
 }
