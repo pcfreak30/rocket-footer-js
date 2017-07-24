@@ -15,6 +15,7 @@ class Manager extends ManagerAbstract {
 		'Iframe',
 		'GoogleAdsense',
 		'AmazonAds',
+		'StumbleUpon',
 	];
 
 	public function is_enabled() {
