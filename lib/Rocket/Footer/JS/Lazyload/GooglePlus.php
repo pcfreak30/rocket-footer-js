@@ -46,7 +46,7 @@ class GooglePlus extends LazyloadAbstract {
 	 */
 	protected function do_lazyload_off( $content, $src ) {
 		if ( false !== strpos( $src, 'apis.google.com/js/platform.js' ) ) {
-			$this->tags->current()->setAttribute( 'data-no-minify', '1' );
+			$this->set_no_minify();
 		}
 	}
 }
