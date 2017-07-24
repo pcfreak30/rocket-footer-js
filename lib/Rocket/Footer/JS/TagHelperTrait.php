@@ -80,7 +80,15 @@ trait TagHelperTrait {
 				'',
 				'<script>',
 				'</script>',
-			], $tag->ownerDocument->saveHTML( $tag ) );
+			], $this->get_tag_content( $tag ) );
+	}
+
+	protected function get_tag_content( $tag = null ) {
+		if ( ! $tag ) {
+			$tag = $this->tags->current();
+		}
+
+		return $tag->ownerDocument->saveHTML( $tag );
 	}
 
 	/**
