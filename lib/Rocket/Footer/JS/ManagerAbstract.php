@@ -25,10 +25,15 @@ class ManagerAbstract extends ComponentAbstract {
 		$component = strtolower( basename( $namespace ) );
 		$filter    = "rocket_footer_js_{$component}_{$class}_modules";
 
-		foreach ( (array) apply_filters( $filter, $this->modules ) as $module ) {
+		$modules_list = apply_filters( $filter, $this->modules );
+
+		foreach ( $modules_list as $module ) {
 			$modules[ $module ] = rocket_footer_js_container()->create( $this->namespace . '\\' . $module );
+		}
+		foreach ( $modules_list as $module ) {
 			$modules[ $module ]->init();
 		}
+
 		$this->modules = $modules;
 	}
 
