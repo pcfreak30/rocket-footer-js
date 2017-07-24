@@ -39,6 +39,7 @@ class GoogleAdsense extends LazyloadAbstract {
 				$js_node->parentNode->removeChild( $js_node );
 				$ad_node->setAttribute( 'data-lazy-widget', "google-adsense-{$this->instance}" );
 				$this->instance ++;
+				$this->tags->flag_removed();
 			} else {
 				$this->set_no_minify( $js_node );
 			}

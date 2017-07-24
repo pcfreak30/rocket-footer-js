@@ -33,6 +33,7 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 						$sub_url = $src;
 						if ( $sub_tag->parentNode ) {
 							$sub_tag->parentNode->removeChild( $sub_tag );
+							$this->tags->flag_removed();
 						}
 					}
 				}

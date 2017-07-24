@@ -30,6 +30,7 @@ class AmazonAds extends LazyloadAbstract {
 			$this->lazyload_script( $sub_content, "amazon-ads-{$this->instance}" );
 			$tag->setAttribute( 'data-lazy-widget', "amazon-ads-{$this->instance}" );
 			$this->instance ++;
+			$this->tags->flag_removed();
 		}
 	}
 
