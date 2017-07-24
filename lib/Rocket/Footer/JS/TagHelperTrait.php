@@ -88,6 +88,10 @@ trait TagHelperTrait {
 			$tag = $this->tags->current();
 		}
 
+		if ( ! ( $tag instanceof \DOMElement ) ) {
+			return false;
+		}
+
 		return $tag->ownerDocument->saveHTML( $tag );
 	}
 
@@ -97,6 +101,10 @@ trait TagHelperTrait {
 	protected function set_no_minify( $tag = null ) {
 		if ( ! $tag ) {
 			$tag = $this->tags->current();
+		}
+
+		if ( ! ( $tag instanceof \DOMElement ) ) {
+			return false;
 		}
 
 		$tag->setAttribute( 'data-no-minify', '1' );
@@ -112,6 +120,10 @@ trait TagHelperTrait {
 			$tag = $this->tags->current();
 		}
 
+		if ( ! ( $tag instanceof \DOMElement ) ) {
+			return false;
+		}
+
 		return 0 === strlen( trim( $tag->getAttribute( 'data-no-minify' ) ) );
 	}
 
@@ -123,6 +135,10 @@ trait TagHelperTrait {
 	protected function is_no_lazyload( $tag = null ) {
 		if ( ! $tag ) {
 			$tag = $this->tags->current();
+		}
+
+		if ( ! ( $tag instanceof \DOMElement ) ) {
+			return false;
 		}
 
 		return 0 === strlen( trim( $tag->getAttribute( 'data-no-lazyload' ) ) );
