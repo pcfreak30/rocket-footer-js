@@ -49,14 +49,4 @@ class Facebook extends LazyloadAbstract {
 
 		}
 	}
-
-	/**
-	 * @param string $content
-	 * @param string $src
-	 *
-	 * @return void
-	 */
-	protected function do_lazyload_off( $content, $src ) {
-		$this->set_no_minify();
-	}
 }

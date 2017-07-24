@@ -37,16 +37,4 @@ class Twitter extends LazyloadAbstract {
 			}
 		}
 	}
-
-	/**
-	 * @param string $content
-	 * @param string $src
-	 *
-	 * @return void
-	 */
-	protected function do_lazyload_off( $content, $src ) {
-		if ( preg_match( $this->regex, $content, $matches ) ) {
-			$this->set_no_minify();
-		}
-	}
 }
