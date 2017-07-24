@@ -15,5 +15,6 @@ class Manager extends ManagerAbstract {
 		'SumoMe',
 		'Avvo',
 		'PushCrew',
+		'MouseFlow',
 	];
 }
