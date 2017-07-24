@@ -21,7 +21,7 @@ use Dice\Dice;
  * @alias WPCCSS()
  */
 function rocket_footer_js() {
-	return rocket_footer_js_container()->create( '\Rocket\Footer\JS' );
+	return rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS' );
 }
 
 function rocket_footer_js_container( $env = 'prod' ) {
