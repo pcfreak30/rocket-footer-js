@@ -111,7 +111,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 * @return void
 	 */
 	protected function do_lazyload_off( $content, $src ) {
-		if ( empty( $this->regex ) || preg_match( $this->regex, $content ) ) {
+		if ( ( empty( $this->regex ) && ! $this->is_no_minify() ) || ( ! empty( $this->regex ) && preg_match( $this->regex, $content ) ) ) {
 			$this->set_no_minify();
 		}
 	}
