@@ -14,6 +14,7 @@ class Manager extends ManagerAbstract {
 		'Cornerstone',
 		'GoogleAnalytics',
 		'PixelYourSite',
+		'WoocommerceSocialMediaSharesButtons',
 	];
 
 }
