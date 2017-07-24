@@ -768,7 +768,7 @@ class JS {
 	 *
 	 * @return bool|string
 	 */
-	protected function remote_fetch( $url ) {
+	public function remote_fetch( $url ) {
 		$file = wp_remote_get( $url, [
 			'user-agent' => 'WP-Rocket',
 			'sslverify'  => false,
