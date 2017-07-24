@@ -4,6 +4,11 @@
 namespace Rocket\Footer\JS;
 
 
+/**
+ * Trait TagHelperTrait
+ *
+ * @package Rocket\Footer\JS
+ */
 trait TagHelperTrait {
 	/**
 	 * @param DOMElement $tag
@@ -79,9 +84,13 @@ trait TagHelperTrait {
 	}
 
 	/**
-	 *
+	 * @param DOMElement $tag
 	 */
-	protected function set_no_minify() {
-		$this->tags->current()->setAttribute( 'data-no-minify', '1' );
+	protected function set_no_minify( $tag = null ) {
+		if ( ! $tag ) {
+			$tag = $this->tags->current();
+		}
+
+		$tag->setAttribute( 'data-no-minify', '1' );
 	}
 }
