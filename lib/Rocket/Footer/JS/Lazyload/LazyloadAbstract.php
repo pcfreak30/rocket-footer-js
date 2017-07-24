@@ -80,6 +80,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 			$this->do_lazyload( $content, $src );
 			$this->tags->next();
 		}
+		$this->after_do_lazyload();
 	}
 
 	/**
@@ -98,6 +99,10 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 */
 	abstract protected function do_lazyload( $content, $src );
 
+
+	protected function after_do_lazyload() {
+
+	}
 
 	/**
 	 * @param string $content
