@@ -44,4 +44,19 @@ class ManagerAbstract extends ComponentAbstract {
 		return $this->modules;
 	}
 
+	/**
+	 * @param $name
+	 *
+	 * @return bool|mixed
+	 */
+	public function get_module( $name ) {
+		foreach ( $this->modules as $module ) {
+			if ( is_a( $module, ( new \ReflectionClass( $this ) )->getNamespaceName() . '\\' . $name ) ) {
+				return $module;
+			}
+		}
+
+		return false;
+	}
+
 }
