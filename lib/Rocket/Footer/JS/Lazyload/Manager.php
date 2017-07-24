@@ -11,6 +11,7 @@ class Manager extends ManagerAbstract {
 		'GooglePlusJS',
 		'Twitter',
 		'Tumbler',
+		'AvadaGoogleMaps',
 	];
 
 	public function is_enabled() {
