@@ -19,6 +19,7 @@ class DoubleClickGoogleAnalytics extends RewriteAbstract {
 			$gaq_calls = call_user_func_array( 'array_merge', $gaq_calls );
 			$this->inject_tag( $this->create_script( 'var _gaq = _gaq || [];' . implode( "\n", $gaq_calls ) ) );
 			$this->inject_tag( $this->create_script( null, '//stats.g.doubleclick.net/dc.js' ) );
+			$this->tags->remove();
 		}
 	}
 }
