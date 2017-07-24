@@ -14,6 +14,13 @@ trait TagHelperTrait {
 	}
 
 	/**
+	 * @param DOMElement $tag
+	 */
+	protected function append_tag( $tag ) {
+		$this->tags->current()->appendChild( $tag );
+	}
+
+	/**
 	 * @param string $content
 	 * @param string $src
 	 *
