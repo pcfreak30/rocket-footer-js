@@ -21,14 +21,7 @@ class Facebook extends LazyloadAbstract {
 		/** @noinspection NotOptimalRegularExpressionsInspection */
 		if ( preg_match( '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*js\.src\s*=\s*"//connect\.facebook.net/[\w_]+/(?:sdk|all)\.js(?:#(?:&?xfbml=\d|(?:&?version=[\w\.\d]+)|(?:&?appId=\d*)&?)+)?"\s*;.*\s*\'facebook-jssdk\'\s*\)\);?~is', $content, $matches ) ) {
 			if ( ! $this->sdk_loaded ) {
-				$tag_content = str_replace(
-					[ "\n", "\r", '<script>//', '//</script>' ],
-					[
-						'',
-						'',
-						'<script>',
-						'</script>',
-					], $this->document->saveHTML( $this->tags->current() ) );
+				$tag_content = $this->get_script_content();
 				$this->lazyload_script( $tag_content, 'facebook-sdk' );
 				/** @var DOMElement $tag */
 				foreach (
