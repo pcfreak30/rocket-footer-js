@@ -757,6 +757,13 @@ class JS {
 	}
 
 	/**
+	 * @return \Rocket\Footer\JS\DOMDocument
+	 */
+	public function get_script_dcument() {
+		return $this->script_document;
+	}
+
+	/**
 	 * @param $url
 	 *
 	 * @return bool|string
