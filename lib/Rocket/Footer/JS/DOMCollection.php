@@ -115,4 +115,11 @@ class DOMCollection implements \Iterator {
 		$this->document->appendChild( $node );
 		$this->fetch();
 	}
+
+	/**
+	 *
+	 */
+	public function flag_removed() {
+		$this->item_removed = true;
+	}
 }
