@@ -9,12 +9,6 @@ class Manager extends ManagerAbstract {
 
 	];
 
-	public function init() {
-		if ( $this->is_enabled() ) {
-			parent::init();
-		}
-	}
-
 	public function is_enabled() {
 		global $a3_lazy_load_global_settings;
 		$lazy_load = false;
