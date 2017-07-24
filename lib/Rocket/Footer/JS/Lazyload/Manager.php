@@ -6,7 +6,8 @@ use Rocket\Footer\JS\ManagerAbstract;
 
 class Manager extends ManagerAbstract {
 	protected $modules = [
-
+		'Facebook',
+		'GooglePlus',
 	];
 
 	public function is_enabled() {
