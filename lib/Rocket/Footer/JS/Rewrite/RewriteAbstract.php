@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Rewrite;
 
 use Rocket\Footer\JS\DOMCollection;
-use Rocket\Footer\JS\DOMElement;
+use Rocket\Footer\JS\TagHelperTrait;
 
 /**
  * Class RewriteAbstract
@@ -12,6 +12,8 @@ use Rocket\Footer\JS\DOMElement;
  * @package Rocket\Footer\JS\Rewrite
  */
 abstract class RewriteAbstract implements RewriteInterface {
+
+	use TagHelperTrait;
 
 	/**
 	 * @var DOMCollection
@@ -84,29 +86,4 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 * @return void
 	 */
 	abstract protected function do_rewrite( $content, $src );
-
-	/**
-	 * @param DOMElement $tag
-	 */
-	protected function inject_tag( $tag ) {
-		$this->tags->current()->parentNode->insertBefore( $tag, $this->tags->current() );
-		$this->tags->next();
-	}
-
-	/**
-	 * @param string $content
-	 * @param string $src
-	 *
-	 * @return DOMElement
-	 */
-	protected function create_script( $content = null, $src = null ) {
-		/** @var DOMElement $external_tag */
-		$external_tag = $this->document->createElement( 'script', $content );
-		$external_tag->setAttribute( 'type', 'text/javascript' );
-		if ( $src ) {
-			$external_tag->setAttribute( 'src', $src );
-		}
-
-		return $external_tag;
-	}
 }
