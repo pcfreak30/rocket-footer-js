@@ -94,10 +94,22 @@ trait TagHelperTrait {
 		$tag->setAttribute( 'data-no-minify', '1' );
 	}
 
+	/**
+	 * @return DOMCollection
+	 */
 	protected function get_script_collection() {
+		return $this->get_tag_collection( 'script' );
+	}
+
+	/**
+	 * @param $type
+	 *
+	 * @return DOMCollection
+	 */
+	protected function get_tag_collection( $type ) {
 		return rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS\\DOMCollection', [
 			$this->content_document,
-			'script',
+			$type,
 		] );
 	}
 }
