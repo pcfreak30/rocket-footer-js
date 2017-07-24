@@ -32,6 +32,8 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 */
 	protected $xpath;
 
+	protected $regex;
+
 	/**
 	 *
 	 */
@@ -83,4 +85,11 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 * @return void
 	 */
 	abstract protected function do_rewrite( $content, $src );
+
+	/**
+	 * @return string
+	 */
+	public function get_regex() {
+		return $this->regex;
+	}
 }
