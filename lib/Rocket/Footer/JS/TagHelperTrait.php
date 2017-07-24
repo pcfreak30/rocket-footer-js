@@ -77,4 +77,11 @@ trait TagHelperTrait {
 				'</script>',
 			], $tag->ownerDocument->saveHTML( $tag ) );
 	}
+
+	/**
+	 *
+	 */
+	protected function set_no_minify() {
+		$this->tags->current()->setAttribute( 'data-no-minify', '1' );
+	}
 }
