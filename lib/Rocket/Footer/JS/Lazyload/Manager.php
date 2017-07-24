@@ -18,6 +18,7 @@ class Manager extends ManagerAbstract {
 		'StumbleUpon',
 		'VK',
 		'BlogherAds',
+		'GoogleRemarketing',
 	];
 
 	public function is_enabled() {
