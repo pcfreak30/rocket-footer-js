@@ -13,6 +13,7 @@ class Manager extends ManagerAbstract {
 		'VidBgPro',
 		'Cornerstone',
 		'GoogleAnalytics',
+		'PixelYourSite',
 	];
 
 }
