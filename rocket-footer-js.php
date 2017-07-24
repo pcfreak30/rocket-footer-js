@@ -71,7 +71,7 @@ if ( version_compare( PHP_VERSION, '5.4.0' ) < 0 ) {
 		register_deactivation_hook( __FILE__, 'rocket_footer_js_deactivate' );
 	} else {
 		include_once __DIR__ . '/wordpress-web-composer/class-wordpress-web-composer.php';
-		$web_composer = new \WordPress_Web_Composer( 'wp_criticalcss' );
+		$web_composer = new \WordPress_Web_Composer( 'rocket_footer_js' );
 		$web_composer->set_install_target( __DIR__ );
 		if ( $web_composer->run() ) {
 			include_once __DIR__ . '/vendor/autoload.php';
