@@ -759,7 +759,7 @@ class JS {
 	/**
 	 * @return \Rocket\Footer\JS\DOMDocument
 	 */
-	public function get_script_dcument() {
+	public function get_script_document() {
 		return $this->script_document;
 	}
 

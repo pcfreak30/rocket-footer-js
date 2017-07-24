@@ -46,7 +46,7 @@ class PixelYourSite implements IntegrationInterface {
 			$fb_pixel               = rocket_footer_js()->get_rewrite_manager()->get_module( 'FacebookPixel' );
 			$regex                  = $fb_pixel->get_regex();
 			$this->tags             = rocket_footer_js()->get_dom_collection();
-			$this->content_document = rocket_footer_js()->get_script_dcument();
+			$this->content_document = rocket_footer_js()->get_script_document();
 			if ( preg_match( $regex, $script, $matches ) ) {
 				$script = '(function(a){a.fbq||(n=a.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)},a._fbq||(a._fbq=n));n.push=n;n.disableConfigLoading=!0;n.loaded=!0;n.version="2.0";n.queue=[]})(window);' . str_replace( $matches[0], '', $script );
 				$this->tags->add( $this->create_script( null, $matches[1] ) );
