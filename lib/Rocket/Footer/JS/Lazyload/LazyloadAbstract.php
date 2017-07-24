@@ -6,6 +6,7 @@ namespace Rocket\Footer\JS\LazyLoad;
 
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
+use Rocket\Footer\JS\DOMElement;
 use Rocket\Footer\JS\Rewrite\LazyloadInterface;
 use Rocket\Footer\JS\TagHelperTrait;
 
@@ -113,5 +114,29 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 */
 	protected function is_enabled() {
 		return rocket_footer_js()->get_lazyload_manager()->is_enabled();
+	}
+
+	protected function lazyload_script( $html, $id, $tag = null ) {
+		/** @var DOMElement $external_tag */
+		if ( ! $tag ) {
+			$tag = $this->tags->current();
+		}
+		if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
+			$external_tag = $this->content_document->createElement( 'div' );
+			$external_tag->appendChild( $this->content_document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_START' ) );
+			$external_tag->appendChild( $this->content_document->createTextNode( $html ) );
+			$external_tag->appendChild( $this->content_document->createElement( 'WP_ROCKET_FOOTER_JS_LAZYLOAD_END' ) );
+		} else {
+			$comment_tag  = $this->content_document->createComment( $html );
+			$external_tag = $this->content_document->createElement( 'div' );
+			$external_tag->appendChild( $comment_tag );
+		}
+		$external_tag->setAttribute( 'id', $id );
+		if ( $this->content_document->isSameNode( $this->document ) ) {
+			$tag->parentNode->insertBefore( $external_tag, $tag );
+		} else {
+			$this->content_document->getElementsByTagName( 'body' )->item( 0 )->appendChild( $external_tag );
+		}
+		$tag->parentNode->removeChild( $tag );
 	}
 }
