@@ -116,6 +116,19 @@ trait TagHelperTrait {
 	}
 
 	/**
+	 * @param DOMElement $tag
+	 *
+	 * @return mixed
+	 */
+	protected function is_no_lazyload( $tag = null ) {
+		if ( ! $tag ) {
+			$tag = $this->tags->current();
+		}
+
+		return 0 === strlen( trim( $tag->getAttribute( 'data-no-lazyload' ) ) );
+	}
+
+	/**
 	 * @return DOMCollection
 	 */
 	protected function get_script_collection() {
