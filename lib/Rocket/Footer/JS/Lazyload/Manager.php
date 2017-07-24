@@ -13,6 +13,7 @@ class Manager extends ManagerAbstract {
 		'Tumbler',
 		'AvadaGoogleMaps',
 		'Iframe',
+		'GoogleAdsense',
 	];
 
 	public function is_enabled() {
