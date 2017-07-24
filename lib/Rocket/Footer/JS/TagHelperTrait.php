@@ -57,4 +57,24 @@ trait TagHelperTrait {
 
 		return $this->document->createElement( $type, $content );
 	}
+
+	/**
+	 * @param DOMElement $tag
+	 *
+	 * @return mixed
+	 */
+	protected function get_script_content( $tag = null ) {
+		if ( ! $tag ) {
+			$tag = $this->tags->current();
+		}
+
+		return str_replace(
+			[ "\n", "\r", '<script>//', '//</script>' ],
+			[
+				'',
+				'',
+				'<script>',
+				'</script>',
+			], $tag->ownerDocument->saveHTML( $tag ) );
+	}
 }
