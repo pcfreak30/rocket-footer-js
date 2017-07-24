@@ -93,4 +93,11 @@ trait TagHelperTrait {
 
 		$tag->setAttribute( 'data-no-minify', '1' );
 	}
+
+	protected function get_script_collection() {
+		return rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS\\DOMCollection', [
+			$this->content_document,
+			'script',
+		] );
+	}
 }
