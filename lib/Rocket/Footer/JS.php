@@ -640,7 +640,7 @@ class JS {
 		return $this->cache;
 	}
 
-	protected function put_content( $file, $data ) {
+	public function put_content( $file, $data ) {
 		/** @var \WP_Filesystem_Base $wp_filesystem */
 		global $wp_filesystem;
 		if ( is_null( $wp_filesystem ) ) {
