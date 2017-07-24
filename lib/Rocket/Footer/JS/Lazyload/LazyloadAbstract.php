@@ -126,8 +126,10 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 
 	protected function lazyload_script( $html, $id, $tag = null ) {
 		/** @var DOMElement $external_tag */
+		$collection = false;
 		if ( ! $tag ) {
-			$tag = $this->tags->current();
+			$tag        = $this->tags->current();
+			$collection = true;
 		}
 		if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
 			$external_tag = $this->content_document->createElement( 'div' );
@@ -144,6 +146,11 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 			$tag->parentNode->insertBefore( $external_tag, $tag );
 		} else {
 			$this->content_document->getElementsByTagName( 'body' )->item( 0 )->appendChild( $external_tag );
+		}
+		if ( $collection ) {
+			$this->tags->remove();
+
+			return;
 		}
 		$tag->parentNode->removeChild( $tag );
 	}
