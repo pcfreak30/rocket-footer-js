@@ -7,7 +7,7 @@ namespace Rocket\Footer\JS\Lazyload;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\DOMElement;
-use Rocket\Footer\JS\Rewrite\LazyloadInterface;
+use Rocket\Footer\JS\Lazyload\LazyloadInterface;
 use Rocket\Footer\JS\TagHelperTrait;
 
 /**
