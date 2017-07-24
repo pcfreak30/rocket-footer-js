@@ -10,5 +10,6 @@ class Manager extends ManagerAbstract {
 		'WPRocketLazyload',
 		'GoogleAnalytics',
 		'DoubleClickGoogleAnalytics',
+		'FacebookPixel',
 	];
 }
