@@ -16,6 +16,7 @@ class Manager extends ManagerAbstract {
 		'GoogleAdsense',
 		'AmazonAds',
 		'StumbleUpon',
+		'VK',
 	];
 
 	public function is_enabled() {
