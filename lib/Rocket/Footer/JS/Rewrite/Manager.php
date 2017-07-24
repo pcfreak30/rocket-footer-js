@@ -8,5 +8,6 @@ class Manager extends ManagerAbstract {
 	protected $modules = [
 		'Tawkto',
 		'WPRocketLazyload',
+		'GoogleAnalytics',
 	];
 }
