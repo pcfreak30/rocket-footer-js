@@ -32,4 +32,11 @@ class ManagerAbstract extends ComponentAbstract {
 		$this->modules = $modules;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function get_modules() {
+		return $this->modules;
+	}
+
 }
