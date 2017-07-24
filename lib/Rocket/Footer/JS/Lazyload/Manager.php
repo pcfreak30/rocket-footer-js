@@ -17,6 +17,7 @@ class Manager extends ManagerAbstract {
 		'AmazonAds',
 		'StumbleUpon',
 		'VK',
+		'BlogherAds',
 	];
 
 	public function is_enabled() {
