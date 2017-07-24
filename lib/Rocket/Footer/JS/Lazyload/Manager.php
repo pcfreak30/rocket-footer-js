@@ -9,6 +9,7 @@ class Manager extends ManagerAbstract {
 		'Facebook',
 		'GooglePlus',
 		'GooglePlusJS',
+		'Twitter',
 	];
 
 	public function is_enabled() {
