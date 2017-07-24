@@ -72,7 +72,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 			}
 			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
 			$content = trim( $content, '/' );
-			if ( ! $this->is_enabled() ) {
+			if ( ! $this->is_enabled() || $this->is_no_lazyload() ) {
 				$this->do_lazyload_off( $content, $src );
 				$this->tags->next();
 				continue;
