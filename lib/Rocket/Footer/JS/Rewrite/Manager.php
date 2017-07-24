@@ -13,5 +13,6 @@ class Manager extends ManagerAbstract {
 		'FacebookPixel',
 		'GoogleWebFonts',
 		'SumoMe',
+		'Avvo',
 	];
 }
