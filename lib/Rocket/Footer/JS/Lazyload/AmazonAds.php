@@ -33,23 +33,20 @@ class AmazonAds extends LazyloadAbstract {
 		}
 	}
 
-	protected function after_do_lazyload() {
-		foreach ( $this->get_script_collection() as $tag ) {
-			$src = $tag->getAttribute( 'src' );
-			if ( ! empty( $src ) ) {
-				$src = rocket_add_url_protocol( $src );
-			}
-			if ( false !== strpos( $src, 'amazon-adsystem.com' ) ) {
-				$this->set_no_minify();
-				$prev_tag = $tag;
-				do {
-					$prev_tag = $prev_tag->previousSibling;
-				} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
-				$js_node = $prev_tag;
-				if ( ! empty( $js_node ) ) {
-					$this->set_no_minify( $prev_tag );
-				}
+	protected function do_lazyload_off( $content, $src ) {
+
+		if ( false !== strpos( $src, 'amazon-adsystem.com' ) ) {
+			$this->set_no_minify();
+			$tag      = $this->tags->current();
+			$prev_tag = $tag;
+			do {
+				$prev_tag = $prev_tag->previousSibling;
+			} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
+			$js_node = $prev_tag;
+			if ( ! empty( $js_node ) ) {
+				$this->set_no_minify( $prev_tag );
 			}
 		}
+
 	}
 }
