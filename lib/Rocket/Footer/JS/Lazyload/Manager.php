@@ -10,6 +10,7 @@ class Manager extends ManagerAbstract {
 		'GooglePlus',
 		'GooglePlusJS',
 		'Twitter',
+		'Tumbler',
 	];
 
 	public function is_enabled() {
