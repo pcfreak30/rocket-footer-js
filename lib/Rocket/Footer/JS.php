@@ -467,7 +467,7 @@ class JS {
 		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
-			$file = rocket_footer_js_remote_fetch( $src );
+			$file = $this->remote_fetch( $src );
 			// Catch Error
 			if ( ! empty( $file ) ) {
 				$js_part_cache = apply_filters( 'rocket_footer_js_process_remote_script', $file, $src );
