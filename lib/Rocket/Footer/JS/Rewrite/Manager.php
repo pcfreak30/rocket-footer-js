@@ -14,5 +14,6 @@ class Manager extends ManagerAbstract {
 		'GoogleWebFonts',
 		'SumoMe',
 		'Avvo',
+		'PushCrew',
 	];
 }
