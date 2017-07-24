@@ -8,6 +8,7 @@ class Manager extends ManagerAbstract {
 	protected $modules = [
 		'Facebook',
 		'GooglePlus',
+		'GooglePlusJS',
 	];
 
 	public function is_enabled() {
