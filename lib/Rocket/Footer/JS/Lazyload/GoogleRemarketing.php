@@ -18,7 +18,7 @@ class GoogleRemarketing extends LazyloadAbstract {
 	}
 
 	protected function do_lazyload_off( $content, $src ) {
-		if ( 'googleadservices.com' === parse_url( $src, PHP_URL_HOST ) && ! $this->is_no_minify() ) {
+		if ( 'googleadservices.com' === parse_url( $src, PHP_URL_HOST ) ) {
 			$tag = $this->tags->current();
 			$this->set_no_minify();
 			$prev_tag = $tag;
