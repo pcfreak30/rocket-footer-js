@@ -17,11 +17,17 @@ trait TagHelperTrait {
 	 * @param string $content
 	 * @param string $src
 	 *
-	 * @return DOMElement
+	 * @param bool   $content_document
+	 *
+	 * @return \Rocket\Footer\JS\DOMElement
 	 */
-	protected function create_script( $content = null, $src = null ) {
+	protected function create_script( $content = null, $src = null, $content_document = true ) {
 		/** @var DOMElement $external_tag */
-		$external_tag = $this->document->createElement( 'script', $content );
+		if ( $content_document ) {
+			$external_tag = $this->content_document->createElement( 'script', $content );
+		} else {
+			$external_tag = $this->document->createElement( 'script', $content );
+		}
 		$external_tag->setAttribute( 'type', 'text/javascript' );
 		if ( $src ) {
 			$external_tag->setAttribute( 'src', $src );
