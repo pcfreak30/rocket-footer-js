@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Rocket\Footer\JS\LazyLoad;
+namespace Rocket\Footer\JS\Lazyload;
 
 
 use Rocket\Footer\JS\DOMCollection;
@@ -13,7 +13,7 @@ use Rocket\Footer\JS\TagHelperTrait;
 /**
  * Class LazyloadAbstract
  *
- * @package Rocket\Footer\JS\LazyLoad
+ * @package Rocket\Footer\JS\Lazyload
  */
 abstract class LazyloadAbstract implements LazyloadInterface {
 	use TagHelperTrait;

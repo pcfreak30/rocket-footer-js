@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Rocket\Footer\JS\LazyLoad;
+namespace Rocket\Footer\JS\Lazyload;
 
 
 class GoogleTranslate extends LazyloadAbstract {

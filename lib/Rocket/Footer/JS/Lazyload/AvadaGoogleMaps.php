@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Rocket\Footer\JS\LazyLoad;
+namespace Rocket\Footer\JS\Lazyload;
 
 
 use Rocket\Footer\JS\DOMElement;
