@@ -50,12 +50,14 @@ JS;
 	}
 
 	protected function do_lazyload_off( $content, $src ) {
-		$tag      = $this->tags->current();
-		$next_tag = $tag;
-		do {
-			$next_tag = $next_tag->nextSibling;
-		} while ( null !== $next_tag && XML_ELEMENT_NODE !== $next_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
-		$this->set_no_minify();
-		$this->set_no_minify( $next_tag );
+		if ( 'vk.com' === parse_url( $src, PHP_URL_HOST ) ) {
+			$tag      = $this->tags->current();
+			$next_tag = $tag;
+			do {
+				$next_tag = $next_tag->nextSibling;
+			} while ( null !== $next_tag && XML_ELEMENT_NODE !== $next_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
+			$this->set_no_minify();
+			$this->set_no_minify( $next_tag );
+		}
 	}
 }
