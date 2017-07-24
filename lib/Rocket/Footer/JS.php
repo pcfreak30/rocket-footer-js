@@ -559,7 +559,7 @@ class JS {
 		}
 	}
 
-	protected function get_content( $file ) {
+	public function get_content( $file ) {
 		/** @var \WP_Filesystem_Base $wp_filesystem */
 		global $wp_filesystem;
 		if ( is_null( $wp_filesystem ) ) {
