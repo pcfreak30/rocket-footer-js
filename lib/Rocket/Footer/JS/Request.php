@@ -9,7 +9,6 @@ class Request extends ComponentAbstract {
 		global $pagenow;
 		parent::init();
 		add_action( 'init', [ $this, 'init_action' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		if ( ! is_admin() ) {
 			add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 			add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
@@ -31,9 +30,7 @@ class Request extends ComponentAbstract {
 			remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 			add_action( 'wp_footer', 'print_emoji_detection_script' );
 		}
-		if ( $this->app->get_lazyload_manager()->is_enabled() ) {
-			add_action( 'wp_enqueue_scripts', 'rocket_footer_js_scripts' );
-		}
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
 	public function enqueue_scripts() {
