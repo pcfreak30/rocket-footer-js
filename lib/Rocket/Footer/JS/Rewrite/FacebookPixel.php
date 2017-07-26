@@ -6,7 +6,9 @@ namespace Rocket\Footer\JS\Rewrite;
 
 class FacebookPixel extends RewriteAbstract {
 
-	protected $regex = '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'((?:https?:)?//connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s';
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$regex = '~!?function\s*\(\s*f\s*,\s*b\s*,\s*e\s*,\s*v\s*,\s*n\s*,\s*t\s*,\s*s\s*\)\s*{\s*if\s*\(\s*f\s*\.\s*fbq\s*\)\s*return\s*;\s*n\s*=\s*f\s*.\s*fbq\s*=\s*function.*\s*\(\s*window\s*,\s*document\s*,\s*\'script\'\s*,\s*\'((?:https?:)?//connect.facebook.net/[\w_]+/fbevents.js)\'\s*\)\s*;~s';
+
 	/**
 	 * @param string  $content
 	 *

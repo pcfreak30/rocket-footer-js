@@ -74,7 +74,7 @@ class DOMCollection implements \Iterator {
 	 * @since 5.0.0
 	 */
 	public function valid() {
-		return 0 < $this->list->length && ! is_null( $this->list->item( $this->index ) );
+		return 0 < $this->list->length && null !== $this->list->item( $this->index );
 	}
 
 	public function remove() {

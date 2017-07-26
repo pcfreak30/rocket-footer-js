@@ -6,7 +6,8 @@ namespace Rocket\Footer\JS\Lazyload;
 
 class GoogleTranslate extends LazyloadAbstract {
 
-	protected $regex = '~google\.translate\.TranslateElement\s*\({.*}\s*,\s*[\'"](.*)[\'"]\s*\)\s*;~';
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$regex = '~google\.translate\.TranslateElement\s*\({.*}\s*,\s*[\'"](.*)[\'"]\s*\)\s*;~';
 
 	/**
 	 * @param string  $content
@@ -27,7 +28,7 @@ class GoogleTranslate extends LazyloadAbstract {
 				/** @var array $matches */
 				$translate_tag = $this->content_document->getElementById( $matches[1] );
 				if ( ! empty( $translate_tag ) ) {
-					$this->lazyload_script( $this->get_script_content( $js_node ) . $this->get_script_content(), "google-translate" );
+					$this->lazyload_script( $this->get_script_content( $js_node ) . $this->get_script_content(), 'google-translate' );
 					$translate_tag->setAttribute( 'data-lazy-widget', 'google-translate' );
 					$translate_tag->setAttribute( 'style', 'min-width:1px; min-height:1px;background:inherit;' );
 					$js_node->parentNode->removeChild( $js_node );

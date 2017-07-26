@@ -8,7 +8,8 @@ use Rocket\Footer\JS\DOMElement;
 
 class StumbleUpon extends LazyloadAbstract {
 
-	protected $regex = '~\(\s*function\s*\(\s*\)\s*{.*[\'"]((?:https?:)?//platform\.stumbleupon\.com/1/widgets.js)[\'"].*\}\s*\)\s*\(\s*\)\s*;~';
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$regex = '~\(\s*function\s*\(\s*\)\s*{.*[\'"]((?:https?:)?//platform\.stumbleupon\.com/1/widgets.js)[\'"].*\}\s*\)\s*\(\s*\)\s*;~';
 
 	/**
 	 * @param string  $content

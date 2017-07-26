@@ -97,6 +97,8 @@ trait TagHelperTrait {
 
 	/**
 	 * @param DOMElement $tag
+	 *
+	 * @return void
 	 */
 	protected function set_no_minify( $tag = null ) {
 		if ( ! $tag ) {
@@ -104,7 +106,7 @@ trait TagHelperTrait {
 		}
 
 		if ( ! ( $tag instanceof \DOMElement ) ) {
-			return false;
+			return;
 		}
 
 		$tag->setAttribute( 'data-no-minify', '1' );
@@ -124,7 +126,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return 0 === strlen( trim( $tag->getAttribute( 'data-no-minify' ) ) );
+		return '' === trim( $tag->getAttribute( 'data-no-minify' ) );
 	}
 
 	/**
@@ -141,7 +143,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return 0 === strlen( trim( $tag->getAttribute( 'data-no-lazyload' ) ) );
+		return '' === trim( $tag->getAttribute( 'data-no-lazyload' ) );
 	}
 
 	/**

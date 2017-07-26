@@ -5,7 +5,8 @@ namespace Rocket\Footer\JS\Lazyload;
 use Rocket\Footer\JS\ManagerAbstract;
 
 class Manager extends ManagerAbstract {
-	protected $modules = [
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$modules = [
 		'Facebook',
 		'GooglePlus',
 		'GooglePlusJS',

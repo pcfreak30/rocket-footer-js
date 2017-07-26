@@ -51,8 +51,14 @@ class ManagerAbstract extends ComponentAbstract {
 	 */
 	public function get_module( $name ) {
 		foreach ( $this->modules as $module ) {
-			if ( is_a( $module, ( new \ReflectionClass( $this ) )->getNamespaceName() . '\\' . $name ) ) {
-				return $module;
+			try {
+
+				if ( is_a( $module, ( new \ReflectionClass( $this ) )->getNamespaceName() . '\\' . $name ) ) {
+					return $module;
+				}
+
+			} catch ( \ReflectionException $e ) {
+
 			}
 		}
 

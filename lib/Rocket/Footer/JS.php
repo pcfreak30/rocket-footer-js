@@ -121,6 +121,7 @@ class JS {
 	 * @param \Rocket\Footer\JS\Lazyload\Manager    $lazyload_manager
 	 * @param \Rocket\Footer\JS\Request             $request
 	 * @param \Rocket\Footer\JS\Cache\Manager       $cache_manager
+	 * @param \Rocket\Footer\JS\DOMDocument         $document
 	 * @param \Rocket\Footer\JS\DOMDocument         $variable_document
 	 * @param \Rocket\Footer\JS\DOMDocument         $script_document
 	 */
@@ -185,7 +186,7 @@ class JS {
 	}
 
 	protected function get_dependancies_exist() {
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		$error = false;
 		if ( validate_plugin( 'wp-rocket/wp-rocket.php' ) ) {
 			$error = true;
@@ -227,7 +228,9 @@ class JS {
 	 */
 	public function process_buffer( $buffer ) {
 		$this->disable_minify_overrides();
+		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
+			/** @noinspection UsageOfSilenceOperatorInspection */
 			if ( ! @$this->document->loadHTML( mb_convert_encoding( $buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
 				return $buffer;
 			}
@@ -322,11 +325,10 @@ class JS {
 
 	protected function fetch_cache() {
 		$this->cache = $this->cache_manager->get_store()->get_cache_fragment( $this->get_cache_id() );
-		if ( ! empty( $this->cache ) ) {
-			// Cached file is gone, we dont have cache
-			if ( ! file_exists( $this->cache  ['filename'] ) ) {
-				$this->cache = false;
-			}
+
+		// Cached file is gone, we dont have cache
+		if ( ! empty( $this->cache ) && ! file_exists( $this->cache  ['filename'] ) ) {
+			$this->cache = false;
 		}
 	}
 
@@ -491,6 +493,28 @@ class JS {
 	}
 
 	/**
+	 * @param $url
+	 *
+	 * @return bool|string
+	 */
+	public function remote_fetch( $url ) {
+		$file = wp_remote_get( $url, [
+			'user-agent' => 'WP-Rocket',
+			'sslverify'  => false,
+		] );
+		if ( ! ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
+						200,
+						304,
+					) ) ) )
+		)
+		) {
+			return $file['body'];
+		}
+
+		return false;
+	}
+
+	/**
 	 * @param string $script
 	 *
 	 * @return string
@@ -506,7 +530,6 @@ class JS {
 	/**
 	 * @param string $src
 	 *
-	 * @internal param DOMElement $tag
 	 */
 	protected function process_local_script( $src ) {
 		if ( 0 == strpos( $src, '/' ) ) {
@@ -528,6 +551,7 @@ class JS {
 		 * Convert the address to a path, minify, and add to buffer.
 		 */
 		if ( class_exists( 'http\Url' ) ) {
+			/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 			$url = new \http\Url( $url_parts );
 			$url = $url->toString();
 		} else {
@@ -566,7 +590,7 @@ class JS {
 	public function get_content( $file ) {
 		/** @var \WP_Filesystem_Base $wp_filesystem */
 		global $wp_filesystem;
-		if ( is_null( $wp_filesystem ) ) {
+		if ( null === $wp_filesystem ) {
 			require_once ABSPATH . '/wp-admin/includes/file.php';
 			WP_Filesystem();
 		}
@@ -647,7 +671,7 @@ class JS {
 	public function put_content( $file, $data ) {
 		/** @var \WP_Filesystem_Base $wp_filesystem */
 		global $wp_filesystem;
-		if ( is_null( $wp_filesystem ) ) {
+		if ( null === $wp_filesystem ) {
 			require_once ABSPATH . '/wp-admin/includes/file.php';
 			WP_Filesystem();
 		}
@@ -703,6 +727,7 @@ class JS {
 
 	public function activate() {
 		if ( ! ( defined( 'ROCKET_FOOTER_JS_COMPOSER_RAN' ) && ROCKET_FOOTER_JS_COMPOSER_RAN ) ) {
+			/** @noinspection PhpIncludeInspection */
 			include_once dirname( $this->plugin_file ) . '/wordpress-web-composer/class-wordpress-web-composer.php';
 			$web_composer = new \WordPress_Web_Composer( 'rocket_footer_js' );
 			$web_composer->set_install_target( dirname( $this->plugin_file ) );
@@ -765,28 +790,6 @@ class JS {
 	 */
 	public function get_script_document() {
 		return $this->script_document;
-	}
-
-	/**
-	 * @param $url
-	 *
-	 * @return bool|string
-	 */
-	public function remote_fetch( $url ) {
-		$file = wp_remote_get( $url, [
-			'user-agent' => 'WP-Rocket',
-			'sslverify'  => false,
-		] );
-		if ( ! ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
-						200,
-						304,
-					) ) ) )
-		)
-		) {
-			return $file['body'];
-		}
-
-		return false;
 	}
 
 	protected function lazyload_html_callback( $matches ) {

@@ -8,7 +8,8 @@ use Rocket\Footer\JS\DOMElement;
 
 class Twitter extends LazyloadAbstract {
 
-	protected $regex = '~(?:window\.twttr\s*=\s*\(|!|\()\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*[\'"]script[\'"]\s*,\s*[\'"]twitter-wjs[\'"]\s*(?:\)\);|\);)~';
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$regex = '~(?:window\.twttr\s*=\s*\(|!|\()\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*[\'"]script[\'"]\s*,\s*[\'"]twitter-wjs[\'"]\s*(?:\)\);|\);)~';
 
 	/**
 	 * @param string  $content

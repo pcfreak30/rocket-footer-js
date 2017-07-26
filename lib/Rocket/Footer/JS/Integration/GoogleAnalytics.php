@@ -11,12 +11,10 @@ class GoogleAnalytics implements IntegrationInterface {
 	}
 
 	public function init_action() {
-		if ( class_exists( 'Ga_Helper' ) ) {
-			if ( ! is_admin() ) {
-				remove_action( 'wp_footer', 'Ga_Frontend::insert_ga_script' );
-				if ( \Ga_Helper::can_add_ga_code() || \Ga_Helper::is_all_feature_disabled() ) {
-					add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_script' ] );
-				}
+		if ( class_exists( 'Ga_Helper' ) && ! is_admin() ) {
+			remove_action( 'wp_footer', 'Ga_Frontend::insert_ga_script' );
+			if ( \Ga_Helper::can_add_ga_code() || \Ga_Helper::is_all_feature_disabled() ) {
+				add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_script' ] );
 			}
 		}
 	}

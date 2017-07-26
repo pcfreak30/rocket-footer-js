@@ -30,7 +30,7 @@ class GooglePlus extends LazyloadAbstract {
 					$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
 					if ( 0 == $tag->childNodes->length ) {
 						$img = $this->create_pixel_image();
-						$tag->setAttribute( 'data-lazy-widget', "google-plus-platform" );
+						$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
 						$tag->appendChild( $img );
 					}
 				}

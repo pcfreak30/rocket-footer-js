@@ -36,26 +36,24 @@ class Tawkto implements IntegrationInterface {
 				$script = str_replace( $matches[0], '', $script );
 				$this->tags->add( $this->create_script( null, $matches[1] ) );
 			}
-			if ( ! empty( $rocket_async_css_file ) ) {
-				if ( class_exists( 'Rocket_Async_Css' ) && method_exists( 'Rocket_Async_Css', 'minify_remote_file' ) && preg_match( '~\w\.href\s*=\s*"(https://cdn\.jsdelivr\.net/emojione/[\d\.]+/assets/css/emojione\.min\.css)"\s*;~', $script, $matches ) ) {
-					$script        = str_replace( $matches[0], '', $script );
-					$style         = rocket_footer_js()->get_content( $rocket_async_css_file );
-					$item_cache_id = md5( $matches[1] );
-					$store         = rocket_footer_js()->get_cache_manager()->get_store();
-					$store->set_prefix( Rocket_Async_Css::TRANSIENT_PREFIX );
-					$file = $store->get_cache_fragment( $item_cache_id );
-					if ( empty( $file ) ) {
-						$file = rocket_footer_js()->remote_fetch( $matches[1] );
-					}
-					// Do nothing on error
-					if ( ! empty( $file ) ) {
-						$css_part = Rocket_Async_Css::get_instance()->minify_remote_file( $url, $file );
-						$style    .= $css_part;
-						$store->update_cache_fragment( $item_cache_id, $css_part );
-						rocket_footer_js()->put_content( $rocket_async_css_file, $style );
-					}
-					$store->set_prefix( JS::TRANSIENT_PREFIX );
+			if ( ! empty( $rocket_async_css_file ) && class_exists( 'Rocket_Async_Css' ) && method_exists( 'Rocket_Async_Css', 'minify_remote_file' ) && preg_match( '~\w\.href\s*=\s*"(https://cdn\.jsdelivr\.net/emojione/[\d\.]+/assets/css/emojione\.min\.css)"\s*;~', $script, $matches ) ) {
+				$script        = str_replace( $matches[0], '', $script );
+				$style         = rocket_footer_js()->get_content( $rocket_async_css_file );
+				$item_cache_id = md5( $matches[1] );
+				$store         = rocket_footer_js()->get_cache_manager()->get_store();
+				$store->set_prefix( Rocket_Async_Css::TRANSIENT_PREFIX );
+				$file = $store->get_cache_fragment( $item_cache_id );
+				if ( empty( $file ) ) {
+					$file = rocket_footer_js()->remote_fetch( $matches[1] );
 				}
+				// Do nothing on error
+				if ( ! empty( $file ) ) {
+					$css_part = Rocket_Async_Css::get_instance()->minify_remote_file( $url, $file );
+					$style    .= $css_part;
+					$store->update_cache_fragment( $item_cache_id, $css_part );
+					rocket_footer_js()->put_content( $rocket_async_css_file, $style );
+				}
+				$store->set_prefix( JS::TRANSIENT_PREFIX );
 			}
 		}
 

@@ -5,7 +5,8 @@ namespace Rocket\Footer\JS\Rewrite;
 use Rocket\Footer\JS\ManagerAbstract;
 
 class Manager extends ManagerAbstract {
-	protected $modules = [
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$modules = [
 		'Tawkto',
 		'WPRocketLazyload',
 		'GoogleAnalytics',

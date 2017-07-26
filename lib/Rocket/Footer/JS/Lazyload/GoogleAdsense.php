@@ -31,7 +31,7 @@ class GoogleAdsense extends LazyloadAbstract {
 			}
 			do {
 				$next_tag = $next_tag->nextSibling;
-			} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' === strtolower( $next_tag->tagName ) && isset( $next_tag->textContent ) && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
+			} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' === strtolower( $next_tag->tagName ) && null !== $next_tag->textContent && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
 			$js_node = $next_tag;
 			if ( null !== $next_tag ) {
 				$sub_content .= $this->get_script_content( $js_node );
@@ -57,7 +57,7 @@ class GoogleAdsense extends LazyloadAbstract {
 				$next_tag = $tag;
 				do {
 					$next_tag = $next_tag->nextSibling;
-				} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' === strtolower( $next_tag->tagName ) && isset( $next_tag->textContent ) && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
+				} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' === strtolower( $next_tag->tagName ) && null !== $next_tag->textContent && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
 				$js_node = $next_tag;
 				if ( ! empty( $js_node ) ) {
 					$this->set_no_minify( $js_node );

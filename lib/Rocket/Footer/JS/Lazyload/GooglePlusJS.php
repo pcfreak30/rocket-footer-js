@@ -8,7 +8,8 @@ use Rocket\Footer\JS\DOMElement;
 
 class GooglePlusJS extends LazyloadAbstract {
 
-	protected $regex = '~\(\s*function\s*\(\s*\)\s*{.*\(\s*.*po\s*\.\s*src\s*=\s*["\']https://apis\s*.google\s*.com/js/(?:platform|plusone).js["\'];.*}\s*\)\s*\(\s*\)\s*;~';
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$regex = '~\(\s*function\s*\(\s*\)\s*{.*\(\s*.*po\s*\.\s*src\s*=\s*["\']https://apis\s*.google\s*.com/js/(?:platform|plusone).js["\'];.*}\s*\)\s*\(\s*\)\s*;~';
 
 	/**
 	 * @param string  $content
@@ -33,7 +34,7 @@ class GooglePlusJS extends LazyloadAbstract {
 					$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
 					if ( 0 == $tag->childNodes->length ) {
 						$img = $this->create_pixel_image();
-						$tag->setAttribute( 'data-lazy-widget', "google-plus-platform" );
+						$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
 						$tag->appendChild( $img );
 					}
 				}

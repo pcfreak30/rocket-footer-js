@@ -47,9 +47,11 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 */
 	public function rewrite( $document = null, $content_document = null ) {
 		if ( ! $document ) {
+			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
 			$document = rocket_footer_js()->get_document();
 		}
 		if ( ! $content_document ) {
+			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
 			$content_document = $document;
 		}
 		$this->document         = $document;

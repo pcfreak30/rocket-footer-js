@@ -7,7 +7,8 @@ namespace Rocket\Footer\JS\Lazyload;
 use Rocket\Footer\JS\DOMElement;
 
 class Tumbler extends LazyloadAbstract {
-	protected $regex = '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*[\'"]script[\'"]\s*,\s*[\'"]tumblr-js[\'"]\s*(?:\)\);|\);)~';
+	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
+		$regex = '~\(\s*function\s*\(\s*d\s*,\s*s\s*,\s*id\s*\)\s*{.*\(\s*document\s*,\s*[\'"]script[\'"]\s*,\s*[\'"]tumblr-js[\'"]\s*(?:\)\);|\);)~';
 
 	/**
 	 * @param string  $content

@@ -14,6 +14,7 @@ class NExtend implements IntegrationInterface {
 	}
 
 	public function disable( $referenceKey, &$rows ) {
+		/** @noinspection ReferenceMismatchInspection */
 		foreach ( array_keys( $rows ) as $key ) {
 			if ( in_array( $rows[ $key ]['referencekey'], [
 				'async',

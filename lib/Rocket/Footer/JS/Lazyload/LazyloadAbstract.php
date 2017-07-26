@@ -7,7 +7,6 @@ namespace Rocket\Footer\JS\Lazyload;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\DOMElement;
-use Rocket\Footer\JS\Lazyload\LazyloadInterface;
 use Rocket\Footer\JS\TagHelperTrait;
 
 /**
@@ -54,9 +53,11 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 */
 	public function lazyload( $document = null, $content_document = null ) {
 		if ( ! $document ) {
+			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
 			$document = rocket_footer_js()->get_document();
 		}
 		if ( ! $content_document ) {
+			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
 			$content_document = $document;
 		}
 		$this->document         = $document;
@@ -91,17 +92,10 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	}
 
 	/**
-	 * @param string  $content
-	 *
-	 * @param  string $src
-	 *
-	 * @return void
+	 * @return bool
 	 */
-	abstract protected function do_lazyload( $content, $src );
-
-
-	protected function after_do_lazyload() {
-
+	protected function is_enabled() {
+		return rocket_footer_js()->get_lazyload_manager()->is_enabled();
 	}
 
 	/**
@@ -116,18 +110,24 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		}
 	}
 
-
 	/**
-	 * @return bool
+	 * @param string  $content
+	 *
+	 * @param  string $src
+	 *
+	 * @return void
 	 */
-	protected function is_enabled() {
-		return rocket_footer_js()->get_lazyload_manager()->is_enabled();
+	abstract protected function do_lazyload( $content, $src );
+
+	protected function after_do_lazyload() {
+
 	}
 
 	protected function lazyload_script( $html, $id, $tag = null ) {
 		/** @var DOMElement $external_tag */
 		$collection = false;
 		if ( ! $tag ) {
+			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
 			$tag        = $this->tags->current();
 			$collection = true;
 		}

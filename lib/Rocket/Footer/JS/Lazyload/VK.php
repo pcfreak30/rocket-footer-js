@@ -21,6 +21,7 @@ class VK extends LazyloadAbstract {
 		} while ( null !== $next_tag && XML_ELEMENT_NODE !== $next_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
 
 		if ( preg_match( '~document\s*.\s*write\s*\(\s*(VK\s*.\s*Share\s*.\s*button.*.\s*\))\s*\);~', $next_tag->textContent, $matches ) ) {
+			/** @noinspection Annotator */
 			$share_script = <<<JS
 (function check () {
   if (typeof VK === 'undefined') {
