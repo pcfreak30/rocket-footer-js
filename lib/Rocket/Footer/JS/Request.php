@@ -10,8 +10,12 @@ class Request extends ComponentAbstract {
 		parent::init();
 		add_action( 'init', [ $this, 'init_action' ] );
 		if ( ! is_admin() ) {
-			add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
-			add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
+			if ( is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
+				remove_filter( 'rocket_buffer', 'rocket_minify_process', 13 );
+			} else {
+				add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
+				add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
+			}
 			if ( ! in_array( $pagenow, array( 'wp-login.php', 'wp-signup.php' ) ) ) {
 				// Ensure zxcvbn is loaded normally, not async so it gets minified
 				add_action( 'wp_default_scripts', [ $this, 'deasync_zxcvbn' ] );
