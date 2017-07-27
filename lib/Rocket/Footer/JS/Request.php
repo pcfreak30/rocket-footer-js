@@ -12,6 +12,7 @@ class Request extends ComponentAbstract {
 		if ( ! is_admin() ) {
 			if ( is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
 				remove_filter( 'rocket_buffer', 'rocket_minify_process', 13 );
+				remove_filter( 'rocket_buffer', 'rocket_minify_html', 20 );
 			} else {
 				add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 				add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
