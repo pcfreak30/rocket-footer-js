@@ -265,7 +265,7 @@ class JS {
 			//Get HTML
 			$buffer = $this->document->saveHTML();
 
-			$this->do_minify_html( $buffer );
+			$buffer = $this->do_minify_html( $buffer );
 		}
 
 		return $buffer;
