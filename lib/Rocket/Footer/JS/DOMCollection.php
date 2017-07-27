@@ -37,7 +37,7 @@ class DOMCollection implements \Iterator {
 	}
 
 	private function fetch() {
-		$this->list = $this->document->getElementsByTagName( 'script' );
+		$this->list = $this->document->getElementsByTagName( $this->tag_type );
 	}
 
 	/**
