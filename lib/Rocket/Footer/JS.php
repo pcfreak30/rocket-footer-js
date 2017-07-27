@@ -419,26 +419,25 @@ class JS {
 	 *
 	 */
 	protected function process_script() {
-		$src = $this->dom_collection->current()->getAttribute( 'src' );
 		// If the last character is not a semicolon, and we have content,add one to prevent syntax errors
 		if ( 0 < strlen( $this->js ) && ! in_array( $this->js[ strlen( $this->js ) - 1 ], [ ';', "\n" ] ) ) {
 			$this->js .= ";\n";
 		}
 		//Decode html entities
-		$src = html_entity_decode( preg_replace( '/((?<!&)#.*;)/', '&$1', $src ) );
+		$src = $this->dom_collection->current()->getAttribute( 'src' );
 		if ( ! empty( $src ) ) {
-			$this->process_external_script( $src );
-
+			$this->process_external_script();
 			return;
 		}
 		$this->process_inline_script();
 	}
 
 	/**
-	 * @param  string $src
 	 *
 	 */
-	protected function process_external_script( $src ) {
+	protected function process_external_script() {
+		$src = $this->dom_collection->current()->getAttribute( 'src' );
+		$src = html_entity_decode( preg_replace( '/((?<!&)#.*;)/', '&$1', $src ) );
 		if ( empty( $this->cache ) ) {
 			if ( 0 === strpos( $src, '//' ) ) {
 				//Handle no protocol urls
