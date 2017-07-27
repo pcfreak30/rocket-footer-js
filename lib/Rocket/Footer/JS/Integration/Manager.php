@@ -16,6 +16,7 @@ class Manager extends ManagerAbstract {
 		'GoogleAnalytics',
 		'PixelYourSite',
 		'WoocommerceSocialMediaSharesButtons',
+		'RevolutionSlider',
 	];
 
 }
