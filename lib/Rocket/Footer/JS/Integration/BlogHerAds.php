@@ -8,7 +8,7 @@ use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\TagHelperTrait;
 
-class BlogHer implements IntegrationInterface {
+class BlogHerAds implements IntegrationInterface {
 	use TagHelperTrait;
 	/**
 	 * @var DOMDocument

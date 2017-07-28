@@ -17,7 +17,7 @@ class Manager extends ManagerAbstract {
 		'PixelYourSite',
 		'WoocommerceSocialMediaSharesButtons',
 		'RevolutionSlider',
-		'BlogHer',
+		'BlogHerAds',
 	];
 
 }
