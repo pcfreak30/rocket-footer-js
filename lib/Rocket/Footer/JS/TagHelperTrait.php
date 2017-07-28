@@ -126,7 +126,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return '' === trim( $tag->getAttribute( 'data-no-minify' ) );
+		return ! trim( $tag->getAttribute( 'data-no-minify' ) );
 	}
 
 	/**
@@ -143,7 +143,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return '' === trim( $tag->getAttribute( 'data-no-lazyload' ) );
+		return ! trim( $tag->getAttribute( 'data-no-lazyload' ) );
 	}
 
 	/**
