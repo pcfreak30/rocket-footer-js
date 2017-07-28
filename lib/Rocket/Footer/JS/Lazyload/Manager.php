@@ -18,7 +18,7 @@ class Manager extends ManagerAbstract {
 		'AmazonAds',
 		'StumbleUpon',
 		'VK',
-		'BlogherAds',
+		'BlogHerAds',
 		'GoogleRemarketing',
 	];
 

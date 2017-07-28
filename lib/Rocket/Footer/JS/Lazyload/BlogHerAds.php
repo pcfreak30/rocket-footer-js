@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Lazyload;
 
 
-class BlogherAds extends LazyloadAbstract {
+class BlogHerAds extends LazyloadAbstract {
 
 	/**
 	 * @param string  $content
