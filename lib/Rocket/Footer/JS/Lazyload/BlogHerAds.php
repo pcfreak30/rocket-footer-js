@@ -42,10 +42,19 @@ class BlogHerAds extends LazyloadAbstract {
 					$this->inject_tag( $this->create_script( null, 'https://cdnjs.cloudflare.com/ajax/libs/Base64/1.0.1/base64.min.js' ) );
 					$this->base64_injected = true;;
 				}
-
+				$comment_tag  = $this->content_document->createComment( $this->get_script_content( $js_tag ) . $this->get_script_content( $tag ) );
+				$external_tag = $this->content_document->createElement( 'div' );
+				$external_tag->appendChild( $comment_tag );
+				$external_tag->setAttribute( 'id', "blogherads-{$this->instance}" );
+				$span = $this->create_tag( 'span' );
+				$img  = $this->create_pixel_image();
+				$span->setAttribute( 'data-lazy-widget', "blogherads-{$this->instance}" );
+				$span->appendChild( $img );
+				$this->append_tag( $span );
+				$tag->parentNode->appendChild( $span );
 				$this->inject_tag( $this->create_script( '(function($) {
     var height = $(window).height();
-    var html = "' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '";
+    var html = "' . base64_encode( $this->get_script_content( $external_tag ) ) . '";
     var items = [];
 
     (function loop(node) {
@@ -63,6 +72,7 @@ class BlogHerAds extends LazyloadAbstract {
     if(final_item)$(final_item).before(atob(html))
 })(jQuery);' ) );
 				$this->tags->remove();
+				$this->instance ++;
 
 				return;
 			}
@@ -71,9 +81,9 @@ class BlogHerAds extends LazyloadAbstract {
 			}
 			$span = $this->create_tag( 'span' );
 			$img  = $this->create_pixel_image();
-			$span->setAttribute( 'data-lazy-widget', "blogherads-{$this->instance}" );
 			$span->appendChild( $img );
-			$tag->parentNode->appendChild( $span );
+			$span->setAttribute( 'data-lazy-widget', "blogherads-{$this->instance}" );
+			$this->append_tag( $span );
 			$this->lazyload_script( $lazyload_content, "blogherads-{$this->instance}" );
 			$this->instance ++;
 		}
