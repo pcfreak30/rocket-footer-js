@@ -43,7 +43,7 @@ class BlogHerAds extends LazyloadAbstract {
 					$this->base64_injected = true;;
 				}
 
-				$this->inject_tag( $this->create_script( '(function(a){var f=a(window).height(),c=[];(function g(b){if(b.getBoundingClientRect){var d=parseInt(b.getBoundingClientRect().top+window.scrollY);d-100>f&&!c[d]&&(c[d]=b)}a(b).children().each(function(b,a){g(a)})})(document);var e=c.filter(Boolean).shift();e&&a(e).before(atob("' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '"))})(jQuery);' ) );
+				$this->inject_tag( $this->create_script( '(function(a){var f=a(window).height(),c=[];(function g(b){if(b.getBoundingClientRect){var d=parseInt(b.getBoundingClientRect().top+window.scrollY);d-100>f&&!c[d]&&(c[d]=b)}a(b).children().each(function(b,a){g(a)})})(document);var e=c.filter(Boolean).shift();e&&a(e).before(' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '"))})(jQuery);' ) );
 				$this->tags->remove();
 
 				return;
