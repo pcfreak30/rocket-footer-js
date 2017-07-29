@@ -52,7 +52,7 @@ class BlogHerAds extends LazyloadAbstract {
         if (node.getBoundingClientRect) {
             var pos = parseInt(node.getBoundingClientRect().top + window.scrollY);
             if (pos - 100 > height) {
-                !items[pos] && (items[pos] = node);
+                if(!items[pos])items[pos] = node;
             }
         }
         $(node).children().each(function(index, element) {
