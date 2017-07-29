@@ -16,8 +16,20 @@ class BlogHerAds extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload( $content, $src ) {
-		if ( 'ads.blogherads.com' === parse_url( $src, PHP_URL_HOST ) ) {
-			$tag = $this->tags->current();
+		if ( 'ads.blogherads.com' === parse_url( $src, PHP_URL_HOST ) || preg_match( '~blogherads\s*.\s*adq\s*.\s*push\s*\(\s*\[[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\]\s*\)\s*;~U', $content, $matches ) ) {
+
+			$tag              = $this->tags->current();
+			$lazyload_content = '';
+			if ( ! empty( $matches ) ) {
+				$prev_tag = $tag;
+				do {
+					$prev_tag = $prev_tag->previousSibling;
+				} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'div' !== strtolower( $tag->tagName ) && $matches[1] !== $tag->getAttribute( 'id' ) );
+				$div_tag = $prev_tag;
+				if ( ! empty( $div_tag ) ) {
+					$lazyload_content = $this->get_script_content( $div_tag ) . $this->get_script_content();
+				}
+			}
 			$this->inject_tag( $this->create_script( 'document.old_write=document.old_write||document.write;document.write=function(data){if(document.currentScript)(function check(){if(typeof jQuery==="undefined")setTimeout(10,check);else jQuery(document.currentScript).before(data)})()};' ) );
 			$file = rocket_footer_js()->remote_fetch( $src );
 			if ( ! empty( $file ) && false !== strpos( $file, 'static/blogherads.js' ) ) {
@@ -37,13 +49,15 @@ g=g<<8|d}return e});b.atob||(b.atob=function(a){a=String(a).replace(/[=]+$/,"");
 
 				return;
 			}
-
+			if ( empty( $lazyload_content ) ) {
+				$lazyload_content = $this->get_script_content();
+			}
 			$span = $this->create_tag( 'span' );
 			$img  = $this->create_pixel_image();
 			$span->setAttribute( 'data-lazy-widget', "blogherads-{$this->instance}" );
 			$span->appendChild( $img );
 			$tag->parentNode->appendChild( $span );
-			$this->lazyload_script( $this->get_script_content(), "blogherads-{$this->instance}" );
+			$this->lazyload_script( $lazyload_content, "blogherads-{$this->instance}" );
 			$this->instance ++;
 		}
 	}
