@@ -43,7 +43,25 @@ class BlogHerAds extends LazyloadAbstract {
 					$this->base64_injected = true;;
 				}
 
-				$this->inject_tag( $this->create_script( '(function($){var height=$(window).height();var html="hello world";var items=[];(function loop(node){if(node.getBoundingClientRect){var pos=parseInt(node.getBoundingClientRect().top+window.scrollY);if(pos-100>height)!items[pos]&&(items[pos]=node)}$(node).children().each(function(index,element){loop(element)})})(document);var final_item=items.filter(Boolean).shift();final_item&&$(final_item).before(atob(' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '"))})(jQuery);' ) );
+				$this->inject_tag( $this->create_script( '(function($) {
+    var height = $(window).height();
+    var html = "' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '");
+    var items = [];
+
+    (function loop(node) {
+        if (node.getBoundingClientRect) {
+            var pos = parseInt(node.getBoundingClientRect().top + window.scrollY);
+            if (pos - 100 > height) {
+                !items[pos] && (items[pos] = node);
+            }
+        }
+        $(node).children().each(function(index, element) {
+            loop(element)
+        });
+    })(document);
+    var final_item = items.filter(Boolean).shift();
+    final_item && $(final_item).before(html)
+})(jQuery);' ) );
 				$this->tags->remove();
 
 				return;
