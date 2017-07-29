@@ -27,7 +27,7 @@ class PinInterest extends LazyloadAbstract {
 					$tag->appendChild( $img );
 				}
 			}
-			$this->lazyload_script( $this->get_script_content( $this->create_tag( null, 'https://assets.pinterest.com/js/pinit_main.js' ) ), 'pin-interest' );
+			$this->lazyload_script( $this->get_script_content( $this->create_script( null, 'https://assets.pinterest.com/js/pinit_main.js' ) ), 'pin-interest' );
 			$this->tags->remove();
 		}
 	}
