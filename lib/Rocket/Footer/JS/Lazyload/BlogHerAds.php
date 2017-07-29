@@ -45,7 +45,7 @@ class BlogHerAds extends LazyloadAbstract {
 
 				$this->inject_tag( $this->create_script( '(function($) {
     var height = $(window).height();
-    var html = "' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '");
+    var html = "' . base64_encode( $this->content_document->saveHTML( $js_tag ) . $this->content_document->saveHTML( $tag ) ) . '";
     var items = [];
 
     (function loop(node) {
