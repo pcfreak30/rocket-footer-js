@@ -16,8 +16,7 @@ class BlogHerAds extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload( $content, $src ) {
-		if ( 'ads.blogherads.com' === parse_url( $src, PHP_URL_HOST ) || preg_match( '~blogherads\s*.\s*adq\s*.\s*push\s*\(\s*\[[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\]\s*\)\s*;~U', $content, $matches ) ) {
-
+		if ( 'ads.blogherads.com' === parse_url( $src, PHP_URL_HOST ) || preg_match( '~blogherads\s*.\s*adq\s*.\s*push\s*\(\s*\[[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\]\s*\)\s*;~U', $content, $matches ) || preg_match( '~blogherads\s*.\s*defineSlot\s*\(\s*[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\s*\)~U', $content, $matches ) ) {
 			$tag              = $this->tags->current();
 			$lazyload_content = '';
 			if ( ! empty( $matches ) ) {
