@@ -60,7 +60,7 @@ class BlogHerAds extends LazyloadAbstract {
         });
     })(document);
     var final_item = items.filter(Boolean).shift();
-    final_item && $(final_item).before(html)
+    final_item && $(final_item).before(atob(html))
 })(jQuery);' ) );
 				$this->tags->remove();
 
