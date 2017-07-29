@@ -18,7 +18,7 @@ class AmazonAds extends LazyloadAbstract {
 			$tag      = $this->tags->current();
 			$prev_tag = $tag;
 			do {
-				$prev_tag = $prev_tag->nextSibling;
+				$prev_tag = $prev_tag->previousSibling;
 			} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
 			$sub_content = $this->get_script_content() . $this->get_tag_content( $prev_tag );
 			$img         = $this->create_pixel_image();
