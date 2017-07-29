@@ -22,7 +22,7 @@ trait TagHelperTrait {
 	 * @param DOMElement $tag
 	 */
 	protected function append_tag( $tag ) {
-		$this->tags->current()->appendChild( $tag );
+		$this->tags->current()->parentNode->appendChild( $tag );
 	}
 
 	/**
