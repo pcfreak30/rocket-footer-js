@@ -23,7 +23,23 @@ class PinInterest extends LazyloadAbstract {
 				$img = $this->create_pixel_image();
 				$img->setAttribute( 'data-lazy-widget', "pin-interest-{$this->instance}" );
 				$tag->parentNode->insertBefore( $img, $tag );
-				$this->lazyload_script( $this->get_script_content( $tag ), "pin-interest-{$this->instance}", $tag );
+				$tag->setAttribute( 'id', "pin-interest-{$this->instance}" );
+				$external_script = $this->create_script(
+					<<<JS
+(function ($, w) {
+	var el = $("#pin-interest-{$this->instance}");
+	el.prev('[data-lazy-widget="pin-interest-{$this->instance}"]').remove();
+	for (key in w) {
+		if (key.match(/PIN_\d+/)) {
+			if (w[ key ] && w[ key ].f && w[ key ].f.util && w[ key ].f.util.build) {
+				w[ key ].f.util.build(el.get(0));
+			}
+		}
+	}
+})(jQuery, window);
+JS
+				);
+				$this->lazyload_script( $this->get_script_content( $tag ) . $this->get_script_content( $external_script ), "pin-interest-{$this->instance}", $tag );
 				$this->instance ++;
 			}
 			if ( ! $this->injected ) {
