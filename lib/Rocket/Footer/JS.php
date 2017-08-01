@@ -236,6 +236,7 @@ class JS {
 			}
 
 			$this->body = $this->document->getElementsByTagName( 'body' )->item( 0 );
+			$this->normalize_cdn_domains();
 
 			do_action( 'rocket_footer_js_do_rewrites' );
 			do_action( 'rocket_footer_js_do_lazyload' );
@@ -245,7 +246,6 @@ class JS {
 			$this->fetch_cache();
 			$filename = '';
 			if ( empty( $this->cache ) ) {
-				$this->normalize_cdn_domains();
 				$filename = $this->get_cache_filename();
 			}
 
