@@ -31,9 +31,7 @@ class PinInterest extends LazyloadAbstract {
 	el.prev('[data-lazy-widget="pin-interest-{$this->instance}"]').remove();
 	for (key in w) {
 		if (key.match(/PIN_\d+/)) {
-			if (w[ key ] && w[ key ].f && w[ key ].f.util && w[ key ].f.util.build) {
-				w[ key ].f.util.build(el.get(0));
-			}
+			w[ key ].f.util.build(el.parent().get(0));
 		}
 	}
 })(jQuery, window);
