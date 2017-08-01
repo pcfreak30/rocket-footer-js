@@ -22,7 +22,7 @@ class PinInterest extends LazyloadAbstract {
 			foreach ( $this->xpath->query( '//*[@data-pin-do]' ) as $tag ) {
 				$img = $this->create_pixel_image();
 				$tag->setAttribute( 'data-lazy-widget', "pin-interest-{$this->instance}" );
-				$tag->parentNode->insertBefore( $tag, $img );
+				$tag->parentNode->insertBefore( $img, $tag );
 				$this->lazyload_script( $this->get_script_content( $tag ), "pin-interest-{$this->instance}", $tag );
 				$this->instance ++;
 			}
