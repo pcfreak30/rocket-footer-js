@@ -48,6 +48,7 @@ class Manager extends ComponentAbstract {
 	 */
 	public function purge_cache() {
 		$this->store->delete_cache_branch();
+		rocket_rrmdir( $this->app->get_cache_path() );
 	}
 
 	/**
