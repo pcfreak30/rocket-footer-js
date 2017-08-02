@@ -117,6 +117,6 @@ JS
 	}
 
 	protected function is_match( $content, $src ) {
-		return $this->is_no_minify() && ( 'ads.blogherads.com' === parse_url( $src, PHP_URL_HOST ) || preg_match( '~blogherads\s*.\s*adq\s*.\s*push\s*\(\s*\[[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\]\s*\)\s*;~U', $content, $this->regex_match ) || preg_match( '~blogherads\s*.\s*defineSlot\s*\(\s*[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\s*\)~U', $content, $this->regex_match ) );
+		return ! $this->is_no_minify() && ( 'ads.blogherads.com' === parse_url( $src, PHP_URL_HOST ) || preg_match( '~blogherads\s*.\s*adq\s*.\s*push\s*\(\s*\[[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\]\s*\)\s*;~U', $content, $this->regex_match ) || preg_match( '~blogherads\s*.\s*defineSlot\s*\(\s*[\'"].*[\'"]\s*,\s*[\'"](.*)[\'"]\s*\s*\)~U', $content, $this->regex_match ) );
 	}
 }
