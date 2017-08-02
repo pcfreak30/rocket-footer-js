@@ -37,7 +37,7 @@ class BlogHerAds extends LazyloadAbstract {
 				$prev_tag = $tag;
 				do {
 					$prev_tag = $prev_tag->previousSibling;
-				} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
+				} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' !== strtolower( $tag->tagName ) && ! $tag->isSameNode( $doc_write_script ) );
 				$js_tag = $prev_tag;
 				$js_tag->setAttribute( 'style', 'display:none' );
 				$tag->setAttribute( 'style', 'display:none' );
