@@ -50,7 +50,6 @@ class BlogHerAds extends LazyloadAbstract {
 				$span->setAttribute( 'data-lazy-widget', "blogherads-{$this->instance}" );
 				$span->appendChild( $img );
 				$this->append_tag( $span );
-				$tag->parentNode->appendChild( $span );
 				$window_check_script = $this->create_script(
 					<<<JS
 (function () {
@@ -62,7 +61,7 @@ JS
 				);
 				$this->set_no_minify( $window_check_script );
 				$this->inject_tag( $window_check_script );
-				$html = base64_encode( $this->get_script_content( $external_tag ) );
+				$html = base64_encode( $this->get_script_content( $span ) . $this->get_script_content( $external_tag ) );
 				$this->inject_tag( $this->create_script(
 					<<<JS
 (function ($) {
