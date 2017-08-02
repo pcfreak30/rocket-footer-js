@@ -51,25 +51,45 @@ class BlogHerAds extends LazyloadAbstract {
 				$span->appendChild( $img );
 				$this->append_tag( $span );
 				$tag->parentNode->appendChild( $span );
-				$this->inject_tag( $this->create_script( '(function($) {
-    var height = $(window).height();
-    var html = "' . base64_encode( $this->get_script_content( $external_tag ) ) . '";
-    var items = [];
+				$window_check_script = $this->create_script( '(function($) {
+					$(window).load(function() { window.loaded = true; });
+				})(jQuery);' );
+				$this->set_no_minify( $window_check_script );
+				$this->inject_tag( $window_check_script );
+				$html = base64_encode( $this->get_script_content( $external_tag ) );
+				$this->inject_tag( $this->create_script(
+					<<<JS
+(function ($) {
+	var run = function () {
+		var height = $(window).height();
+		var html = "{$html}";
+		var items = [];
 
-    (function loop(node) {
-        if (node.getBoundingClientRect) {
-            var pos = parseInt(node.getBoundingClientRect().top + window.scrollY);
-            if (pos - 100 > height) {
-                if(!items[pos])items[pos] = node;
-            }
-        }
-        $(node).children().each(function(index, element) {
-            loop(element)
-        });
-    })(document);
-    var final_item = items.filter(Boolean).shift();
-    if(final_item)$(final_item).before(atob(html))
-})(jQuery);' ) );
+		(function loop (node) {
+			if (node.getBoundingClientRect) {
+				var pos = parseInt(node.getBoundingClientRect().top + window.scrollY);
+				if (pos - 100 > height)
+				{
+					if (!items[ pos ]) items[ pos ] = node;
+				}
+			}
+			$(node).children().each(function (index, element) {
+				loop(element)
+			});
+		})(document);
+		var final_item = items.filter(Boolean).shift();
+		if (final_item) $(final_item).before(atob(html))
+	}
+	if (window.loaded) {
+		run();
+		return;
+	}
+	$(window).load(run);
+})(jQuery);
+JS
+				) );
+
+
 				$this->tags->remove();
 				$this->instance ++;
 
