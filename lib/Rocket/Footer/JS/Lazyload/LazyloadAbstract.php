@@ -74,11 +74,15 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
 			$content = trim( $content, '/' );
 			if ( ! $this->is_enabled() || $this->is_no_lazyload() ) {
-				$this->do_lazyload_off( $content, $src );
+				if ( $this->is_match( $content, $src ) ) {
+					$this->do_lazyload_off( $content, $src );
+				}
 				$this->tags->next();
 				continue;
 			}
-			$this->do_lazyload( $content, $src );
+			if ( $this->is_match( $content, $src ) ) {
+				$this->do_lazyload( $content, $src );
+			}
 			$this->tags->next();
 		}
 		$this->after_do_lazyload();
@@ -105,9 +109,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 * @return void
 	 */
 	protected function do_lazyload_off( $content, $src ) {
-		if ( ( empty( $this->regex ) && ! $this->is_no_minify() ) || ( ! empty( $this->regex ) && preg_match( $this->regex, $content ) ) ) {
-			$this->set_no_minify();
-		}
+		$this->set_no_minify();
 	}
 
 	/**
@@ -165,7 +167,17 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		return $img;
 	}
 
-	/**
-	 * @return DOMCollection
-	 */
+	protected function is_match( $content, $src ) {
+		if ( $this->is_no_minify() ) {
+			return false;
+		}
+		if ( empty( $this->regex ) ) {
+			return false;
+		}
+		if ( preg_match( $this->regex, $content ) ) {
+			return true;
+		}
+
+		return false;
+	}
 }
