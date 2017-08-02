@@ -38,7 +38,15 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 */
 	protected $instance = 0;
 
+	/**
+	 * @var string
+	 */
 	protected $regex;
+
+	/**
+	 * @var array
+	 */
+	protected $regex_match;
 
 	/**
 	 *
@@ -121,10 +129,18 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 */
 	abstract protected function do_lazyload( $content, $src );
 
+	/**
+	 *
+	 */
 	protected function after_do_lazyload() {
 
 	}
 
+	/**
+	 * @param      $html
+	 * @param      $id
+	 * @param null $tag
+	 */
 	protected function lazyload_script( $html, $id, $tag = null ) {
 		/** @var DOMElement $external_tag */
 		$collection = false;
@@ -167,6 +183,12 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		return $img;
 	}
 
+	/**
+	 * @param $content
+	 * @param $src
+	 *
+	 * @return bool
+	 */
 	protected function is_match( $content, $src ) {
 		if ( $this->is_no_minify() ) {
 			return false;
@@ -174,7 +196,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		if ( empty( $this->regex ) ) {
 			return false;
 		}
-		if ( preg_match( $this->regex, $content ) ) {
+		if ( preg_match( $this->regex, $content, $this->regex_match ) ) {
 			return true;
 		}
 
