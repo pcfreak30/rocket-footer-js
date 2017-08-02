@@ -384,7 +384,7 @@ class JS {
 		return $filename;
 	}
 
-	protected function get_cache_path() {
+	public function get_cache_path() {
 		return WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
 	}
 
