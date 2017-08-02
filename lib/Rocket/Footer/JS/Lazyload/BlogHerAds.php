@@ -82,7 +82,7 @@ JS
 			$(node).children().each(function (index, element) {
 				loop(element)
 			});
-		})(document);
+		})(document.body);
 		var final_item = items.filter(Boolean).shift();
 		if (final_item) $(final_item).before(atob(html))
 	}
