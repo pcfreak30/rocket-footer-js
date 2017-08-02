@@ -18,13 +18,12 @@ class Tumbler extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload( $content, $src ) {
-		if ( preg_match( $this->regex, $content, $matches ) ) {
-			$tag_content = $this->get_script_content();
-			$this->lazyload_script( $tag_content, 'tumblr-share-button-widget' );
-			/** @var DOMElement $tag */
-			foreach ( $this->xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " tumblr-share-button ")]' ) as $tag ) {
-				$tag->setAttribute( 'data-lazy-widget', 'twitter-sdk' );
-			}
+		$tag_content = $this->get_script_content();
+		$this->lazyload_script( $tag_content, 'tumblr-share-button-widget' );
+		/** @var DOMElement $tag */
+		foreach ( $this->xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " tumblr-share-button ")]' ) as $tag ) {
+			$tag->setAttribute( 'data-lazy-widget', 'twitter-sdk' );
 		}
 	}
+
 }

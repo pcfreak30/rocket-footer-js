@@ -29,4 +29,8 @@ class Iframe extends LazyloadAbstract {
 			}
 		}
 	}
+
+	protected function is_match( $content, $src ) {
+		return false;
+	}
 }

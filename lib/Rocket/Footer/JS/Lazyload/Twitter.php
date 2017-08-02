@@ -19,23 +19,22 @@ class Twitter extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload( $content, $src ) {
-		if ( preg_match( $this->regex, $content, $matches ) ) {
-			$tag_content = $this->get_script_content();
-			$this->lazyload_script( $tag_content, 'twitter-sdk' );
-			/** @var DOMElement $tag */
-			foreach (
-				array(
-					'twitter-share-button',
-					'twitter-hashtag-button',
-					'twitter-mention-button',
-					'twitter-dm-button',
-					'twitter-follow-button',
-				) as $class
-			) {
-				foreach ( $this->xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " ' . $class . ' ")]' ) as $tag ) {
-					$tag->setAttribute( 'data-lazy-widget', 'twitter-sdk' );
-				}
+		$tag_content = $this->get_script_content();
+		$this->lazyload_script( $tag_content, 'twitter-sdk' );
+		/** @var DOMElement $tag */
+		foreach (
+			array(
+				'twitter-share-button',
+				'twitter-hashtag-button',
+				'twitter-mention-button',
+				'twitter-dm-button',
+				'twitter-follow-button',
+			) as $class
+		) {
+			foreach ( $this->xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " ' . $class . ' ")]' ) as $tag ) {
+				$tag->setAttribute( 'data-lazy-widget', 'twitter-sdk' );
 			}
 		}
 	}
+
 }

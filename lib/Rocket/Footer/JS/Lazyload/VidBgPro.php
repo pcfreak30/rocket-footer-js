@@ -56,4 +56,8 @@ class VidBgPro extends LazyloadAbstract {
 			}
 		}
 	}
+
+	protected function is_enabled() {
+		return false;
+	}
 }
