@@ -51,9 +51,15 @@ class BlogHerAds extends LazyloadAbstract {
 				$span->appendChild( $img );
 				$this->append_tag( $span );
 				$tag->parentNode->appendChild( $span );
-				$window_check_script = $this->create_script( '(function($) {
-					$(window).load(function() { window.loaded = true; });
-				})(jQuery);' );
+				$window_check_script = $this->create_script(
+					<<<JS
+(function () {
+	(window.addEventListener || window.attachEvent)((window.addEventListener ? '' : 'on') + 'load', function () {
+		window.loaded = true;
+	});
+})();
+JS
+				);
 				$this->set_no_minify( $window_check_script );
 				$this->inject_tag( $window_check_script );
 				$html = base64_encode( $this->get_script_content( $external_tag ) );
