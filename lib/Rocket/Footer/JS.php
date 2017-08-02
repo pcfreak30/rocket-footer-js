@@ -367,6 +367,7 @@ class JS {
 		// Cleanup
 		unset( $cdn_domain_parts, $cdn_domain );
 	}
+
 	protected function get_cache_filename() {
 		$js_key     = get_rocket_option( 'minify_js_key' );
 		$cache_path = $this->get_cache_path();
@@ -609,10 +610,7 @@ class JS {
 		if ( empty( $item_cache ) ) {
 			// Remove any conditional comments for IE that somehow was put in the script tag
 			$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $this->dom_collection->current()->textContent );
-			//Minify ?
-			if ( get_rocket_option( 'minify_html_inline_js', false ) ) {
-				$js_part = $this->minify( $js_part );
-			}
+			$js_part = $this->minify( $js_part );
 			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part );
 		} else {
 			$js_part = $item_cache;
