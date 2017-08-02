@@ -18,15 +18,14 @@ class PinInterest extends LazyloadAbstract {
 	 */
 	protected function do_lazyload( $content, $src ) {
 		if ( 'assets.pinterest.com' === parse_url( $src, PHP_URL_HOST ) && false !== strpos( parse_url( $src, PHP_URL_PATH ), 'js/pinit.js' ) ) {
-			foreach ( [ '//*[@data-pin-do]', '//*[@data-pin-log]' ] as $query ) {
-				/** @var DOMElement $tag */
-				foreach ( $this->xpath->query( $query ) as $tag ) {
-					$img = $this->create_pixel_image();
-					$img->setAttribute( 'data-lazy-widget', "pin-interest-{$this->instance}" );
-					$tag->parentNode->insertBefore( $img, $tag );
-					$tag->setAttribute( 'id', "pin-interest-{$this->instance}" );
-					$external_script = $this->create_script(
-						<<<JS
+			/** @var DOMElement $tag */
+			foreach ( $this->xpath->query( '//*[@data-pin-do]' ) as $tag ) {
+				$img = $this->create_pixel_image();
+				$img->setAttribute( 'data-lazy-widget', "pin-interest-{$this->instance}" );
+				$tag->parentNode->insertBefore( $img, $tag );
+				$tag->setAttribute( 'id', "pin-interest-{$this->instance}" );
+				$external_script = $this->create_script(
+					<<<JS
 (function ($, w) {
 	var el = $("#pin-interest-{$this->instance}");
 	el.prev('[data-lazy-widget="pin-interest-{$this->instance}"]').remove();
@@ -37,12 +36,10 @@ class PinInterest extends LazyloadAbstract {
 	}
 })(jQuery, window);
 JS
-					);
-					$this->lazyload_script( $this->get_script_content( $tag ) . $this->get_script_content( $external_script ), "pin-interest-{$this->instance}", $tag );
-					$this->instance ++;
-				}
+				);
+				$this->lazyload_script( $this->get_script_content( $tag ) . $this->get_script_content( $external_script ), "pin-interest-{$this->instance}", $tag );
+				$this->instance ++;
 			}
-
 			if ( ! $this->injected ) {
 				$this->inject_tag( $this->create_script( null, 'https://assets.pinterest.com/js/pinit_main.js' ) );
 				$this->injected = true;
