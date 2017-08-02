@@ -29,7 +29,9 @@ class BlogHerAds extends LazyloadAbstract {
 					$lazyload_content = $this->get_script_content( $div_tag ) . $this->get_script_content();
 				}
 			}
-			$this->inject_tag( $this->create_script( 'document.old_write=document.old_write||document.write;document.write=function(data){if(document.currentScript)(function check(){if(typeof jQuery==="undefined")setTimeout(10,check);else jQuery(document.currentScript).before(data)})()};' ) );
+			$doc_write_script = $this->create_script( 'document.old_write=document.old_write||document.write;document.write=function(data){if(document.currentScript)(function check(){if(typeof jQuery==="undefined")setTimeout(10,check);else jQuery(document.currentScript).before(data)})()};' );
+			$doc_write_script->setAttribute( 'style', 'display:none' );
+			$this->inject_tag( $doc_write_script );
 			$file = rocket_footer_js()->remote_fetch( $src );
 			if ( ! empty( $file ) && false !== strpos( $file, 'static/blogherads.js' ) ) {
 				$prev_tag = $tag;
@@ -37,6 +39,8 @@ class BlogHerAds extends LazyloadAbstract {
 					$prev_tag = $prev_tag->previousSibling;
 				} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'script' !== strtolower( $tag->tagName ) );
 				$js_tag = $prev_tag;
+				$js_tag->setAttribute( 'style', 'display:none' );
+				$tag->setAttribute( 'style', 'display:none' );
 				if ( ! $this->base64_injected ) {
 					$this->inject_tag( $this->create_script( null, 'https://cdnjs.cloudflare.com/ajax/libs/Base64/1.0.1/base64.min.js' ) );
 					$this->base64_injected = true;;
