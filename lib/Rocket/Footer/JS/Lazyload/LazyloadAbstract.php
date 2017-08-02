@@ -193,13 +193,10 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		if ( $this->is_no_minify() ) {
 			return false;
 		}
-		if ( empty( $this->regex ) ) {
+		if ( ! empty( $this->regex ) && preg_match( $this->regex, $content, $this->regex_match ) ) {
 			return false;
 		}
-		if ( preg_match( $this->regex, $content, $this->regex_match ) ) {
-			return true;
-		}
 
-		return false;
+		return true;
 	}
 }
