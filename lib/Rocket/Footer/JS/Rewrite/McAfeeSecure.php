@@ -14,7 +14,7 @@ class McAfeeSecure extends RewriteAbstract {
 	 * @return void
 	 */
 	protected function do_rewrite( $content, $src ) {
-		if ( 'cdn.ywxi.net' === parse_url( $src, PHP_URL_HOST ) ) {
+		if ( 'cdn.ywxi.net' === parse_url( $src, PHP_URL_HOST ) || false !== strpos( $content, '.ywxi.net/js/1.js' ) ) {
 			$file = rocket_footer_js()->remote_fetch( add_query_arg( 'h', parse_url( home_url(), PHP_URL_HOST ), 'https://cdn.ywxi.net/js/host-loader.js' ) );
 			if ( ! empty( $file ) && preg_match( '~host.js\?v=\d+&h=[\w\.-]+~', $file, $matches ) ) {
 				$external_script = $this->create_script( "https://cdn.ywxi.net/js/{$matches[0]}" );
