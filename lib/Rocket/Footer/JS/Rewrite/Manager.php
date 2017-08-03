@@ -19,5 +19,6 @@ class Manager extends ManagerAbstract {
 		'MouseFlow',
 		'Clicky',
 		'GoogleTagManager',
+		'McAfeeSecure',
 	];
 }
