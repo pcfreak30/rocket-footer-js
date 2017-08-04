@@ -21,6 +21,7 @@ class Manager extends ManagerAbstract {
 		'BlogHerAds',
 		'GoogleRemarketing',
 		'PinInterest',
+		'GoogleTranslate',
 	];
 
 	public function is_enabled() {
