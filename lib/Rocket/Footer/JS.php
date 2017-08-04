@@ -641,6 +641,7 @@ class JS {
 			$inline_js .= preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $tag->textContent );
 		}
 		if ( ! empty( $inline_js ) ) {
+			$inline_js = $this->minify( $inline_js );
 			$this->insert_inline_script( $inline_js );
 		}
 	}
