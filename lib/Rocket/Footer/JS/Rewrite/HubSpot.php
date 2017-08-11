@@ -32,7 +32,7 @@ class HubSpot extends RewriteAbstract {
 					if ( preg_match( $regex, $file, $matches ) ) {
 						$matched = true;
 						$this->inject_tag( $this->create_script( null, $matches[1] ) );
-						$json = json_decode( $matched[2], true );
+						$json = json_decode( $matches[2], true );
 						foreach ( $json as $key => $val ) {
 							$external_script->setAttribute( $key, $val );
 						}
