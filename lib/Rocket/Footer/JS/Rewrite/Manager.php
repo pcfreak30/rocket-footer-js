@@ -20,5 +20,6 @@ class Manager extends ManagerAbstract {
 		'Clicky',
 		'GoogleTagManager',
 		'McAfeeSecure',
+		'HubSpot',
 	];
 }
