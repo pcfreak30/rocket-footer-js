@@ -498,11 +498,15 @@ class JS {
 	 *
 	 * @return bool|string
 	 */
-	public function remote_fetch( $url ) {
-		$file = wp_remote_get( $url, [
+	public function remote_fetch( $url, $method = 'get', $args = [] ) {
+		$func = "wp_remote_{$method}";
+		if ( ! function_exists( $func ) ) {
+			return false;
+		}
+		$file = $func( $url, array_merge_recursive( [
 			'user-agent' => 'WP-Rocket',
 			'sslverify'  => false,
-		] );
+		], $args ) );
 		if ( ! ( $file instanceof \WP_Error || ( is_array( $file ) && ( empty( $file['response']['code'] ) || ! in_array( $file['response']['code'], array(
 						200,
 						304,
@@ -521,6 +525,54 @@ class JS {
 	 * @return string
 	 */
 	protected function minify( $script ) {
+		$closure_url   = 'https://closure-compiler.appspot.com';
+		$closure_error = false;
+		$args          = [
+			'body' => [
+				'js_code'           => $script,
+				'compilation_level' => 'SIMPLE_OPTIMIZATIONS',
+				'output_format'     => [ 'compiled_code', 'errors' ],
+				'output_info'       => 'SIMPLE_OPTIMIZATIONS',
+			],
+		];
+		$result        = $this->remote_fetch( $closure_url, 'post', $args );
+
+		if ( empty( $result ) ) {
+			$closure_error = true;
+		}
+		if ( ! empty( $result ) ) {
+			$json = json_decode( $result );
+			if ( ! empty( $json->errors ) ) {
+				$closure_error = true;
+			}
+			if ( empty( $json->errors ) ) {
+				$script = $json->compiledCode;
+			}
+		}
+
+		if ( ! $closure_error ) {
+			return $script;
+		}
+		$args['body']['compilation_level'] = 'WHITESPACE_ONLY';
+
+		$result = $this->remote_fetch( $closure_url, 'post', $args );
+
+		if ( empty( $result ) ) {
+			$closure_error = true;
+		}
+		if ( ! empty( $result ) ) {
+			$json = json_decode( $result );
+			if ( ! empty( $json->errors ) ) {
+				$closure_error = true;
+			}
+			if ( empty( $json->errors ) ) {
+				$script = $json->compiledCode;
+			}
+		}
+		if ( ! $closure_error ) {
+			return $script;
+		}
+
 		$script = preg_replace( '~(?<!(?:["\'/]))<!--.*-->(?![\'"/])~Us', '', $script );
 		$script = rocket_minify_inline_js( $script );
 		$script = preg_replace( '~/\*!?\s+.*\*/~sU', '', $script );
