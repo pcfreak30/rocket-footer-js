@@ -5,6 +5,12 @@ namespace Rocket\Footer\JS\Rewrite;
 
 
 class HubSpot extends RewriteAbstract {
+	private $scripts = [];
+
+	public function init() {
+		parent::init();
+		add_action( 'rocket_footer_js_process_remote_script', [ $this, 'process_remote_script' ], 10, 2 );
+	}
 
 	/**
 	 * @param string  $content
@@ -32,18 +38,57 @@ class HubSpot extends RewriteAbstract {
 					if ( preg_match( $regex, $file, $matches ) ) {
 						$matched = true;
 						$this->inject_tag( $this->create_script( null, $matches[1] ) );
-						$json = json_decode( $matches[2], true );
+						$this->scripts[] = parse_url( $matches[1] );
+						$json            = json_decode( $matches[2], true );
 						foreach ( $json as $key => $val ) {
 							$external_script->setAttribute( $key, $val );
 						}
 					}
 				}
 				if ( $matched ) {
+					$this->scripts[] = parse_url( $src );
 					$this->inject_tag( $external_script );
 					$this->tags->remove();
 				}
 			}
 		}
 
+	}
+
+	/**
+	 * @param $content
+	 * @param $src
+	 */
+	public function process_remote_script( $content, $src ) {
+		if ( 'js.hs-analytics.net' === parse_url( $src, PHP_URL_HOST ) ) {
+			preg_match_all( '~_hsq\s*\.\s*push\s*\(\s*(\[.*\])\)\s*;~U', $content, $matches );
+			foreach ( array_keys( $matches[1] ) as $index ) {
+				$item = $matches[1][ $index ];
+				$item = json_decode( str_replace( "'", '"', $item ), true );
+				if ( ! $item ) {
+					$item = [];
+				}
+				$matches[1][ $index ] = $item;
+			}
+			if ( ! empty( $matches ) ) {
+				foreach ( $matches[1] as $index => $item ) {
+					if ( 'embedHubSpotScript' === $item[0] ) {
+						$url   = parse_url( $item[1] );
+						$found = false;
+						foreach ( $this->scripts as $script ) {
+							if ( $url['host'] === $script['host'] && $url['path'] === $script['path'] ) {
+								$found = true;
+								break;
+							}
+						}
+						if ( $found ) {
+							$content = str_replace( $matches[0], '', $content );
+						}
+					}
+				}
+			}
+		}
+
+		return $content;
 	}
 }
