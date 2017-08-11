@@ -23,9 +23,9 @@ class HubSpot extends RewriteAbstract {
 				$this->set_no_minify( $external_script );
 				foreach (
 					[
-						'~\(\s*[\'"]CollectedForms-\d+[\'"]\s*,\s*[\'"]((?:https?:)?//js\.hscollectedforms\.net/collectedforms\.js)[\'"]\s*,\s*({.*})\s*\)\d*;~',
-						'~\(\s*[\'"]hs-analytics[\'"]\s*,\s*[\'"]((?:https?:)?//js\.hs-analytics\.net/analytics/\d+/\d+.js)[\'"]\s*,\s*({.*})\s*\)\d*;~',
-						'~\(\s*[\'"]messages-\d+[\'"]\s*,\s*[\'"]((?:https?:)?//api.usemessages.com/messages/v2/embed/\d+.js)[\'"]\s*,\s*({.*})\s*\)\d*;~',
+						'~\(\s*[\'"]CollectedForms-\d+[\'"]\s*,\s*[\'"]((?:https?:)?//js\.hscollectedforms\.net/collectedforms\.js)[\'"]\s*,\s*({.*})\s*\)\d*;~U',
+						'~\(\s*[\'"]hs-analytics[\'"]\s*,\s*[\'"]((?:https?:)?//js\.hs-analytics\.net/analytics/\d+/\d+.js)[\'"]\s*,\s*({.*})\s*\)\d*;~U',
+						'~\(\s*[\'"]messages-\d+[\'"]\s*,\s*[\'"]((?:https?:)?//api.usemessages.com/messages/v2/embed/\d+.js)[\'"]\s*,\s*({.*})\s*\)\d*;~U',
 
 					] as $regex
 				) {
