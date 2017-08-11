@@ -685,6 +685,7 @@ class JS {
 		$external_tag->setAttribute( 'src', $src );
 		$external_tag->setAttribute( 'data-minify', '1' );
 		$external_tag->setAttribute( 'async', 'async' );
+		$external_tag->setAttribute( 'crossorigin', 'anonymous' );
 		// Add element to footer
 		$this->body->appendChild( $external_tag );
 	}
