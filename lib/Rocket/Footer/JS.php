@@ -525,14 +525,14 @@ class JS {
 	 * @return string
 	 */
 	protected function minify( $script ) {
-		$closure_url   = 'https://closure-compiler.appspot.com';
+		$closure_url   = 'https://closure-compiler.appspot.com/compile';
 		$closure_error = false;
 		$args          = [
 			'body' => [
 				'js_code'           => $script,
 				'compilation_level' => 'SIMPLE_OPTIMIZATIONS',
-				'output_format'     => [ 'compiled_code', 'errors' ],
-				'output_info'       => 'SIMPLE_OPTIMIZATIONS',
+				'output_info'       => 'errors',
+				'output_format'     => 'json',
 			],
 		];
 		$result        = $this->remote_fetch( $closure_url, 'post', $args );
@@ -553,6 +553,7 @@ class JS {
 		if ( ! $closure_error ) {
 			return $script;
 		}
+		$closure_error                     = false;
 		$args['body']['compilation_level'] = 'WHITESPACE_ONLY';
 
 		$result = $this->remote_fetch( $closure_url, 'post', $args );
