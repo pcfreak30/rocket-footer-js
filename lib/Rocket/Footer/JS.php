@@ -651,14 +651,7 @@ class JS {
 	}
 
 	public function get_content( $file ) {
-		/** @var \WP_Filesystem_Base $wp_filesystem */
-		global $wp_filesystem;
-		if ( null === $wp_filesystem ) {
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-			WP_Filesystem();
-		}
-
-		return $wp_filesystem->get_contents( $file );
+		return $this->get_wp_filesystem()->get_contents( $file );
 	}
 
 	/**
@@ -730,14 +723,21 @@ class JS {
 	}
 
 	public function put_content( $file, $data ) {
-		/** @var \WP_Filesystem_Base $wp_filesystem */
+		return $this->get_wp_filesystem()->put_contents( $file, $data );
+	}
+
+	/**
+	 * @return \WP_Filesystem_Direct
+	 */
+	public function get_wp_filesystem() {
+		/** @var \WP_Filesystem_Direct $wp_filesystem */
 		global $wp_filesystem;
-		if ( null === $wp_filesystem ) {
+		if ( is_null( $wp_filesystem ) ) {
 			require_once ABSPATH . '/wp-admin/includes/file.php';
 			WP_Filesystem();
 		}
 
-		return $wp_filesystem->put_contents( $file, $data );
+		return $wp_filesystem;
 	}
 
 	protected function add_main_script( $src ) {
