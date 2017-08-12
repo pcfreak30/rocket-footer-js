@@ -30,7 +30,7 @@ class Videos extends LazyloadAbstract {
 			$info = $oembed->get_data( $src );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$img = $this->create_tag( 'img' );
-				$img->setAttribute( 'src', $info->thumbnail_url );
+				$img->setAttribute( 'data-src', $info->thumbnail_url );
 				$img->setAttribute( 'width', $info->thumbnail_width );
 				$img->setAttribute( 'style', 'max-width:100%;height:auto;cursor:pointer;' );
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
