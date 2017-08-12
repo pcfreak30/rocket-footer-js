@@ -23,11 +23,12 @@
 		if ($target.length) {
 			match = reComment.exec($target.html());
 			if (match) {
-				$target.replaceWith($.trim(match[ 1 ]));
+				var $video = $($.trim(match[ 1 ])).insertBefore($target);
+				$target.remove();
 				if ($this !== $target) {
 					$this.remove();
 				}
-				$target.lazyLoadXT();
+				$video.lazyLoadXT();
 			}
 		}
 
