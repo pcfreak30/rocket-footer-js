@@ -526,53 +526,59 @@ class JS {
 	 */
 	protected function minify( $script ) {
 		$closure_url   = 'https://closure-compiler.appspot.com/compile';
-		$closure_error = false;
-		$args          = [
-			'body' => [
-				'js_code'           => $script,
-				'compilation_level' => 'SIMPLE_OPTIMIZATIONS',
-				'output_info'       => 'errors',
-				'output_format'     => 'json',
-			],
-		];
-		$result        = $this->remote_fetch( $closure_url, 'post', $args );
+		$run_closure   = ( defined( "ROCKET_FOOTER_JS_ENABLE_CLOSURE_COMPILER" ) && ROCKET_FOOTER_JS_ENABLE_CLOSURE_COMPILER );
+		$closure_error = ! $run_closure;
+		$result        = null;
+		if ( $run_closure ) {
+			$args   = [
+				'body' => [
+					'js_code'           => $script,
+					'compilation_level' => 'SIMPLE_OPTIMIZATIONS',
+					'output_info'       => 'errors',
+					'output_format'     => 'json',
+				],
+			];
+			$result = $this->remote_fetch( $closure_url, 'post', $args );
 
-		if ( empty( $result ) ) {
-			$closure_error = true;
-		}
-		if ( ! empty( $result ) ) {
-			$json = json_decode( $result );
-			if ( ! empty( $json->errors ) ) {
+			if ( empty( $result ) ) {
 				$closure_error = true;
 			}
-			if ( empty( $json->errors ) ) {
-				$script = $json->compiledCode;
-			}
-		}
-
-		if ( ! $closure_error ) {
-			return $script;
-		}
-		$closure_error                     = false;
-		$args['body']['compilation_level'] = 'WHITESPACE_ONLY';
-
-		$result = $this->remote_fetch( $closure_url, 'post', $args );
-
-		if ( empty( $result ) ) {
-			$closure_error = true;
-		}
-		if ( ! empty( $result ) ) {
-			$json = json_decode( $result );
-			if ( ! empty( $json->errors ) ) {
-				$closure_error = true;
-			}
-			if ( empty( $json->errors ) ) {
-				$script = $json->compiledCode;
+			if ( ! empty( $result ) ) {
+				$json = json_decode( $result );
+				if ( ! empty( $json->errors ) ) {
+					$closure_error = true;
+				}
+				if ( empty( $json->errors ) ) {
+					$script = $json->compiledCode;
+				}
 			}
 		}
 		if ( ! $closure_error ) {
 			return $script;
 		}
+		if ( $run_closure ) {
+			$closure_error                     = false;
+			$args['body']['compilation_level'] = 'WHITESPACE_ONLY';
+
+			$result = $this->remote_fetch( $closure_url, 'post', $args );
+
+			if ( empty( $result ) ) {
+				$closure_error = true;
+			}
+			if ( ! empty( $result ) ) {
+				$json = json_decode( $result );
+				if ( ! empty( $json->errors ) ) {
+					$closure_error = true;
+				}
+				if ( empty( $json->errors ) ) {
+					$script = $json->compiledCode;
+				}
+			}
+			if ( ! $closure_error ) {
+				return $script;
+			}
+		}
+
 
 		$script = preg_replace( '~(?<!(?:["\'/]))<!--.*-->(?![\'"/])~Us', '', $script );
 		$script = rocket_minify_inline_js( $script );
