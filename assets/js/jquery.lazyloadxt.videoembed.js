@@ -27,6 +27,7 @@
 				if ($this !== $target) {
 					$this.remove();
 				}
+				$target.lazyLoadXT();
 			}
 		}
 
