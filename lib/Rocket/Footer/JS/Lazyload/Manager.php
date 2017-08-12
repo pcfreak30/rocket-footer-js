@@ -14,6 +14,7 @@ class Manager extends ManagerAbstract {
 		'Tumbler',
 		'AvadaGoogleMaps',
 		'Iframe',
+		'Videos',
 		'GoogleAdsense',
 		'AmazonAds',
 		'StumbleUpon',

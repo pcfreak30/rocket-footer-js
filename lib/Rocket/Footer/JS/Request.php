@@ -40,14 +40,13 @@ class Request extends ComponentAbstract {
 
 	public function enqueue_scripts() {
 		global $a3_lazy_load_global_settings;
-		$lazy_load = false;
+		$dep = 'lazy-load-xt-script';
 		if ( ! empty( $a3_lazy_load_global_settings ) ) {
-			wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->app->get_plugin_file() ), array( 'jquery-lazyloadxt' ) );
-			$lazy_load = true;
+			$dep = 'jquery-lazyloadxt';
 		}
-		if ( ! $lazy_load ) {
-			wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->app->get_plugin_file() ), array( 'lazy-load-xt-script' ) );
-		}
+
+		wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->app->get_plugin_file() ), array( $dep ) );
+		wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->app->get_plugin_file() ), array( $dep ) );
 	}
 
 	/**
