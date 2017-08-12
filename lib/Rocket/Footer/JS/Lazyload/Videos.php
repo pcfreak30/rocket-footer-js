@@ -65,7 +65,7 @@ class Videos extends LazyloadAbstract {
 			$info      = pathinfo( $url_parts['path'] );
 			$hash      = md5( $url_parts['scheme'] . '://' . ( ( ( empty( $url_parts['port'] ) || 80 === (int) $url_parts['port'] ) ) ? ':' . $url_parts['port'] : '' ) . $info['dirname'] . '/' . $info['filename'] );
 			$filename  = rocket_footer_js()->get_cache_path() . $hash . '.' . $info['extension'];
-			$final_url = parse_url( get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) ), PHP_URL_PATH );
+			$final_url = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
 			if ( ! rocket_footer_js()->get_wp_filesystem()->is_file( $filename ) ) {
 				rocket_footer_js()->put_content( $filename, $data );
 			}
