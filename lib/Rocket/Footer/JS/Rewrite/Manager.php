@@ -21,5 +21,6 @@ class Manager extends ManagerAbstract {
 		'GoogleTagManager',
 		'McAfeeSecure',
 		'HubSpot',
+		'PingdomPrum',
 	];
 }
