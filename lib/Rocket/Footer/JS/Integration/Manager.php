@@ -3,11 +3,11 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-use Rocket\Footer\JS\ManagerAbstract;
+use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
 
 class Manager extends ManagerAbstract {
-	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
-		$modules = [
+	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
+	protected $modules = [
 		'Amp',
 		'PageLinksTo',
 		'NExtend',

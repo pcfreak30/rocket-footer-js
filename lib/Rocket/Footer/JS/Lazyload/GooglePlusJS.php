@@ -19,25 +19,25 @@ class GooglePlusJS extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload( $content, $src ) {
-			$tag_content = $this->get_script_content();
-			$this->lazyload_script( $tag_content, 'google-plus-platform' );
-			/** @var DOMElement $tag */
-			foreach (
-				array(
-					'//g:plusone',
-					'//*[contains(concat(" ", normalize-space(@class), " "), " g-plusone ")]',
-					'//*[contains(concat(" ", normalize-space(@class), " "), " g-plus ")]',
-				) as $expression
-			) {
-				foreach ( $this->xpath->query( $expression ) as $tag ) {
+		$tag_content = $this->get_script_content();
+		$this->lazyload_script( $tag_content, 'google-plus-platform' );
+		/** @var DOMElement $tag */
+		foreach (
+			array(
+				'//g:plusone',
+				'//*[contains(concat(" ", normalize-space(@class), " "), " g-plusone ")]',
+				'//*[contains(concat(" ", normalize-space(@class), " "), " g-plus ")]',
+			) as $expression
+		) {
+			foreach ( $this->xpath->query( $expression ) as $tag ) {
+				$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
+				if ( 0 == $tag->childNodes->length ) {
+					$img = $this->create_pixel_image();
 					$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
-					if ( 0 == $tag->childNodes->length ) {
-						$img = $this->create_pixel_image();
-						$tag->setAttribute( 'data-lazy-widget', 'google-plus-platform' );
-						$tag->appendChild( $img );
-					}
+					$tag->appendChild( $img );
 				}
 			}
+		}
 
 	}
 

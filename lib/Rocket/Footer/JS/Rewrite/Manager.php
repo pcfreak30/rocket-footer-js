@@ -2,11 +2,16 @@
 
 namespace Rocket\Footer\JS\Rewrite;
 
-use Rocket\Footer\JS\ManagerAbstract;
+use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
 
+/**
+ * Class Manager
+ *
+ * @package Rocket\Footer\JS\Rewrite
+ */
 class Manager extends ManagerAbstract {
-	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
-		$modules = [
+	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
+	protected $modules = [
 		'Tawkto',
 		'WPRocketLazyload',
 		'GoogleAnalytics',

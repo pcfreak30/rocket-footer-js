@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class RevolutionSlider implements IntegrationInterface {
+class RevolutionSlider extends IntegrationAbstract {
 
 	public function init() {
 		if ( function_exists( 'rev_slider_shortcode' ) ) {

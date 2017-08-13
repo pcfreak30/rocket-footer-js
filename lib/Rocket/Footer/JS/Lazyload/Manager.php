@@ -2,11 +2,20 @@
 
 namespace Rocket\Footer\JS\Lazyload;
 
-use Rocket\Footer\JS\ManagerAbstract;
+use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
 
+/**
+ * Class Manager
+ *
+ * @package Rocket\Footer\JS\Lazyload
+ * @property array $a3_lazy_load_global_settings
+ */
 class Manager extends ManagerAbstract {
-	protected /** @noinspection ClassOverridesFieldOfSuperClassInspection */
-		$modules = [
+	/**
+	 * @var array
+	 */
+	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
+	protected $modules = [
 		'Facebook',
 		'GooglePlus',
 		'GooglePlusJS',
@@ -25,11 +34,13 @@ class Manager extends ManagerAbstract {
 		'GoogleTranslate',
 	];
 
+	/**
+	 * @return bool
+	 */
 	public function is_enabled() {
-		global $a3_lazy_load_global_settings;
 		$lazy_load = false;
 		if ( class_exists( 'A3_Lazy_Load' ) ) {
-			$lazy_load = (bool) $a3_lazy_load_global_settings['a3l_apply_lazyloadxt'];
+			$lazy_load = (bool) $this->a3_lazy_load_global_settings['a3l_apply_lazyloadxt'];
 		}
 		if ( class_exists( 'LazyLoadXT' ) ) {
 			$lazy_load = true;

@@ -18,7 +18,6 @@ use Dice\Dice;
 /**
  * @SuppressWarnings(PHPMD.StaticAccess)
  * @return \Rocket\Footer\JS
- * @alias WPCCSS()
  */
 function rocket_footer_js() {
 	return rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS' );

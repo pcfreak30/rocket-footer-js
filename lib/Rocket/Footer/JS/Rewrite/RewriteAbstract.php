@@ -3,6 +3,7 @@
 
 namespace Rocket\Footer\JS\Rewrite;
 
+use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\TagHelperTrait;
 
@@ -10,8 +11,9 @@ use Rocket\Footer\JS\TagHelperTrait;
  * Class RewriteAbstract
  *
  * @package Rocket\Footer\JS\Rewrite
+ * @property \Rocket\Footer\JS $plugin
  */
-abstract class RewriteAbstract implements RewriteInterface {
+abstract class RewriteAbstract extends ComponentAbstract {
 
 	use TagHelperTrait;
 
@@ -32,6 +34,9 @@ abstract class RewriteAbstract implements RewriteInterface {
 	 */
 	protected $xpath;
 
+	/**
+	 * @var string
+	 */
 	protected $regex;
 
 	/**
@@ -48,7 +53,7 @@ abstract class RewriteAbstract implements RewriteInterface {
 	public function rewrite( $document = null, $content_document = null ) {
 		if ( ! $document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
-			$document = rocket_footer_js()->get_document();
+			$document = $this->app->get_document();
 		}
 		if ( ! $content_document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */

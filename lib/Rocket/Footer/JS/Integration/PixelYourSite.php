@@ -4,27 +4,14 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-use Rocket\Footer\JS\DOMCollection;
-use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\Rewrite\FacebookPixel;
-use Rocket\Footer\JS\TagHelperTrait;
 
 /**
  * Class PixelYourSite
  *
  * @package Rocket\Footer\JS\Integration
  */
-class PixelYourSite implements IntegrationInterface {
-	use TagHelperTrait;
-	/**
-	 * @var DOMDocument
-	 */
-	protected $content_document;
-	/**
-	 * @var DOMCollection
-	 */
-	protected $tags;
-
+class PixelYourSite extends IntegrationAbstract {
 	/**
 	 *
 	 */

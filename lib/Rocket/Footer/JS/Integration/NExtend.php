@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class NExtend implements IntegrationInterface {
+class NExtend extends IntegrationAbstract {
 
 	public function init() {
 		if ( class_exists( 'N2Pluggable' ) ) {

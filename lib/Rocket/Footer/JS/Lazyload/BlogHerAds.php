@@ -32,7 +32,7 @@ class BlogHerAds extends LazyloadAbstract {
 		$doc_write_script = $this->create_script( 'document.old_write=document.old_write||document.write;document.write=function(data){if(document.currentScript)(function check(){if(typeof jQuery==="undefined")setTimeout(10,check);else jQuery(document.currentScript).before(data)})()};' );
 		$doc_write_script->setAttribute( 'style', 'display:none' );
 		$this->inject_tag( $doc_write_script );
-		$file = rocket_footer_js()->remote_fetch( $src );
+		$file = $this->app->remote_fetch( $src );
 		if ( ! empty( $file ) && false !== strpos( $file, 'static/blogherads.js' ) ) {
 			$prev_tag = $tag;
 			do {

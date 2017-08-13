@@ -3,11 +3,10 @@
 
 namespace Rocket\Footer\JS;
 
+use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
 
 class Request extends ComponentAbstract {
 	public function init() {
-		global $pagenow;
-		parent::init();
 		add_action( 'init', [ $this, 'init_action' ] );
 		if ( ! is_admin() ) {
 			if ( is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
@@ -17,7 +16,7 @@ class Request extends ComponentAbstract {
 				add_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 				add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
 			}
-			if ( ! in_array( $pagenow, array( 'wp-login.php', 'wp-signup.php' ) ) ) {
+			if ( ! in_array( $this->pagenow, array( 'wp-login.php', 'wp-signup.php' ) ) ) {
 				// Ensure zxcvbn is loaded normally, not async so it gets minified
 				add_action( 'wp_default_scripts', [ $this, 'deasync_zxcvbn' ] );
 			}
@@ -25,7 +24,7 @@ class Request extends ComponentAbstract {
 		add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_deferred_js_files', '__return_zero' );
-		add_filter( 'rocket_buffer', [ $this->app, 'process_buffer' ], PHP_INT_MAX );
+		add_filter( 'rocket_buffer', [ $this->plugin, 'process_buffer' ], PHP_INT_MAX );
 		remove_filter( 'rocket_buffer', 'rocket_insert_deferred_js', 11 );
 		remove_filter( 'rocket_buffer', 'rocket_defer_js', 14 );
 	}
@@ -45,8 +44,8 @@ class Request extends ComponentAbstract {
 			$dep = 'jquery-lazyloadxt';
 		}
 
-		wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->app->get_plugin_file() ), array( $dep ) );
-		wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->app->get_plugin_file() ), array( $dep ) );
+		wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+		wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), array( $dep ) );
 	}
 
 	/**

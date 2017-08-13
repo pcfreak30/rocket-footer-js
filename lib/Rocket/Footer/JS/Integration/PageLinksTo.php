@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class PageLinksTo implements IntegrationInterface {
+class PageLinksTo extends IntegrationAbstract {
 
 	public function init() {
 		if ( class_exists( 'CWS_PageLinksTo' ) ) {

@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class GoogleAnalytics implements IntegrationInterface {
+class GoogleAnalytics extends IntegrationAbstract {
 
 	public function init() {
 		add_action( 'init', [ $this, 'init_action' ], 11 );

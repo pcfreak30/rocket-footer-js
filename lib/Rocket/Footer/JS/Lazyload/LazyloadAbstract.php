@@ -4,6 +4,7 @@
 namespace Rocket\Footer\JS\Lazyload;
 
 
+use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\DOMElement;
@@ -13,8 +14,9 @@ use Rocket\Footer\JS\TagHelperTrait;
  * Class LazyloadAbstract
  *
  * @package Rocket\Footer\JS\Lazyload
+ * @property \Rocket\Footer\JS $app
  */
-abstract class LazyloadAbstract implements LazyloadInterface {
+abstract class LazyloadAbstract extends ComponentAbstract {
 	use TagHelperTrait;
 	/**
 	 * @var DOMCollection
@@ -62,7 +64,7 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	public function lazyload( $document = null, $content_document = null ) {
 		if ( ! $document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
-			$document = rocket_footer_js()->get_document();
+			$document = $this->app->get_document();
 		}
 		if ( ! $content_document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
@@ -74,8 +76,8 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		$this->xpath            = new \DOMXPath( $content_document );
 		$this->before_do_lazyload();
 		while ( $this->tags->valid() ) {
-			$tag = $this->tags->current();
-			$src = $tag->getAttribute( 'src' );
+			$tag     = $this->tags->current();
+			$src     = $tag->getAttribute( 'src' );
 			if ( ! empty( $src ) ) {
 				$src = rocket_add_url_protocol( $src );
 			}
@@ -107,7 +109,24 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 	 * @return bool
 	 */
 	protected function is_enabled() {
-		return rocket_footer_js()->get_lazyload_manager()->is_enabled();
+		return $this->app->get_lazyload_manager()->is_enabled();
+	}
+
+	/**
+	 * @param $content
+	 * @param $src
+	 *
+	 * @return bool
+	 */
+	protected function is_match( $content, $src ) {
+		if ( $this->is_no_minify() ) {
+			return false;
+		}
+		if ( ! empty( $this->regex ) ) {
+			return (bool) preg_match( $this->regex, $content, $this->regex_match );
+		}
+
+		return true;
 	}
 
 	/**
@@ -181,22 +200,5 @@ abstract class LazyloadAbstract implements LazyloadInterface {
 		$img->setAttribute( 'src', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' );
 
 		return $img;
-	}
-
-	/**
-	 * @param $content
-	 * @param $src
-	 *
-	 * @return bool
-	 */
-	protected function is_match( $content, $src ) {
-		if ( $this->is_no_minify() ) {
-			return false;
-		}
-		if ( ! empty( $this->regex ) ) {
-			return (bool) preg_match( $this->regex, $content, $this->regex_match );
-		}
-
-		return true;
 	}
 }

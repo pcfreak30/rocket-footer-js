@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class VidBgPro implements IntegrationInterface {
+class VidBgPro extends IntegrationAbstract {
 
 	public function init() {
 		if ( function_exists( 'vidbgpro_init_footer' ) && rocket_footer_js()->get_lazyload_manager()->is_enabled() ) {

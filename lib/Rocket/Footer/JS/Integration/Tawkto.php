@@ -5,21 +5,8 @@ namespace Rocket\Footer\JS\Integration;
 
 
 use Rocket\Footer\JS;
-use Rocket\Footer\JS\DOMCollection;
-use Rocket\Footer\JS\DOMDocument;
-use Rocket\Footer\JS\TagHelperTrait;
 
-class Tawkto implements IntegrationInterface {
-	use TagHelperTrait;
-	/**
-	 * @var DOMDocument
-	 */
-	protected $content_document;
-	/**
-	 * @var DOMCollection
-	 */
-	protected $tags;
-
+class Tawkto extends IntegrationAbstract {
 
 	public function init() {
 		if ( function_exists( 'toastie_wc_smsb_social_init' ) ) {

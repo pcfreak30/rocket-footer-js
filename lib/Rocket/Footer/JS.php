@@ -4,8 +4,8 @@
 namespace Rocket\Footer;
 
 
+use pcfreak30\WordPress\Plugin\Framework\PluginAbstract;
 use Rocket\Footer\JS\Cache\Manager;
-use Rocket\Footer\JS\ComponentAbstract;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\DOMElement;
@@ -19,7 +19,7 @@ use Rocket\Footer\JS\Rewrite\Manager as RewriteManager;
  *
  * @package Rocket\Footer
  */
-class JS {
+class JS extends PluginAbstract {
 	/**
 	 * Plugin version
 	 */
@@ -28,6 +28,8 @@ class JS {
 	 *
 	 */
 	const TRANSIENT_PREFIX = 'rocket_footer_js_';
+
+	const PLUGIN_SLUG = 'rocket-footer-js';
 
 
 	/**
@@ -70,6 +72,9 @@ class JS {
 	 */
 	private $variable_document;
 
+	/**
+	 * @var \SplObjectStorage
+	 */
 	private $node_map;
 	/**
 	 * @var array
@@ -108,10 +113,6 @@ class JS {
 	 * @var DOMCollection
 	 */
 	private $dom_collection;
-	/**
-	 * @var string
-	 */
-	private $plugin_file;
 
 	/**
 	 * JS constructor.
@@ -135,7 +136,7 @@ class JS {
 		$this->script_document     = $script_document;
 		$this->node_map            = new \SplObjectStorage();
 		$this->document            = $document;
-		$this->plugin_file         = dirname( dirname( dirname( __DIR__ ) ) ) . '/rocket-footer-js.php';
+		parent::__construct();
 	}
 
 	/**
@@ -177,14 +178,13 @@ class JS {
 		$this->home = set_url_scheme( home_url() );
 		// Get our domain
 		$this->domain = parse_url( $this->home, PHP_URL_HOST );
-		foreach ( get_object_vars( $this ) as &$property ) {
-			if ( $property instanceof ComponentAbstract ) {
-				$property->set_app( $this );
-				$property->init();
-			}
-		}
+
+		parent::init();
 	}
 
+	/**
+	 * @return bool
+	 */
 	protected function get_dependancies_exist() {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		$error = false;
@@ -204,17 +204,6 @@ class JS {
 		}
 
 		return ! $error;
-	}
-
-	/**
-	 *
-	 */
-	public function __destruct() {
-		foreach ( get_object_vars( $this ) as &$property ) {
-			if ( $property instanceof ComponentAbstract ) {
-				unset( $property );
-			}
-		}
 	}
 
 	/**
@@ -274,9 +263,28 @@ class JS {
 		return $buffer;
 	}
 
+	/**
+	 *
+	 */
 	protected function disable_minify_overrides() {
 		remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 		remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
+	}
+
+	/**
+	 *
+	 */
+	protected function normalize_cdn_domains() {
+		// Remote fetch external scripts
+		$this->cdn_domains = get_rocket_cdn_cnames();
+		// Get the hostname for each CDN CNAME
+		foreach ( array_keys( (array) $this->cdn_domains ) as $index ) {
+			$cdn_domain       = &$this->cdn_domains[ $index ];
+			$cdn_domain_parts = parse_url( $cdn_domain );
+			$cdn_domain       = $cdn_domain_parts['host'];
+		}
+		// Cleanup
+		unset( $cdn_domain_parts, $cdn_domain );
 	}
 
 	/**
@@ -326,6 +334,9 @@ class JS {
 		}
 	}
 
+	/**
+	 *
+	 */
 	protected function fetch_cache() {
 		$this->cache = $this->cache_manager->get_store()->get_cache_fragment( $this->get_cache_id() );
 
@@ -358,19 +369,9 @@ class JS {
 		return $post_cache_id;
 	}
 
-	protected function normalize_cdn_domains() {
-		// Remote fetch external scripts
-		$this->cdn_domains = get_rocket_cdn_cnames();
-		// Get the hostname for each CDN CNAME
-		foreach ( array_keys( (array) $this->cdn_domains ) as $index ) {
-			$cdn_domain       = &$this->cdn_domains[ $index ];
-			$cdn_domain_parts = parse_url( $cdn_domain );
-			$cdn_domain       = $cdn_domain_parts['host'];
-		}
-		// Cleanup
-		unset( $cdn_domain_parts, $cdn_domain );
-	}
-
+	/**
+	 * @return string
+	 */
 	protected function get_cache_filename() {
 		$js_key     = get_rocket_option( 'minify_js_key' );
 		$cache_path = $this->get_cache_path();
@@ -388,14 +389,23 @@ class JS {
 		return $filename;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function get_cache_path() {
 		return WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function get_cache_hash() {
 		return md5( serialize( $this->cache_list ) );
 	}
 
+	/**
+	 *
+	 */
 	protected function cleanup_nodes() {
 		/** @var DOMElement $tag */
 		// Remove all elements from DOM
@@ -411,6 +421,9 @@ class JS {
 		}
 	}
 
+	/**
+	 *
+	 */
 	protected function process_scripts() {
 		$this->dom_collection = new DOMCollection( $this->script_document, 'script' );
 		while ( $this->dom_collection->valid() ) {
@@ -650,6 +663,11 @@ class JS {
 		}
 	}
 
+	/**
+	 * @param $file
+	 *
+	 * @return bool|string
+	 */
 	public function get_content( $file ) {
 		return $this->get_wp_filesystem()->get_contents( $file );
 	}
@@ -701,6 +719,9 @@ class JS {
 		}
 	}
 
+	/**
+	 * @param $script
+	 */
 	protected function insert_inline_script( $script ) {
 		//Create script tag
 		$inline_tag = $this->document->createElement( 'script', $script );
@@ -709,6 +730,11 @@ class JS {
 		$this->body->appendChild( $inline_tag );
 	}
 
+	/**
+	 * @param $filename
+	 *
+	 * @return array|string
+	 */
 	protected function write_cache( $filename ) {
 		if ( empty( $this->cache ) ) {
 			$data = [ 'filename' => $filename ];
@@ -722,24 +748,19 @@ class JS {
 		return $this->cache;
 	}
 
+	/**
+	 * @param $file
+	 * @param $data
+	 *
+	 * @return bool
+	 */
 	public function put_content( $file, $data ) {
 		return $this->get_wp_filesystem()->put_contents( $file, $data );
 	}
 
 	/**
-	 * @return \WP_Filesystem_Direct
+	 * @param $src
 	 */
-	public function get_wp_filesystem() {
-		/** @var \WP_Filesystem_Direct $wp_filesystem */
-		global $wp_filesystem;
-		if ( is_null( $wp_filesystem ) ) {
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-			WP_Filesystem();
-		}
-
-		return $wp_filesystem;
-	}
-
 	protected function add_main_script( $src ) {
 		// Create script element
 		$external_tag = $this->document->createElement( 'script' );
@@ -752,6 +773,9 @@ class JS {
 		$this->body->appendChild( $external_tag );
 	}
 
+	/**
+	 *
+	 */
 	protected function fix_old_libxml() {
 		// Hack to fix a bug with libxml versions earlier than 2.9.x
 		if ( 1 === version_compare( '2.9.0', LIBXML_DOTTED_VERSION ) ) {
@@ -763,6 +787,11 @@ class JS {
 
 	}
 
+	/**
+	 * @param $buffer
+	 *
+	 * @return mixed|string
+	 */
 	protected function do_minify_html( $buffer ) {
 		// If HTML minify is on, process it
 		if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
@@ -787,6 +816,9 @@ class JS {
 		return $this->document;
 	}
 
+	/**
+	 *
+	 */
 	public function activate() {
 		if ( ! ( defined( 'ROCKET_FOOTER_JS_COMPOSER_RAN' ) && ROCKET_FOOTER_JS_COMPOSER_RAN ) ) {
 			/** @noinspection PhpIncludeInspection */
@@ -797,6 +829,9 @@ class JS {
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function deactivate() {
 		$this->cache_manager->get_store()->delete_cache_branch();
 	}
@@ -816,35 +851,34 @@ class JS {
 	}
 
 	/**
-	 * @return string
+	 *
 	 */
-	public function get_plugin_file() {
-		return $this->plugin_file;
-	}
-
 	public function activate_error_no_wprocket() {
-		$info = get_plugin_data( $this->plugin_file );
 		_e( sprintf( '
 	<div class="error notice">
 		<p>Opps! %s requires WP-Rocket! Please Download at <a href="http://www.wp-rocket.me">www.wp-rocket.me</a></p>
-	</div>', $info['Name'] ) );
+	</div>', $this->get_plugin_info( 'Name' ) ) );
 	}
 
+	/**
+	 *
+	 */
 	public function activate_error_wprocket_inactive() {
-		$info = get_plugin_data( $this->plugin_file );
 		$path = 'wp-rocket/wp-rocket.php';
 		_e( sprintf( '
 	<div class="error notice">
 		<p>Opps! %s requires WP-Rocket! Please Enable the plugin <a href="%s">here</a></p>
-	</div>', $info['Name'], wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $path ), 'activate-plugin_' . $path ) ) );
+	</div>', $this->get_plugin_info( 'Name' ), wp_nonce_url( admin_url( 'plugins.php?action=activate&plugin=' . $path ), 'activate-plugin_' . $path ) ) );
 	}
 
+	/**
+	 *
+	 */
 	public function activate_error_no_domdocument() {
-		$info = get_plugin_data( $this->plugin_file );
 		_e( sprintf( '
 	<div class="error notice">
 		<p>Opps! %s requires PHP XML extension! Please contact your web host or system administrator to get this installed.</p>
-	</div>', $info['Name'] ) );
+	</div>', $this->get_plugin_info( 'Name' ) ) );
 	}
 
 	/**
@@ -854,7 +888,23 @@ class JS {
 		return $this->script_document;
 	}
 
+	/**
+	 * @return void
+	 */
+	public function uninstall() {
+		// Noop method
+	}
+
+	/**
+	 * @param $matches
+	 *
+	 * @return string
+	 */
 	protected function lazyload_html_callback( $matches ) {
 		return '<!-- ' . html_entity_decode( $matches[1] ) . ' -->';
+	}
+
+	public function get_wp_filesystem() {
+		return parent::get_wp_filesystem();
 	}
 }

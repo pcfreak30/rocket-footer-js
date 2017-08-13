@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class McAfeeSecure implements IntegrationInterface {
+class McAfeeSecure extends IntegrationAbstract {
 
 	public function init() {
 		if ( class_exists( 'Mcafeesecure' ) && class_exists( 'WooCommerce' ) ) {

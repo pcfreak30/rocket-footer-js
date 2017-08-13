@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-class Cornerstone implements IntegrationInterface {
+class Cornerstone extends IntegrationAbstract {
 
 	public function init() {
 		if ( function_exists( 'cornerstone_plugin_init' ) ) {
