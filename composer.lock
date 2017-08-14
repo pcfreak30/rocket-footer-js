@@ -121,12 +121,12 @@
       "source": {
         "type": "git",
         "url": "https://github.com/pcfreak30/wordpress-plugin-framework.git",
-        "reference": "ff914725fdda4fb923b04812b194306d7633ce1a"
+        "reference": "282658f2c90a6dfe101f149d218409b7bd7efa7c"
       },
       "dist": {
         "type": "zip",
-        "url": "https://api.github.com/repos/pcfreak30/wordpress-plugin-framework/zipball/ff914725fdda4fb923b04812b194306d7633ce1a",
-        "reference": "ff914725fdda4fb923b04812b194306d7633ce1a",
+        "url": "https://api.github.com/repos/pcfreak30/wordpress-plugin-framework/zipball/282658f2c90a6dfe101f149d218409b7bd7efa7c",
+        "reference": "282658f2c90a6dfe101f149d218409b7bd7efa7c",
         "shasum": ""
       },
       "type": "library",
@@ -146,7 +146,7 @@
         }
       ],
       "description": "A simple PSR-4 and composer ready plugin framework for the modern wordpress age",
-      "time": "2017-08-13T07:08:13+00:00"
+      "time": "2017-08-13T22:57:06+00:00"
     }
   ],
   "packages-dev": [
