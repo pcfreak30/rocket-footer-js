@@ -23,6 +23,11 @@ function rocket_footer_js() {
 	return rocket_footer_js_container()->create( '\\Rocket\\Footer\\JS' );
 }
 
+/**
+ * @param string $env
+ *
+ * @return \Dice\Dice
+ */
 function rocket_footer_js_container( $env = 'prod' ) {
 	static $container;
 	if ( empty( $container ) ) {
@@ -34,20 +39,29 @@ function rocket_footer_js_container( $env = 'prod' ) {
 }
 
 /**
- *
+ * Init function shortcut
  */
 function rocket_footer_js_init() {
 	rocket_footer_js()->init();
 }
 
+/**
+ * Activate function shortcut
+ */
 function rocket_footer_js_activate() {
 	rocket_footer_js()->activate();
 }
 
+/**
+ * Deactivate function shortcut
+ */
 function rocket_footer_js_deactivate() {
 	rocket_footer_js()->deactivate();
 }
 
+/**
+ * Error for older php
+ */
 function rocket_footer_js_php_upgrade_notice() {
 	$info = get_plugin_data( __FILE__ );
 	_e(
@@ -60,6 +74,9 @@ function rocket_footer_js_php_upgrade_notice() {
 	);
 }
 
+/**
+ * Error if vendors autoload is missing
+ */
 function rocket_footer_js_php_vendor_missing() {
 	$info = get_plugin_data( __FILE__ );
 	_e(
