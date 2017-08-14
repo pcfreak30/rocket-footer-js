@@ -60,6 +60,18 @@ function rocket_footer_js_php_upgrade_notice() {
 	);
 }
 
+function rocket_footer_js_php_vendor_missing() {
+	$info = get_plugin_data( __FILE__ );
+	_e(
+		sprintf(
+			'
+	<div class="error notice">
+		<p>Opps! %s is corrupted it seems, please re-install the plugin.</p>
+	</div>', $info['Name']
+		)
+	);
+}
+
 if ( version_compare( PHP_VERSION, '5.4.0' ) < 0 ) {
 	add_action( 'admin_notices', 'rocket_footer_js_php_upgrade_notice' );
 } else {
@@ -69,14 +81,6 @@ if ( version_compare( PHP_VERSION, '5.4.0' ) < 0 ) {
 		register_activation_hook( __FILE__, 'rocket_footer_js_activate' );
 		register_deactivation_hook( __FILE__, 'rocket_footer_js_deactivate' );
 	} else {
-		include_once __DIR__ . '/wordpress-web-composer/class-wordpress-web-composer.php';
-		$web_composer = new \WordPress_Web_Composer( 'rocket_footer_js' );
-		$web_composer->set_install_target( __DIR__ );
-		if ( $web_composer->run() ) {
-			include_once __DIR__ . '/vendor/autoload.php';
-			register_deactivation_hook( __FILE__, 'rocket_footer_js_activate' );
-			register_deactivation_hook( __FILE__, 'rocket_footer_js_deactivate' );
-			define( 'ROCKET_FOOTER_JS_COMPOSER_RAN', true );
-		}
+		add_action( 'admin_notices', 'rocket_footer_js_php_vendor_missing' );
 	}
 }
