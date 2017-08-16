@@ -9,6 +9,12 @@ use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\TagHelperTrait;
 
+/**
+ * Class IntegrationAbstract
+ *
+ * @package Rocket\Footer\JS\Integration
+ * @property \Rocket\Footer\JS $plugin
+ */
 abstract class IntegrationAbstract extends ComponentAbstract {
 	use TagHelperTrait;
 	/**
