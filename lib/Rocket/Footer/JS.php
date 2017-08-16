@@ -824,13 +824,7 @@ class JS extends PluginAbstract {
 	 *
 	 */
 	public function activate() {
-		if ( ! ( defined( 'ROCKET_FOOTER_JS_COMPOSER_RAN' ) && ROCKET_FOOTER_JS_COMPOSER_RAN ) ) {
-			/** @noinspection PhpIncludeInspection */
-			include_once dirname( $this->plugin_file ) . '/wordpress-web-composer/class-wordpress-web-composer.php';
-			$web_composer = new \WordPress_Web_Composer( 'rocket_footer_js' );
-			$web_composer->set_install_target( dirname( $this->plugin_file ) );
-			$web_composer->run();
-		}
+
 	}
 
 	/**
