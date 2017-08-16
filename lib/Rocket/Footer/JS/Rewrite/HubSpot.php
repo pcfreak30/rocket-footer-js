@@ -68,7 +68,7 @@ class HubSpot extends RewriteAbstract {
 	 */
 	protected function do_rewrite( $content, $src ) {
 		if ( 'js.hs-scripts.com' === parse_url( $src, PHP_URL_HOST ) ) {
-			$file = $this->app->remote_fetch( $src );
+			$file = $this->plugin1->remote_fetch( $src );
 			if ( ! empty( $file ) ) {
 				$file            = str_replace( "\n", '', $file );
 				$matched         = false;

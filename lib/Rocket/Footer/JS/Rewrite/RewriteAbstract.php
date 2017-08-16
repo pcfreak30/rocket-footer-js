@@ -53,7 +53,7 @@ abstract class RewriteAbstract extends ComponentAbstract {
 	public function rewrite( $document = null, $content_document = null ) {
 		if ( ! $document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
-			$document = $this->app->get_document();
+			$document = $this->plugin->document;
 		}
 		if ( ! $content_document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */

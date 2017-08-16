@@ -3,9 +3,16 @@
 namespace Rocket\Footer\JS\Cache;
 
 use pcfreak30\WordPress\Cache\Store;
+use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
 use Rocket\Footer\JS;
-use Rocket\Footer\JS\ComponentAbstract;
 
+
+/**
+ * Class Manager
+ *
+ * @package Rocket\Footer\JS\Cache
+ * @property \Rocket\Footer\JS $plugin
+ */
 class Manager extends ComponentAbstract {
 	/**
 	 * @var \pcfreak30\WordPress\Cache\Store
@@ -48,7 +55,7 @@ class Manager extends ComponentAbstract {
 	 */
 	public function purge_cache() {
 		$this->store->delete_cache_branch();
-		rocket_rrmdir( $this->app->get_cache_path() );
+		rocket_rrmdir( $this->plugin->get_cache_path() );
 	}
 
 	/**

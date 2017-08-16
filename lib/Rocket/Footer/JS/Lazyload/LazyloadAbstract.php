@@ -14,7 +14,7 @@ use Rocket\Footer\JS\TagHelperTrait;
  * Class LazyloadAbstract
  *
  * @package Rocket\Footer\JS\Lazyload
- * @property \Rocket\Footer\JS $app
+ * @property \Rocket\Footer\JS $plugin
  */
 abstract class LazyloadAbstract extends ComponentAbstract {
 	use TagHelperTrait;
@@ -64,7 +64,7 @@ abstract class LazyloadAbstract extends ComponentAbstract {
 	public function lazyload( $document = null, $content_document = null ) {
 		if ( ! $document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
-			$document = $this->app->get_document();
+			$document = $this->plugin->document;
 		}
 		if ( ! $content_document ) {
 			/** @noinspection CallableParameterUseCaseInTypeContextInspection */
@@ -109,7 +109,7 @@ abstract class LazyloadAbstract extends ComponentAbstract {
 	 * @return bool
 	 */
 	protected function is_enabled() {
-		return $this->app->get_lazyload_manager()->is_enabled();
+		return $this->plugin->lazyload_manager > is_enabled();
 	}
 
 	/**
