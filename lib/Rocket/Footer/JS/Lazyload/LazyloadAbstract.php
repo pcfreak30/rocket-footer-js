@@ -109,7 +109,7 @@ abstract class LazyloadAbstract extends ComponentAbstract {
 	 * @return bool
 	 */
 	protected function is_enabled() {
-		return $this->plugin->lazyload_manager > is_enabled();
+		return $this->plugin->lazyload_manager->is_enabled();
 	}
 
 	/**
