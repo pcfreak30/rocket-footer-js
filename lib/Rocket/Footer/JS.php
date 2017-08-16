@@ -672,6 +672,10 @@ class JS extends PluginAbstract {
 		return $this->get_wp_filesystem()->get_contents( $file );
 	}
 
+	public function get_wp_filesystem() {
+		return parent::get_wp_filesystem();
+	}
+
 	/**
 	 *
 	 */
@@ -895,6 +899,10 @@ class JS extends PluginAbstract {
 		// Noop method
 	}
 
+	public function get_transient_prefix() {
+		return static::TRANSIENT_PREFIX;
+	}
+
 	/**
 	 * @param $matches
 	 *
@@ -902,9 +910,5 @@ class JS extends PluginAbstract {
 	 */
 	protected function lazyload_html_callback( $matches ) {
 		return '<!-- ' . html_entity_decode( $matches[1] ) . ' -->';
-	}
-
-	public function get_wp_filesystem() {
-		return parent::get_wp_filesystem();
 	}
 }
