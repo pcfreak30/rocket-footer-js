@@ -36,7 +36,6 @@ class Manager extends ComponentAbstract {
 	}
 
 	public function init() {
-		parent::init();
 		add_action( 'after_rocket_clean_domain', [ $this, 'purge_cache' ], 10, 0 );
 		add_action( 'after_rocket_clean_post', [ $this, 'purge_post' ] );
 		add_action( 'after_rocket_clean_term', [ $this, 'purge_term' ] );
