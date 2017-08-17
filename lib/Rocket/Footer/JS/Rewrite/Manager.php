@@ -12,6 +12,7 @@ use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
 class Manager extends ManagerAbstract {
 	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
 	protected $modules = [
+		'AsyncDocumentWrite',
 		'Tawkto',
 		'WPRocketLazyload',
 		'GoogleAnalytics',
