@@ -26,6 +26,14 @@ This plugin will do the following:
  * Double Click Google Analytics
  * Avvo.com Tracking
  * Pushcrew Tracking
+ * Clicky Tracking
+ * Facebook Pixel Tracking
+ * MCAfee Secure
+ * Sumo Ne
+ * Pingdom Prum
+ * Google Tag Manager
+ * Mouse Flow
+ * Cornerstone Page Builder
 * Automatically lazy load popular widgets if https://wordpress.org/plugins/lazy-load-xt/ or https://wordpress.org/plugins/a3-lazy-load/ are active. Services include:
  * Google Maps with Avada theme
  * All Facebook social widgets
@@ -38,6 +46,9 @@ This plugin will do the following:
  * VK.com
  * WooCommerce Social Media Share Buttons plugin
  * Any iframe
+ * Blog Her Ads
+ * Video embeds (click to activate)
+ * Pin Interest
 
 If you need dedicated/professional assistance with this plugin or just want an expert to get your site to run the fastest it can be, you may hire me at [Codeable](https://codeable.io/developers/derrick-hammer/?ref=rvtGZ)
 
@@ -50,6 +61,20 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 2.0.0 ###
+
+This is a ***MAJOR*** release and over 50% of the code is rewritten. While it has been extensively tested, there may still be bugs! Please test in a development site before deploying! Due to the amount of work, only a summary of this version will be detailed below.
+
+* ***Major*** rewrite using new composer based framework.
+* Feature: Add McAfee Secure integration
+* Feature: Add Revolution Slider integration
+* Feature: Add video embed lazyload and download thumnails locally
+* Feature: Add Pin Interest lazyLoad
+* Feature: Add Blog Her Ads lazyload
+* Feature: Hijack JS document.write to enable 3rd party scripts to inject html safely
+* Feature: Add Hub Spot rewriting
+* Feature: Add Pindom Prum rewrite
 
 ### 1.4.6 ###
 

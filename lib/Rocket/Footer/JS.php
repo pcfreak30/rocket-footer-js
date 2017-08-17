@@ -23,7 +23,7 @@ class JS extends PluginAbstract {
 	/**
 	 * Plugin version
 	 */
-	const VERSION = '';
+	const VERSION = '2.0.0';
 	/**
 	 *
 	 */
