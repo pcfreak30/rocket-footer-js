@@ -25,6 +25,7 @@ class Request extends ComponentAbstract {
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_deferred_js_files', '__return_zero' );
 		add_filter( 'rocket_buffer', [ $this->plugin, 'process_buffer' ], PHP_INT_MAX );
+		add_filter( 'rocket_htaccess_web_fonts_access', [ $this, 'add_js_to_htaccess_cors' ] );
 		remove_filter( 'rocket_buffer', 'rocket_insert_deferred_js', 11 );
 		remove_filter( 'rocket_buffer', 'rocket_defer_js', 14 );
 	}
@@ -56,5 +57,13 @@ class Request extends ComponentAbstract {
 			$scripts->registered['zxcvbn-async']->src   = includes_url( '/js/zxcvbn.min.js' );
 			$scripts->registered['zxcvbn-async']->extra = array();
 		}
+	}
+
+	public function add_js_to_htaccess_cors( $rules ) {
+		$rules    = explode( "\n", $rules );
+		$rules[4] = str_replace( ')$', '|js)$', $rules[4] );
+		$rules    = implode( "\n", $rules );
+
+		return $rules;
 	}
 }
