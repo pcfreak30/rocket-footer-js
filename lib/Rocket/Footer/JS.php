@@ -13,6 +13,7 @@ use Rocket\Footer\JS\Integration\Manager as IntegrationManager;
 use Rocket\Footer\JS\Lazyload\Manager as LazyloadManager;
 use Rocket\Footer\JS\Request;
 use Rocket\Footer\JS\Rewrite\Manager as RewriteManager;
+use Rocket\Footer\JS\Util;
 
 /**
  * Class JS
@@ -113,6 +114,10 @@ class JS extends PluginAbstract {
 	 * @var DOMCollection
 	 */
 	private $dom_collection;
+	/**
+	 * @var \Rocket\Footer\JS\Util
+	 */
+	private $util;
 
 	/**
 	 * JS constructor.
@@ -125,8 +130,18 @@ class JS extends PluginAbstract {
 	 * @param \Rocket\Footer\JS\DOMDocument         $document
 	 * @param \Rocket\Footer\JS\DOMDocument         $variable_document
 	 * @param \Rocket\Footer\JS\DOMDocument         $script_document
+	 * @param \Rocket\Footer\JS\Util                $util
 	 */
-	public function __construct( RewriteManager $rewrite_manager, IntegrationManager $integration_manager, LazyloadManager $lazyload_manager, Request $request, Manager $cache_manager, DOMDocument $document, DOMDocument $variable_document, DOMDocument $script_document ) {
+	public function __construct(
+		RewriteManager $rewrite_manager,
+		IntegrationManager $integration_manager,
+		LazyloadManager $lazyload_manager,
+		Request $request, Manager $cache_manager,
+		DOMDocument $document,
+		DOMDocument $variable_document,
+		DOMDocument $script_document,
+		Util $util
+	) {
 		$this->rewrite_manager     = $rewrite_manager;
 		$this->integration_manager = $integration_manager;
 		$this->lazyload_manager    = $lazyload_manager;
@@ -136,6 +151,7 @@ class JS extends PluginAbstract {
 		$this->script_document     = $script_document;
 		$this->node_map            = new \SplObjectStorage();
 		$this->document            = $document;
+		$this->util                = $util;
 		parent::__construct();
 	}
 
@@ -895,6 +911,13 @@ class JS extends PluginAbstract {
 
 	public function get_transient_prefix() {
 		return static::TRANSIENT_PREFIX;
+	}
+
+	/**
+	 * @return \Rocket\Footer\JS\Util
+	 */
+	public function get_util() {
+		return $this->util;
 	}
 
 	/**

@@ -30,7 +30,7 @@ class Videos extends LazyloadAbstract {
 			$info = $oembed->get_data( $src );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$img = $this->create_tag( 'img' );
-				$img->setAttribute( 'data-src', $this->download_image( $info->thumbnail_url ) );
+				$img->setAttribute( 'data-src', $this->ut( $info->thumbnail_url ) );
 				$img->setAttribute( 'width', $info->thumbnail_width );
 				$img->setAttribute( 'style', 'max-width:100%;height:auto;cursor:pointer;' );
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
@@ -58,25 +58,7 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
-	private function download_image( $url ) {
-		$data = $this->plugin->remote_fetch( $url );
-		if ( ! empty( $data ) ) {
-			$url_parts = parse_url( $url );
-			$info      = pathinfo( $url_parts['path'] );
-			if ( empty( $url_parts['port'] ) ) {
-				$url_parts['port'] = '';
-			}
-			$hash      = md5( $url_parts['scheme'] . '://' . $info['dirname'] . ( ! empty( $url_parts['port'] ) ? ":{$url_parts['port']}" : '' ) . '/' . $info['filename'] );
-			$filename  = $this->plugin->get_cache_path() . $hash . '.' . $info['extension'];
-			$final_url = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
-			if ( ! $this->plugin->get_wp_filesystem()->is_file( $filename ) ) {
-				$this->plugin->put_content( $filename, $data );
-			}
-			$url = $final_url;
-		}
 
-		return $url;
-	}
 
 	protected function is_match( $content, $src ) {
 		return false;
