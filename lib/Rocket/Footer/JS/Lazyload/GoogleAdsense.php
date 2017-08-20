@@ -44,27 +44,19 @@ class GoogleAdsense extends LazyloadAbstract {
 		}
 	}
 
-	protected function after_do_lazyload() {
-		foreach ( $this->get_script_collection() as $tag ) {
-			$src = $tag->getAttribute( 'src' );
-			if ( ! empty( $src ) ) {
-				$src = rocket_add_url_protocol( $src );
-			}
-			if ( 'pagead2.googlesyndication.com' === parse_url( $src, PHP_URL_HOST ) ) {
-				$tag->setAttribute( 'data-no-minify', 1 );
-				$next_tag = $tag;
-				do {
-					$next_tag = $next_tag->nextSibling;
-				} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' === strtolower( $next_tag->tagName ) && null !== $next_tag->textContent && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
-				$js_node = $next_tag;
-				if ( ! empty( $js_node ) ) {
-					$this->set_no_minify( $js_node );
-				}
-			}
+	protected function do_lazyload_off( $content, $src ) {
+		$this->set_no_minify();
+		$next_tag = $this->tags->current();
+		do {
+			$next_tag = $next_tag->nextSibling;
+		} while ( ! ( XML_ELEMENT_NODE === $next_tag->nodeType && 'script' === strtolower( $next_tag->tagName ) && null !== $next_tag->textContent && false !== strpos( $next_tag->textContent, 'adsbygoogle' ) ) );
+		$js_node = $next_tag;
+		if ( ! empty( $js_node ) ) {
+			$this->set_no_minify( $js_node );
 		}
 	}
 
 	protected function is_match( $content, $src ) {
-		return parent::is_match( $content, $src ) && 'pagead2.googlesyndication.com' === parse_url( $src, PHP_URL_HOST );
+		return parent::is_match( $content, $src ) && '' === trim( $this->tags->current()->getAttribute( 'data-lazyload-processed' ) ) && 'pagead2.googlesyndication.com' === parse_url( $src, PHP_URL_HOST );
 	}
 }
