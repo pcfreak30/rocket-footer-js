@@ -4,8 +4,14 @@
 namespace Rocket\Footer\JS;
 
 
+use Mimey\MimeTypes;
 use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
 
+/**
+ * Class Util
+ *
+ * @package Rocket\Footer\JS
+ */
 class Util extends ComponentAbstract {
 
 	/**
@@ -15,7 +21,13 @@ class Util extends ComponentAbstract {
 		// TODO: Implement init() method.
 	}
 
-	public function download_remote_file( $url ) {
+	/**
+	 * @param        $url
+	 * @param string $extension
+	 *
+	 * @return string
+	 */
+	public function download_remote_file( $url, $extension = null ) {
 		$data = $this->plugin->remote_fetch( $url );
 		if ( ! empty( $data ) ) {
 			$url_parts = parse_url( $url );
@@ -24,16 +36,10 @@ class Util extends ComponentAbstract {
 				$url_parts['port'] = '';
 			}
 			if ( empty( $info['extension'] ) ) {
-				$tempfile = wp_tempnam();
-
-				$this->plugin->get_wp_filesystem()->put_contents( $tempfile, $data );
-				$filetype = wp_check_filetype_and_ext( $tempfile, basename( $tempfile ) );
-				$filetype = array_filter( $filetype );
-				$this->plugin->get_wp_filesystem()->delete( $tempfile );
-				if ( empty( $filetype ) ) {
-					return $url;
-				}
-				$info['extension'] = $filetype['ext'];
+				$info['extension'] = $extension;
+			}
+			if ( empty( $info['extension'] ) ) {
+				return $url;
 			}
 			$hash      = md5( $url_parts['scheme'] . '://' . $info['dirname'] . ( ! empty( $url_parts['port'] ) ? ":{$url_parts['port']}" : '' ) . '/' . $info['filename'] );
 			$filename  = $this->plugin->get_cache_path() . $hash . '.' . $info['extension'];
