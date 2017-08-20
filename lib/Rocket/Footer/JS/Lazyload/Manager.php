@@ -24,6 +24,7 @@ class Manager extends ManagerAbstract {
 		'AvadaGoogleMaps',
 		'Iframe',
 		'Videos',
+		'GoogleAdsenseMobile',
 		'GoogleAdsense',
 		'AmazonAds',
 		'StumbleUpon',
