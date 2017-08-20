@@ -29,5 +29,6 @@ class Manager extends ManagerAbstract {
 		'HubSpot',
 		'PingdomPrum',
 		'TypeKit',
+		'CrazyEgg',
 	];
 }
