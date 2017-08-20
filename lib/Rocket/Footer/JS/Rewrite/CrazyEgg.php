@@ -14,7 +14,7 @@ class CrazyEgg extends RewriteAbstract {
 	 * @return void
 	 */
 	protected function do_rewrite( $content, $src ) {
-		if ( preg_match_all( '~//script\.crazyegg\.com(/pages/scripts/\d+/\d+\.js)~', $content, $matches ) ) {
+		if ( preg_match( '~//script\.crazyegg\.com(/pages/scripts/\d+/\d+\.js)~', $content, $matches ) ) {
 			$this->inject_tag( $this->create_script( null, "https://script.crazyegg.com{$matches[1]}" ) );
 			$this->tags->remove();
 		}
