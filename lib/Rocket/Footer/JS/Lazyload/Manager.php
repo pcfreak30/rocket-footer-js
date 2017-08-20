@@ -32,6 +32,7 @@ class Manager extends ManagerAbstract {
 		'GoogleRemarketing',
 		'PinInterest',
 		'GoogleTranslate',
+		'Backgroundimages',
 	];
 
 	/**
