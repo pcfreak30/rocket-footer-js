@@ -28,5 +28,6 @@ class Manager extends ManagerAbstract {
 		'McAfeeSecure',
 		'HubSpot',
 		'PingdomPrum',
+		'TypeKit',
 	];
 }
