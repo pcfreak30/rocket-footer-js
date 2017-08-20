@@ -28,6 +28,7 @@ class Util extends ComponentAbstract {
 
 				$this->plugin->get_wp_filesystem()->put_contents( $tempfile, $data );
 				$filetype = wp_check_filetype_and_ext( $tempfile, basename( $tempfile ) );
+				$filetype = array_filter( $filetype );
 				$this->plugin->get_wp_filesystem()->delete( $tempfile );
 				if ( empty( $filetype ) ) {
 					return $url;
