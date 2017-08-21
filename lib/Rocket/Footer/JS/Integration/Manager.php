@@ -18,6 +18,7 @@ class Manager extends ManagerAbstract {
 		'WoocommerceSocialMediaSharesButtons',
 		'RevolutionSlider',
 		'McAfeeSecure',
+		'CrazyEgg',
 	];
 
 }
