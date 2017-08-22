@@ -511,7 +511,7 @@ class JS extends PluginAbstract {
 			if ( ! empty( $file ) ) {
 				$js_part_cache = apply_filters( 'rocket_footer_js_process_remote_script', $file, $src );
 				$js_part       = $this->minify( $js_part_cache );
-				if ( $js_part_cache != $file ) {
+				if ( $js_part_cache != $file && apply_filters( 'rocket_footer_js_reprocess_remote_script', true, $file, $src ) ) {
 					$js_part_cache = $file;
 					$js_part_cache = $this->minify( $js_part_cache );
 				} else {
@@ -661,7 +661,7 @@ class JS extends PluginAbstract {
 			$js_part       = $js_part_cache;
 
 			$js_part = $this->minify( $js_part );
-			if ( $js_part_cache != $file ) {
+			if ( $js_part_cache != $file && apply_filters( 'rocket_footer_js_reprocess_local_script', true, $file, $src ) ) {
 				$js_part_cache = $file;
 				$js_part_cache = $this->minify( $js_part_cache );
 			} else {
