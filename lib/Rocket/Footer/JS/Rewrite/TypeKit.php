@@ -38,7 +38,9 @@ class TypeKit extends RewriteAbstract {
 								switch ( $arg ) {
 									case 'primer':
 									case 'subset_id':
-										$query_args[ $arg ] = $font->descriptors->$arg;
+										if ( isset( $font->descriptors->$arg ) ) {
+											$query_args[ $arg ] = $font->descriptors->$arg;
+										}
 										break;
 									case 'fwd':
 										$query_args[ $arg ] = $json->fn->${$font->family}[ $index ];
