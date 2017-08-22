@@ -521,7 +521,11 @@ class JS extends PluginAbstract {
 				$this->js .= $js_part;
 			}
 		} else {
-			$this->js .= apply_filters( 'rocket_footer_js_process_remote_script', $item_cache, $src );
+			$js_part = $item_cache;
+			if ( apply_filters( 'rocket_footer_js_reprocess_remote_script', true, $js_part, $src ) ) {
+				$js_part = apply_filters( 'rocket_footer_js_process_remote_script', $js_part, $src );
+			}
+			$this->js .= $js_part;
 		}
 	}
 
@@ -675,7 +679,11 @@ class JS extends PluginAbstract {
 			$this->js .= $js_part;
 			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part_cache );
 		} else {
-			$this->js .= apply_filters( 'rocket_footer_js_process_local_script', $item_cache, $url );
+			$js_part = $item_cache;
+			if ( apply_filters( 'rocket_footer_js_reprocess_local_script', true, $js_part, $src ) ) {
+				apply_filters( 'rocket_footer_js_process_local_script', $js_part, $url );
+			}
+			$this->js .= $js_part;
 		}
 	}
 
