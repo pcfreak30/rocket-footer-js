@@ -24,7 +24,7 @@ class CrazyEgg extends IntegrationAbstract {
 	}
 
 	public function maybe_reprocess( $value, $script, $url ) {
-		if ( 'script.crazyegg.com' === parse_url( $url, PHP_URL_HOST ) && strpos( $script, 'atob' ) ) {
+		if ( 'script.crazyegg.com' === parse_url( $url, PHP_URL_HOST ) && false !== strpos( $script, 'atob' ) ) {
 			$value = false;
 		}
 
