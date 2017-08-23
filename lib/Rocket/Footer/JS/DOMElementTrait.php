@@ -35,7 +35,7 @@ trait DOMElementTrait {
 	public function next( $xpath_expr ) {
 		$xpath      = new \DOMXPath( $this->ownerDocument );
 		$xpath_expr = trim( "following-sibling::{$xpath_expr}", ':' );
-		if ( ( $result = $xpath->query( $xpath_expr ) ) && 0 < $result->length ) {
+		if ( ( $result = $xpath->query( $xpath_expr, $this ) ) && 0 < $result->length ) {
 			return $result->item( 0 );
 		}
 
@@ -45,7 +45,7 @@ trait DOMElementTrait {
 	public function prev( $xpath_expr ) {
 		$xpath      = new \DOMXPath( $this->ownerDocument );
 		$xpath_expr = trim( "preceding-sibling::{$xpath_expr}", ':' );
-		if ( ( $result = $xpath->query( $xpath_expr ) ) && 0 < $result->length ) {
+		if ( ( $result = $xpath->query( $xpath_expr, $this ) ) && 0 < $result->length ) {
 			return $result->item( 0 );
 		}
 
