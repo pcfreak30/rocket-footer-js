@@ -239,10 +239,11 @@ class JS extends PluginAbstract {
 		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 			/** @noinspection UsageOfSilenceOperatorInspection */
-			$buffer = $this->pre_process_scripts( $buffer );
-			if ( ! @$this->document->loadHTML( mb_convert_encoding( $buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
+			$pre_buffer = $this->pre_process_scripts( $buffer );
+			if ( ! @$this->document->loadHTML( mb_convert_encoding( $pre_buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
 				return $buffer;
 			}
+
 			$this->decode_inline_scripts();
 
 			$this->body = $this->document->getElementsByTagName( 'body' )->item( 0 );
