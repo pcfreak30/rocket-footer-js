@@ -17,15 +17,7 @@ class GoogleAdsenseMobile extends LazyloadAbstract {
 	 * @return void
 	 */
 	protected function do_lazyload( $content, $src ) {
-		$tag      = $this->tags->current();
-		$prev_tag = $tag;
-		do {
-			$prev_tag = $prev_tag->previousSibling;
-		} while ( null !== $prev_tag && ! ( XML_ELEMENT_NODE == $prev_tag->nodeType && 'script' === strtolower( $prev_tag->tagName ) && 'pagead2.googlesyndication.com' === parse_url( $src, PHP_URL_HOST ) ) );
-		$js_node = $prev_tag;
-		if ( null !== $js_node ) {
-			$js_node->setAttribute( 'data-lazyload-processed', '1' );
-		}
+		$tag = $this->tags->current();
 		$tag->setAttribute( 'style', 'display:none' );
 		if ( ! $this->base64_injected ) {
 			$this->inject_tag( $this->create_script( null, 'https://cdnjs.cloudflare.com/ajax/libs/Base64/1.0.1/base64.min.js' ) );
