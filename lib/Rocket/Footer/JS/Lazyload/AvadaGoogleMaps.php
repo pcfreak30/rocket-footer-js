@@ -12,7 +12,7 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 	protected $script_comtent;
 	protected $map_tag;
 	protected $regex = '~fusion_run_map_fusion_map_(\w+)~is';
-
+	protected $processed = false;
 	/**
 	 * @param string  $content
 	 *
@@ -46,6 +46,7 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 
 		$element = $this->content_document->getElementById( "fusion_map_{$this->regex_match[1]}" );
 		if ( ! empty( $element ) ) {
+			$this->processed = true;
 			$element->setAttribute( 'data-lazy-widget', $this->script_id );
 		}
 	}
@@ -78,7 +79,7 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 	}
 
 	protected function after_do_lazyload() {
-		if ( ! empty( $this->map_tag ) ) {
+		if ( ! empty( $this->map_tag ) && $this->processed ) {
 			$this->lazyload_script( $this->script_comtent, $this->script_id, $this->map_tag );
 		}
 	}
