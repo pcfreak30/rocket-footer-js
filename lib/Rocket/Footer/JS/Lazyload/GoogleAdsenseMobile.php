@@ -30,6 +30,7 @@ class GoogleAdsenseMobile extends LazyloadAbstract {
 		$span = $this->create_tag( 'span' );
 		$img  = $this->create_pixel_image();
 		$span->setAttribute( 'data-lazy-widget', "google-adsense-mobile-{$this->instance}" );
+		$span->setAttribute( 'data-lazy-remove', "1" );
 		$span->appendChild( $img );
 		$this->append_tag( $span );
 		$window_check_script = $this->create_script(
