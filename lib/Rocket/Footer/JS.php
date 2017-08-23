@@ -848,7 +848,10 @@ class JS extends PluginAbstract {
 	 *
 	 */
 	public function activate() {
-
+		if ( ! $this->get_dependancies_exist() ) {
+			return;
+		}
+		flush_rocket_htaccess();
 	}
 
 	/**

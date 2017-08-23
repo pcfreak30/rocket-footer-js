@@ -49,6 +49,7 @@ function rocket_footer_js_init() {
  * Activate function shortcut
  */
 function rocket_footer_js_activate() {
+	rocket_footer_js()->init();
 	rocket_footer_js()->activate();
 }
 
