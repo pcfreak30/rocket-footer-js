@@ -23,7 +23,6 @@ class GoogleAdsense extends LazyloadAbstract {
 		$ad_node = $tag->next( 'ins[contains(concat(" ", normalize-space(@class), " "), " adsbygoogle ")]' );
 
 		if ( ! empty( $ad_node ) ) {
-			$ad_node     = $tag->next( 'ins[contains(concat(" ", normalize-space(@class), " "), " adsbygoogle ")]' );
 			$sub_content = $this->get_script_content( $ad_node );
 			$this->lazyload_script( $sub_content, "google-adsense-{$this->instance}" );
 			$ad_node->parentNode->removeChild( $ad_node );
