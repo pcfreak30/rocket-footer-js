@@ -20,11 +20,7 @@ class BlogHerAds extends LazyloadAbstract {
 		$tag              = $this->tags->current();
 		$lazyload_content = '';
 		if ( ! empty( $this->regex_match ) ) {
-			$prev_tag = $tag;
-			do {
-				$prev_tag = $prev_tag->previousSibling;
-			} while ( null !== $prev_tag && XML_ELEMENT_NODE !== $prev_tag->nodeType && 'div' !== strtolower( $tag->tagName ) && $this->regex_match[1] !== $tag->getAttribute( 'id' ) );
-			$div_tag = $prev_tag;
+			$div_tag = $tag->prev( "div[@id=\"{$this->regex_match[1]}\"]" );
 			if ( ! empty( $div_tag ) ) {
 				$lazyload_content = $this->get_script_content( $div_tag ) . $this->get_script_content();
 			}
