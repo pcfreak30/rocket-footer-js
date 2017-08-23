@@ -239,9 +239,11 @@ class JS extends PluginAbstract {
 		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 			/** @noinspection UsageOfSilenceOperatorInspection */
+			$buffer = $this->pre_process_scripts( $buffer );
 			if ( ! @$this->document->loadHTML( mb_convert_encoding( $buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
 				return $buffer;
 			}
+			$this->decode_inline_scripts();
 
 			$this->body = $this->document->getElementsByTagName( 'body' )->item( 0 );
 			$this->normalize_cdn_domains();
@@ -938,5 +940,36 @@ class JS extends PluginAbstract {
 	 */
 	protected function lazyload_html_callback( $matches ) {
 		return '<!-- ' . html_entity_decode( $matches[1] ) . ' -->';
+	}
+
+	protected function pre_process_scripts( $buffer ) {
+		return preg_replace_callback( '~(<script[^>]*>)(.*)(<\/script>)~isU', [
+			$this,
+			'pre_process_scripts_callback',
+		], $buffer );
+	}
+
+	protected function pre_process_scripts_callback( $match ) {
+		if ( 0 === strlen( trim( $match[2] ) ) || $match[2] === strip_tags( $match[2] ) ) {
+			return $match[0];
+		}
+
+		return "{$match[1]}" . htmlentities( $match[2] ) . "{$match[3]}";
+	}
+
+	protected function decode_inline_scripts() {
+		/** @var DOMElement $tag */
+		foreach ( ( new \DOMXPath( $this->document ) )->query( '//script[not(@src)]' ) as $tag ) {
+			$decoded = html_entity_decode( $tag->textContent );
+			if ( $tag->textContent !== $decoded ) {
+				$new_script = $this->document->createElement( 'script', $decoded );
+				if ( $tag->hasAttributes() ) {
+					foreach ( $tag->attributes as $attr ) {
+						$new_script->setAttribute( $attr->nodeName, $attr->nodeValue );
+					}
+				}
+				$tag->parentNode->replaceChild( $new_script, $tag );
+			}
+		}
 	}
 }
