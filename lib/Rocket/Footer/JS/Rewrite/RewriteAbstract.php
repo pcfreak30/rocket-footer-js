@@ -70,7 +70,11 @@ abstract class RewriteAbstract extends ComponentAbstract {
 			if ( ! empty( $src ) ) {
 				$src = rocket_add_url_protocol( $src );
 			}
-			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
+			$content = $tag->textContent;
+			if ( empty( $src ) ) {
+				$content = $this->plugin->util->maybe_decode_script( $content );
+			}
+			$content = str_replace( [ "\n", "\r" ], '', $content );
 			$content = trim( $content, '/' );
 			$this->do_rewrite( $content, $src );
 			$this->tags->next();

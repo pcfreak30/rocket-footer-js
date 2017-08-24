@@ -244,7 +244,7 @@ class JS extends PluginAbstract {
 				return $buffer;
 			}
 
-			$this->decode_inline_scripts();
+			//$this->decode_inline_scripts();
 
 			$this->body = $this->document->getElementsByTagName( 'body' )->item( 0 );
 			$this->normalize_cdn_domains();
@@ -275,6 +275,8 @@ class JS extends PluginAbstract {
 
 			//Get HTML
 			$buffer = $this->document->saveHTML();
+
+			$buffer = $this->post_process_scripts( $buffer );
 
 			$buffer = $this->do_minify_html( $buffer );
 		}
@@ -708,12 +710,13 @@ class JS extends PluginAbstract {
 	 */
 	protected function process_inline_script() {
 		// Check item cache
-		$item_cache_id = [ md5( $this->dom_collection->current()->textContent ) ];
+		$content       = $this->util->maybe_decode_script( $this->dom_collection->current()->textContent );
+		$item_cache_id = [ md5( $content ) ];
 		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
 			// Remove any conditional comments for IE that somehow was put in the script tag
-			$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $this->dom_collection->current()->textContent );
+			$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $content );
 			$js_part = $this->minify( $js_part );
 			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part );
 		} else {
@@ -950,27 +953,26 @@ class JS extends PluginAbstract {
 		], $buffer );
 	}
 
+	protected function post_process_scripts( $buffer ) {
+		return preg_replace_callback( '~(<script[^>]*>)(.*)(<\/script>)~isU', [
+			$this,
+			'post_process_scripts_callback',
+		], $buffer );
+	}
+
 	protected function pre_process_scripts_callback( $match ) {
-		if ( 0 === strlen( trim( $match[2] ) ) || $match[2] === strip_tags( $match[2] ) ) {
+		if ( 0 === strlen( trim( $match[2] ) ) || false !== strpos( $match[2], 'CDATA' ) ) {
 			return $match[0];
 		}
 
-		return "{$match[1]}" . htmlentities( $match[2] ) . "{$match[3]}";
+		return "{$match[1]}" . $this->util->encode_script( $match[2] ) . "{$match[3]}";
 	}
 
-	protected function decode_inline_scripts() {
-		/** @var DOMElement $tag */
-		foreach ( ( new \DOMXPath( $this->document ) )->query( '//script[not(@src)]' ) as $tag ) {
-			$decoded = html_entity_decode( $tag->textContent );
-			if ( $tag->textContent !== $decoded ) {
-				$new_script = $this->document->createElement( 'script', $decoded );
-				if ( $tag->hasAttributes() ) {
-					foreach ( $tag->attributes as $attr ) {
-						$new_script->setAttribute( $attr->nodeName, $attr->nodeValue );
-					}
-				}
-				$tag->parentNode->replaceChild( $new_script, $tag );
-			}
+	protected function post_process_scripts_callback( $match ) {
+		if ( 0 === strlen( trim( $match[2] ) ) ) {
+			return $match[0];
 		}
+
+		return "{$match[1]}" . $this->util->maybe_decode_script( $match[2] ) . "{$match[3]}";
 	}
 }
