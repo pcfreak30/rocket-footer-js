@@ -239,8 +239,7 @@ class JS extends PluginAbstract {
 		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 			/** @noinspection UsageOfSilenceOperatorInspection */
-			$pre_buffer = $this->pre_process_scripts( $buffer );
-			if ( ! @$this->document->loadHTML( mb_convert_encoding( $pre_buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
+			if ( ! @$this->document->loadHTML( mb_convert_encoding( $buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
 				return $buffer;
 			}
 
@@ -275,8 +274,6 @@ class JS extends PluginAbstract {
 
 			//Get HTML
 			$buffer = $this->document->saveHTML();
-
-			$buffer = $this->post_process_scripts( $buffer );
 
 			$buffer = $this->do_minify_html( $buffer );
 		}
@@ -944,35 +941,5 @@ class JS extends PluginAbstract {
 	 */
 	protected function lazyload_html_callback( $matches ) {
 		return '<!-- ' . html_entity_decode( $matches[1] ) . ' -->';
-	}
-
-	protected function pre_process_scripts( $buffer ) {
-		return preg_replace_callback( '~(<script[^>]*>)(.*)(<\/script>)~isU', [
-			$this,
-			'pre_process_scripts_callback',
-		], $buffer );
-	}
-
-	protected function post_process_scripts( $buffer ) {
-		return preg_replace_callback( '~(<script[^>]*>)(.*)(<\/script>)~isU', [
-			$this,
-			'post_process_scripts_callback',
-		], $buffer );
-	}
-
-	protected function pre_process_scripts_callback( $match ) {
-		if ( 0 === strlen( trim( $match[2] ) ) || false !== strpos( $match[2], 'CDATA' ) ) {
-			return $match[0];
-		}
-
-		return "{$match[1]}" . $this->util->encode_script( $match[2] ) . "{$match[3]}";
-	}
-
-	protected function post_process_scripts_callback( $match ) {
-		if ( 0 === strlen( trim( $match[2] ) ) ) {
-			return $match[0];
-		}
-
-		return "{$match[1]}" . $this->util->maybe_decode_script( $match[2] ) . "{$match[3]}";
 	}
 }
