@@ -4,7 +4,6 @@
 namespace Rocket\Footer\JS;
 
 
-use Mimey\MimeTypes;
 use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
 
 /**
@@ -51,5 +50,25 @@ class Util extends ComponentAbstract {
 		}
 
 		return $url;
+	}
+
+	public function maybe_decode_script( $data ) {
+		if ( $this->is_base64_encoded( $data ) ) {
+			return json_decode( base64_decode( $data ) );
+		}
+
+		return $data;
+	}
+
+	public function encode_script( $data ) {
+		return base64_encode( json_encode( $data ) );
+	}
+
+	protected function is_base64_encoded( $data ) {
+		if ( base64_decode( $data, true ) && json_decode( base64_decode( $data ) ) ) {
+			return true;
+		}
+
+		return false;
 	}
 }
