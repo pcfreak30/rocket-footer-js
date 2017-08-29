@@ -119,6 +119,8 @@ class JS extends PluginAbstract {
 	 */
 	private $util;
 
+	private $cache_hash;
+
 	/**
 	 * JS constructor.
 	 *
@@ -368,7 +370,7 @@ class JS extends PluginAbstract {
 	 * @return array
 	 */
 	protected function get_cache_id() {
-		$post_cache_id_hash = md5( serialize( $this->cache_list ) );
+		$post_cache_id_hash = $this->get_cache_hash();
 		$post_cache_id      = array();
 		if ( is_singular() ) {
 			$post_cache_id [] = 'post_' . get_the_ID();
@@ -418,7 +420,11 @@ class JS extends PluginAbstract {
 	 * @return string
 	 */
 	protected function get_cache_hash() {
-		return md5( serialize( $this->cache_list ) );
+		if ( null === $this->cache_hash ) {
+			$this->cache_hash = md5( serialize( $this->cache_list ) );
+		}
+
+		return $this->cache_hash;
 	}
 
 	/**
