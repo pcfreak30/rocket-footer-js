@@ -35,7 +35,7 @@ class Request extends ComponentAbstract {
 			remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 			add_action( 'wp_footer', 'print_emoji_detection_script' );
 		}
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ], 999 );
 	}
 
 	public function enqueue_scripts() {
@@ -45,9 +45,12 @@ class Request extends ComponentAbstract {
 			$dep = 'jquery-lazyloadxt';
 		}
 
-		wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), array( $dep ) );
-		wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), array( $dep ) );
-		wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+		if ( wp_script_is( $dep, 'registered' ) ) {
+			wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+			wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+			wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+		}
+
 	}
 
 	/**
