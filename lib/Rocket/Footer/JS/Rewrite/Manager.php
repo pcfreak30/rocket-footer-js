@@ -24,7 +24,6 @@ class Manager extends ManagerAbstract {
 		'PushCrew',
 		'MouseFlow',
 		'Clicky',
-		'GoogleTagManager',
 		'McAfeeSecure',
 		'HubSpot',
 		'PingdomPrum',
