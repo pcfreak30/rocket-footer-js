@@ -9,10 +9,20 @@ use Rocket\Footer\JS\DOMElement;
 class AvadaGoogleMaps extends LazyloadAbstract {
 
 	protected $script_id;
-	protected $script_comtent;
+	protected $script_content;
 	protected $map_tag;
 	protected $regex = '~fusion_run_map_fusion_map_(\w+)~is';
 	protected $processed = false;
+
+	public function init() {
+		add_filter( 'avada_setting_get_js_compiler', [ $this, 'zero' ] );
+		parent::init();
+	}
+
+	public function zero() {
+		return '0';
+	}
+
 	/**
 	 * @param string  $content
 	 *
@@ -24,27 +34,42 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 		if ( empty( $this->script_id ) ) {
 			$this->script_id = 'avada_fusion_google_maps';
 		}
-		$sub_url = '';
+		$dep_scripts = [];
 		/** @var DOMElement $sub_tag */
 		foreach ( $this->get_script_collection() as $sub_tag ) {
 			$src = $sub_tag->getAttribute( 'src' );
-			if ( false !== strpos( parse_url( $src, PHP_URL_PATH ), 'assets/js/infobox_packed.js' ) ) {
-				$sub_url = $src;
+			if ( false !== strpos( parse_url( $src, PHP_URL_PATH ), 'assets/js/infobox_packed.js' ) ||
+			     false !== strpos( parse_url( $src, PHP_URL_PATH ), 'library/infobox_packed.js' ) ||
+			     false !== strpos( parse_url( $src, PHP_URL_PATH ), 'library/jquery.fusion_maps.js' ) ||
+			     false !== strpos( parse_url( $src, PHP_URL_PATH ), 'general/fusion-google-map.js' ) ) {
+				$dep_scripts [] = $src;
 				if ( $sub_tag->parentNode ) {
 					$sub_tag->parentNode->removeChild( $sub_tag );
 					$this->tags->flag_removed();
 				}
 			}
 		}
-		if ( ! empty( $sub_url ) ) {
-			$new_script = $this->create_script( '(function(){(function check(){if(typeof google=="undefined")setTimeout(check,10);else{jQuery.getScript("' . $sub_url . '", function(){' . $content . '; if(document.readyState == "complete"){' . $this->regex_match[0] . '();}})}})()})();' );
+
+		$element     = $this->content_document->getElementById( "fusion_map_{$this->regex_match[1]}" );
+		$lazy_widget = $element->getAttribute( 'data-lazy-widget' );
+		if ( ! empty( $lazy_widget ) ) {
+			$this->tags->remove();
+
+			return;
+		}
+		$dep_scripts = array_unique( $dep_scripts );
+		if ( ! empty( $dep_scripts ) ) {
+			$dep_scripts = array_map( function ( $script ) {
+				return '$.getScript( ' . wp_json_encode( $script ) . ' )';
+			}, $dep_scripts );
+
+			$new_script = $this->create_script( '(function($){(function check(){if(typeof google==="undefined" || typeof $==="undefined")setTimeout(check,10);else{$.when(' . implode( ',', $dep_scripts ) . ',  $.Deferred(function( deferred ){$( deferred.resolve );})).done(function(){debugger;' . $content . '; if(document.readyState == "complete"){' . $this->regex_match[0] . '();}})}})()})(jQuery);' );
 		} else {
 			$new_script = $this->create_script( '(function(){(function check(){if(typeof google=="undefined")setTimeout(check,10);else{' . $content . ';' . $this->regex_match[0] . '();}})()})();' );
 		}
-		$this->script_comtent .= $this->get_script_content( $new_script );
+		$this->script_content .= $this->get_script_content( $new_script );
 		$this->tags->remove();
 
-		$element = $this->content_document->getElementById( "fusion_map_{$this->regex_match[1]}" );
 		if ( ! empty( $element ) ) {
 			$this->processed = true;
 			$element->setAttribute( 'data-lazy-widget', $this->script_id );
@@ -80,7 +105,7 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 
 	protected function after_do_lazyload() {
 		if ( ! empty( $this->map_tag ) && $this->processed ) {
-			$this->lazyload_script( $this->script_comtent, $this->script_id, $this->map_tag );
+			$this->lazyload_script( $this->get_script_content( $this->map_tag ) . $this->script_content, $this->script_id, $this->map_tag );
 		}
 	}
 }
