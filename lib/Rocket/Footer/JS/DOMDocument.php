@@ -22,7 +22,7 @@ class DOMDocument extends \DOMDocument {
 		], $buffer );
 	}
 
-	public function saveHTML( DOMNode $node = null ) {
+	public function saveHTML( \DOMNode $node = null ) {
 		$html = parent::saveHTML( $node );
 
 		return $this->post_process_scripts( $html );
