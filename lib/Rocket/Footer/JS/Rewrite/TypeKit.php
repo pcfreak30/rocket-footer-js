@@ -62,14 +62,14 @@ class TypeKit extends RewriteAbstract {
 							}
 							$css = '';
 							if ( ! empty( $formats ) ) {
-								$css = "@font-face{font-fanily:{$font->family};src:";
+								$css = "@font-face{font-family:{$font->family};src:";
 								foreach ( $formats as $format => $url ) {
 									$css .= "url('{$url}') format(\"{$format}\")";
 									if ( $formats_index_list[ $format ] != count( $formats_index_list ) - 1 ) {
 										$css .= ',';
 									}
 								}
-								$css .= ";font-weight: {$font->descriptors->weight}; font-style:{$font->descriptors->style}";
+								$css .= ";font-weight: {$font->descriptors->weight}; font-style:{$font->descriptors->style}}";
 							}
 							$all_css .= $css;
 
@@ -79,6 +79,10 @@ class TypeKit extends RewriteAbstract {
 						$style_tag = $this->create_tag( 'style', $all_css );
 						$style_tag->setAttribute( 'type', 'text/css' );
 						$head->appendChild( $style_tag );
+						$classes    = array_filter( explode( ' ', $this->document->documentElement->getAttribute( 'class' ) ) );
+						$classes [] = 'wf-active';
+						$classes    = array_unique( $classes );
+						$this->document->documentElement->setAttribute( 'class', implode( ' ', $classes ) );
 					}
 					$this->tags->remove();
 				}
