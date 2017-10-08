@@ -17,7 +17,7 @@ class PixelYourSite extends IntegrationAbstract {
 	 */
 	public function init() {
 		if ( function_exists( 'pys_free_init' ) ) {
-			add_filter( 'rocket_footer_js_process_local_script', [ $this, 'process' ] );
+			add_filter( 'rocket_footer_js_process_local_script', [ $this, 'process' ], 10, 2 );
 		}
 	}
 
