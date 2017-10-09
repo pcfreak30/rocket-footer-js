@@ -18,7 +18,6 @@ class Manager extends ManagerAbstract {
 		'GoogleAnalytics',
 		'DoubleClickGoogleAnalytics',
 		'FacebookPixel',
-		'GoogleWebFonts',
 		'SumoMe',
 		'Avvo',
 		'PushCrew',
