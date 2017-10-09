@@ -29,5 +29,6 @@ class Manager extends ManagerAbstract {
 		'PingdomPrum',
 		'TypeKit',
 		'CrazyEgg',
+		'BingBat',
 	];
 }
