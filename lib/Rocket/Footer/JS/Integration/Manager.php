@@ -19,6 +19,7 @@ class Manager extends ManagerAbstract {
 		'RevolutionSlider',
 		'McAfeeSecure',
 		'CrazyEgg',
+		'Woocommerce',
 	];
 
 }
