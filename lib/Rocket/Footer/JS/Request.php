@@ -48,6 +48,7 @@ class Request extends ComponentAbstract {
 		if ( wp_script_is( $dep, 'registered' ) ) {
 			wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), array( $dep ) );
 			wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+			wp_enqueue_script( 'jquery-lazyloadxt.video', plugins_url( 'assets/js/jquery.lazyloadxt.video.js', $this->plugin->get_plugin_file() ), array( $dep ) );
 			wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), array( $dep ) );
 			wp_enqueue_script( 'jquery.lazyloadxt.imagefixes', plugins_url( 'assets/js/jquery.lazyloadxt.imagefixes.js', $this->plugin->get_plugin_file() ), array( $dep ) );
 		}
@@ -65,9 +66,19 @@ class Request extends ComponentAbstract {
 	}
 
 	public function add_js_to_htaccess_cors( $rules ) {
-		$rules    = explode( "\n", $rules );
-		$rules[4] = str_replace( ')$', '|js)$', $rules[4] );
-		$rules    = implode( "\n", $rules );
+		$rules = explode( "\n", $rules );
+		$match = false;
+		foreach ( $rules as $index => $rule ) {
+			if ( false !== stripos( $rule, 'FilesMatch' ) ) {
+				$match = $index;
+				break;
+			}
+		}
+		if ( $match ) {
+			$rules[ $match ] = str_replace( ')$', '|js)$', $rules[ $match ] );
+		}
+
+		$rules = implode( "\n", $rules );
 
 		return $rules;
 	}
