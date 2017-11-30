@@ -245,8 +245,6 @@ class JS extends PluginAbstract {
 				return $buffer;
 			}
 
-			//$this->decode_inline_scripts();
-
 			$this->body = $this->document->getElementsByTagName( 'body' )->item( 0 );
 			$this->normalize_cdn_domains();
 
@@ -689,7 +687,7 @@ class JS extends PluginAbstract {
 		} else {
 			$js_part = $item_cache;
 			if ( apply_filters( 'rocket_footer_js_reprocess_local_script', true, $js_part, $src ) ) {
-				apply_filters( 'rocket_footer_js_process_local_script', $js_part, $url );
+				$js_part = apply_filters( 'rocket_footer_js_process_local_script', $js_part, $url );
 			}
 			$this->js .= $js_part;
 		}
@@ -938,6 +936,27 @@ class JS extends PluginAbstract {
 	 */
 	public function get_util() {
 		return $this->util;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_cdn_domains() {
+		return $this->cdn_domains;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_domain() {
+		return $this->domain;
+	}
+
+	/**
+	 * @return \Rocket\Footer\JS\DOMElement
+	 */
+	public function get_body() {
+		return $this->body;
 	}
 
 	/**
