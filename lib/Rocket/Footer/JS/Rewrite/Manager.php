@@ -29,5 +29,7 @@ class Manager extends ManagerAbstract {
 		'TypeKit',
 		'CrazyEgg',
 		'BingBat',
+		'Klaviyo',
+		'YouTubeEmbedAPI',
 	];
 }
