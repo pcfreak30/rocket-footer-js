@@ -29,6 +29,8 @@ class Manager extends ManagerAbstract {
 		'MetaSlider',
 		'GoogleMapsWidgetPRO',
 		'SmartSlider3',
+		'DiviBuilder',
+		'BNEFlyOut',
 	];
 
 }
