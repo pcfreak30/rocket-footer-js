@@ -63,7 +63,7 @@ class AvadaGoogleMaps extends LazyloadAbstract {
 				return '$.getScript( ' . wp_json_encode( $script ) . ' )';
 			}, $dep_scripts );
 
-			$new_script = $this->create_script( '(function($){(function check(){if(typeof google==="undefined" || typeof $==="undefined")setTimeout(check,10);else{$.when(' . implode( ',', $dep_scripts ) . ',  $.Deferred(function( deferred ){$( deferred.resolve );})).done(function(){debugger;' . $content . '; if(document.readyState == "complete"){' . $this->regex_match[0] . '();}})}})()})(jQuery);' );
+			$new_script = $this->create_script( '(function($){(function check(){if(typeof google==="undefined" || typeof $==="undefined")setTimeout(check,10);else{$.when(' . implode( ',', $dep_scripts ) . ',  $.Deferred(function( deferred ){$( deferred.resolve );})).done(function(){' . $content . '; if(document.readyState == "complete"){' . $this->regex_match[0] . '();}})}})()})(jQuery);' );
 		} else {
 			$new_script = $this->create_script( '(function(){(function check(){if(typeof google=="undefined")setTimeout(check,10);else{' . $content . ';' . $this->regex_match[0] . '();}})()})();' );
 		}
