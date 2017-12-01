@@ -44,6 +44,18 @@ class Videos extends LazyloadAbstract {
 				$this->instance ++;
 			}
 		}
+		$tags = $this->get_tag_collection( 'source' );
+		foreach ( $tags as $tag ) {
+			if ( $this->is_no_lazyload( $tag ) ) {
+				continue;
+			}
+			$src = $tag->getAttribute( 'src' );
+			if ( empty( $src ) ) {
+				continue;
+			}
+			$tag->setAttribute( 'data-src', $src );
+			$tag->removeAttribute( 'src' );
+		}
 	}
 
 	/**
