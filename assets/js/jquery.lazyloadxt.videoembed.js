@@ -48,6 +48,7 @@
 						var $this = $play_video,
 							$wrapper = $this.closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap'),
 							$image = $wrapper.find('.et_pb_video_box img');
+						$wrapper.find('.et_pb_video_overlay').parent().css('paddingTop', '').end().hide();
 						$image.click();
 						var $video_iframe = $wrapper.find("iframe");
 						if ($video_iframe.length) {
@@ -58,7 +59,9 @@
 							});
 							return;
 						}
-						old_et_pb_play_overlayed_video($play_video);
+						$wrapper.find('video').load(function () {
+							old_et_pb_play_overlayed_video($play_video);
+						}).show().lazyLoadXT();
 					}
 				}
 				setTimeout(check, 10);
