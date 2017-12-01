@@ -29,6 +29,15 @@
 		if (changed) {
 			this.load();
 		}
+		$el.triggerHandler('load')
+		$el.children('source,track').triggerHandler('load');
 	});
+
+	/*
+		Always hide the divi module video element
+	 */
+	$(function () {
+		$('.et_pb_video_box video').hide();
+	})
 
 })(window.jQuery || window.Zepto || window.$);
