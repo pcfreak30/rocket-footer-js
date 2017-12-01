@@ -30,8 +30,8 @@ class WoocommerceSocialMediaSharesButtons extends IntegrationAbstract {
 					$doc->appendChild( $tag );
 					$script = str_replace( $match, '', $script );
 				}
-				do_action( 'rocket_footer_js_do_rewrites', rocket_footer_js()->get_script_document(), $doc );
-				do_action( 'rocket_footer_js_do_lazyload', rocket_footer_js()->get_script_document(), $doc );
+				do_action( 'rocket_footer_js_do_rewrites', $this->plugin->script_document, $doc );
+				do_action( 'rocket_footer_js_do_lazyload', $this->plugin->script_document, $doc );
 			}
 		}
 
