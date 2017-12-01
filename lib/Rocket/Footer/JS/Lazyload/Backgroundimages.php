@@ -20,7 +20,7 @@ class Backgroundimages extends LazyloadAbstract {
 	protected function after_do_lazyload() {
 		$xpath = new \DOMXPath( $this->document );
 		foreach ( $xpath->query( '//*[@style]' ) as $tag ) {
-			preg_match_all( '/url\\(\\s*([\'"](.*?)[\'"]|[^\\)\\s]+)\\s*\\)/', $tag->getAttribute( 'style' ), $matches );
+			preg_match_all( '/url\\(\\s*([\'"]?(.*?)[\'"]?|[^\\)\\s]+)\\s*\\)/i', $tag->getAttribute( 'style' ), $matches );
 			if ( ! empty( $matches ) && ! empty( $matches[1] ) ) {
 				$match = array_shift( $matches[2] );
 				if ( empty( $match ) ) {
