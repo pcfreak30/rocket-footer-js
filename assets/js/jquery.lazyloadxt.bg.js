@@ -19,5 +19,13 @@
 				.triggerHandler('load');
 		}
 	});
+	/* Workaround to auto resize divi video posters */
+	$(document).on('lazyload', '.et_pb_video_overlay', function () {
+		var ratio = $(this).data('aspectRatio');
+		if ($.fn.fitVids && ratio) {
+			$(this).closest('.et_pb_video').find('.et_pb_video_box img').hide();
+			$(this).parent().fitVids({ customSelector: '.et_pb_video_overlay' }).end().parent().css('paddingTop', (ratio * 100) + '%');
+		}
+	});
 
 })(window.jQuery || window.Zepto || window.$);
