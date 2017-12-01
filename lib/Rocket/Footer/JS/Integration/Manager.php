@@ -20,6 +20,15 @@ class Manager extends ManagerAbstract {
 		'McAfeeSecure',
 		'CrazyEgg',
 		'Woocommerce',
+		'WonderPluginCarousel',
+		'BridgeTheme',
+		'QcodeThemeFramework',
+		'DiviPopupBuilder',
+		'Audio',
+		'A3LazyLoad',
+		'MetaSlider',
+		'GoogleMapsWidgetPRO',
+		'SmartSlider3',
 	];
 
 }
