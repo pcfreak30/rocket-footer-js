@@ -17,8 +17,12 @@ class Videos extends LazyloadAbstract {
 	}
 
 	protected function after_do_lazyload() {
+		if ( ! $this->is_enabled() ) {
+			return;
+		}
 		$oembed = _wp_oembed_get_object();
-		foreach ( $this->get_tag_collection( 'iframe' ) as $tag ) {
+		$tags   = $this->get_tag_collection( 'iframe' );
+		foreach ( $tags as $tag ) {
 			if ( $this->is_no_lazyload( $tag ) ) {
 				continue;
 			}
@@ -36,6 +40,7 @@ class Videos extends LazyloadAbstract {
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
 				$tag->parentNode->insertBefore( $img, $tag );
 				$this->lazyload_script( $this->get_tag_content( $tag ), "lazyload-video-{$this->instance}", $tag );
+				$tags->flag_removed();
 				$this->instance ++;
 			}
 		}
@@ -57,7 +62,6 @@ class Videos extends LazyloadAbstract {
 
 		return $url;
 	}
-
 
 
 	protected function is_match( $content, $src ) {
