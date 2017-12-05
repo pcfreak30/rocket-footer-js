@@ -10,7 +10,7 @@ class BNEFlyOut extends IntegrationAbstract {
 	 *
 	 */
 	public function init() {
-		if ( function_exists( 'bne_flyout_setup' ) && $this->plugin->lazyload_manager->is_enabled() ) {
+		if ( ( function_exists( 'bne_flyout_setup' ) || class_exists( 'BNE_Flyouts' ) ) && $this->plugin->lazyload_manager->is_enabled() ) {
 			add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 100 );
 		}
 	}
