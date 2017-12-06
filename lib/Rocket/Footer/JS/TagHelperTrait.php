@@ -122,7 +122,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return false === trim( $tag->getAttribute( 'data-no-minify' ) );
+		return '1' === trim( $tag->getAttribute( 'data-no-minify' ) );
 	}
 
 	/**
