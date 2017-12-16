@@ -17,10 +17,17 @@ class DiviBuilder extends IntegrationAbstract {
 	public function theme_check() {
 		if ( function_exists( 'et_setup_builder' ) ) {
 			add_action( 'rocket_footer_js_do_rewrites', [ $this, 'rewrite' ] );
-			if ( $this->plugin->lazyload_manager->is_enabled() & function_exists( 'et_core_is_fb_enabled' ) && et_core_is_fb_enabled() ) {
-				add_filter( 'a3_lazy_load_run_filter', '__return_false' );
+			if ( $this->plugin->lazyload_manager->is_enabled() ) {
+				if ( function_exists( 'et_core_is_fb_enabled' ) && et_core_is_fb_enabled() ) {
+					add_filter( 'a3_lazy_load_run_filter', '__return_false' );
+				}
+				add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ] );
 			}
 		}
+	}
+
+	public function scripts() {
+		wp_add_inline_script( 'jquery-core', '(function($){$(function(){$(".et_pb_slider").on("simple_slider_after_move_to", function(){$(window).trigger("resize")})})})(jQuery);' );
 	}
 
 	public function rewrite() {
