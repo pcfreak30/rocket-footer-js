@@ -31,6 +31,7 @@ class Manager extends ManagerAbstract {
 		'SmartSlider3',
 		'DiviBuilder',
 		'BNEFlyOut',
+		'WPEXThemeFramework',
 	];
 
 }
