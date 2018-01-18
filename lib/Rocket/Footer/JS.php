@@ -390,6 +390,17 @@ class JS extends PluginAbstract {
 	/**
 	 * @return string
 	 */
+	protected function get_cache_hash() {
+		if ( null === $this->cache_hash ) {
+			$this->cache_hash = md5( serialize( $this->cache_list ) );
+		}
+
+		return $this->cache_hash;
+	}
+
+	/**
+	 * @return string
+	 */
 	protected function get_cache_filename() {
 		$js_key     = get_rocket_option( 'minify_js_key' );
 		$cache_path = $this->get_cache_path();
@@ -412,17 +423,6 @@ class JS extends PluginAbstract {
 	 */
 	public function get_cache_path() {
 		return WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function get_cache_hash() {
-		if ( null === $this->cache_hash ) {
-			$this->cache_hash = md5( serialize( $this->cache_list ) );
-		}
-
-		return $this->cache_hash;
 	}
 
 	/**
@@ -957,6 +957,20 @@ class JS extends PluginAbstract {
 	 */
 	public function get_body() {
 		return $this->body;
+	}
+
+	/**
+	 * @param $url
+	 *
+	 * @return \http\Url|string
+	 */
+	public function strip_cdn( $url ) {
+		$url_parts           = parse_url( $url );
+		$url_parts['host']   = $this->domain;
+		$url_parts['scheme'] = is_ssl() ? 'https' : 'http';
+		$url                 = http_build_url( $url_parts );
+
+		return $url;
 	}
 
 	/**
