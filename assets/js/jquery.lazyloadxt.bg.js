@@ -5,7 +5,7 @@
 	'use strict';
 
 	var options = $.lazyLoadXT,
-		bgAttr = options.bgAttr || 'data-bg';
+		bgAttr = options.bgAttr || 'data-lazyload-bg';
 
 	options.selector += ',[' + bgAttr + ']';
 

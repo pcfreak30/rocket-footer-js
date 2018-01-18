@@ -33,7 +33,7 @@ class Backgroundimages extends LazyloadAbstract {
 				$match = get_rocket_cdn_url( $match );
 				$style = str_replace( $matches[0][0], 'none', $tag->getAttribute( 'style' ) );
 				$tag->setAttribute( 'style', $style );
-				$tag->setAttribute( 'data-bg', $match );
+				$tag->setAttribute( 'data-lazyload-bg', $match );
 			}
 		}
 
