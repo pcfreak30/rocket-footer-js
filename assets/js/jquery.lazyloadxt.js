@@ -1,9 +1,11 @@
-/*! Lazy Load XT v1.1.0 2016-01-12
- * http://ressio.github.io/lazy-load-xt
- * (C) 2016 RESS.io
- * Licensed under MIT */
+/*jslint browser:true, plusplus:true, vars:true */
+/*jshint browser:true, jquery:true */
+/*jshint -W040:false */
+/* to don't alert on "this" in triggerLoadOrError */
 
 (function ($, window, document, undefined) {
+	'use strict';
+
 	// options
 	var lazyLoadXT = 'lazyLoadXT',
 		dataLazied = 'lazied',
@@ -125,6 +127,7 @@
 		});
 	};
 
+
 	/**
 	 * Process function/object event handler
 	 * @param {string} event suffix
@@ -151,6 +154,7 @@
 		queueCheckLazyElements();
 	}
 
+
 	/**
 	 * Trigger onload/onerror handler
 	 * @param {Event} e
@@ -158,6 +162,7 @@
 	function triggerLoadOrError (e) {
 		triggerEvent(e.type, $(this).off(load_error, triggerLoadOrError));
 	}
+
 
 	/**
 	 * Load visible elements
@@ -211,6 +216,7 @@
 						src = $isFunction(srcAttr) ? srcAttr($el) : el.getAttribute(srcAttr);
 
 					if (src) {
+						el.src = '';
 						el.src = src;
 					}
 
@@ -233,6 +239,7 @@
 			triggerEvent('complete', $(docElement));
 		}
 	}
+
 
 	/**
 	 * Run check of lazy elements after timeout
