@@ -36,6 +36,7 @@ class Manager extends ManagerAbstract {
 		'Backgroundimages',
 		'GravityFormsRecaptcha',
 		'QcodeGoogleMaps',
+		'RevolutionSlider',
 	];
 
 	/**
