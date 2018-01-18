@@ -32,6 +32,7 @@ class Manager extends ManagerAbstract {
 		'DiviBuilder',
 		'BNEFlyOut',
 		'WPEXThemeFramework',
+		'PressCoreThemeFramework',
 	];
 
 }
