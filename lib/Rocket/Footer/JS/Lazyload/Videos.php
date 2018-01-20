@@ -17,7 +17,7 @@ class Videos extends LazyloadAbstract {
 	}
 
 	protected function after_do_lazyload() {
-		if ( ! $this->is_enabled() ) {
+		if ( ! $this->is_enabled() || ! get_rocket_option( 'lazyload_iframes' ) ) {
 			return;
 		}
 		$oembed = _wp_oembed_get_object();
@@ -30,14 +30,16 @@ class Videos extends LazyloadAbstract {
 			if ( empty( $src ) ) {
 				$src = $tag->getAttribute( 'src' );
 			}
-			$src  = $this->maybe_translate_url( $src );
-			$info = $oembed->get_data( $src );
+			$src           = $this->maybe_translate_url( $src );
+			$info          = $oembed->get_data( $src );
+			$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$img = $this->create_tag( 'img' );
 				$img->setAttribute( 'data-src', $this->plugin->util->download_remote_file( $info->thumbnail_url ) );
 				$img->setAttribute( 'width', $info->thumbnail_width );
 				$img->setAttribute( 'style', 'max-width:100%;height:auto;cursor:pointer;' );
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
+				$img->setAttribute( 'data-lazy-video-embed-type', $this->get_video_type( $src ) );
 				$tag->parentNode->insertBefore( $img, $tag );
 				$this->lazyload_script( $this->get_tag_content( $tag ), "lazyload-video-{$this->instance}", $tag );
 				$tags->flag_removed();
@@ -65,7 +67,8 @@ class Videos extends LazyloadAbstract {
 		$url = parse_url( $url );
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
 			if ( false !== strpos( $url['path'], 'embed' ) ) {
-				$video_id     = pathinfo( $url['path'], PATHINFO_FILENAME );
+				$video_id = pathinfo( $url['path'], PATHINFO_FILENAME );
+
 				$url['path']  = '/watch';
 				$url['query'] = http_build_query( [ 'v' => $video_id ] );
 			}
@@ -75,6 +78,39 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
+	private function maybe_translate_thumbnail_url( $url ) {
+		$url  = parse_url( $url );
+		$urls = [];
+		if ( 'i.ytimg.com' === $url['host'] ) {
+			$size_url = $url;
+			$video_id = basename( pathinfo( $url['path'], PATHINFO_FILENAME ) );
+			foreach ( [ 'maxresdefault', 'hqdefault', 'sddefault', 'mqdefault' ] as $size ) {
+				$size_url['path'] = "/vi/{$video_id}/{$size}.jpg";
+				$urls[]           = http_build_url( $size_url );
+				$size_url['path'] = "/vi/{$video_id}/{$size}.webp";
+				$urls[]           = http_build_url( $size_url );
+			}
+		}
+		if ( ! empty( $urls ) ) {
+			return $urls;
+		}
+		$url = http_build_url( $url );
+
+		return $url;
+	}
+
+	protected function get_video_type( $url ) {
+		$url  = parse_url( $url );
+		$type = null;
+		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
+			$type = 'youtube';
+		}
+		if ( null !== $type ) {
+			return $type;
+		}
+
+		return 'generic';
+	}
 
 	protected function is_match( $content, $src ) {
 		return false;
