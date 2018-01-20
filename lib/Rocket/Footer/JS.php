@@ -237,7 +237,7 @@ class JS extends PluginAbstract {
 	 * @return mixed
 	 */
 	public function process_buffer( $buffer ) {
-		$this->disable_minify_overrides();
+		$this->disable_option_overrides();
 		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 			/** @noinspection UsageOfSilenceOperatorInspection */
@@ -284,9 +284,10 @@ class JS extends PluginAbstract {
 	/**
 	 *
 	 */
-	protected function disable_minify_overrides() {
+	protected function disable_option_overrides() {
 		remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 		remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
+		remove_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
 	}
 
 	/**
