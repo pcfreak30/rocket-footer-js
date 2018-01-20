@@ -20,6 +20,7 @@ class Request extends ComponentAbstract {
 				// Ensure zxcvbn is loaded normally, not async so it gets minified
 				add_action( 'wp_default_scripts', [ $this, 'deasync_zxcvbn' ] );
 			}
+			add_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
 		}
 		add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
@@ -58,6 +59,7 @@ class Request extends ComponentAbstract {
 			wp_enqueue_script( 'jquery-lazyloadxt.video', plugins_url( 'assets/js/jquery.lazyloadxt.video.js', $this->plugin->get_plugin_file() ), [ $dep ] );
 			wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), [ $dep ] );
 			wp_enqueue_script( 'jquery.lazyloadxt.imagefixes', plugins_url( 'assets/js/jquery.lazyloadxt.imagefixes.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			wp_enqueue_style( 'rocket-footer-js-video-lazyload', plugins_url( 'assets/css/video-lazyload.css', $this->plugin->get_plugin_file() ) );
 		}
 
 	}
