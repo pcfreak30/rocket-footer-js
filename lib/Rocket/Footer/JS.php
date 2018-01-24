@@ -288,6 +288,7 @@ class JS extends PluginAbstract {
 		remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 		remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
 		remove_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
+		remove_filter( 'pre_get_rocket_option_lazyload', '__return_zero' );
 	}
 
 	/**
