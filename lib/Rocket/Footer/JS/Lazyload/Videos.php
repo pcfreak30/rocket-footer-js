@@ -17,7 +17,11 @@ class Videos extends LazyloadAbstract {
 	}
 
 	protected function after_do_lazyload() {
-		if ( ! $this->is_enabled() || ! get_rocket_option( 'lazyload_iframes' ) ) {
+		if ( ! $this->is_enabled() ) {
+			return;
+		}
+		$a3_lazy_load_global_settings = $this->a3_lazy_load_global_settings;
+		if ( ! $a3_lazy_load_global_settings['a3l_apply_to_videos'] ) {
 			return;
 		}
 		$oembed = _wp_oembed_get_object();
