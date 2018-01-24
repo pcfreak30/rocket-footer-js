@@ -16,6 +16,9 @@
 		if (id) {
 			$target = $('#' + id);
 		}
+		if ($(this).data('lazyLoadedVideo')) {
+			return false;
+		}
 		match = reComment.exec($target.html());
 		if (match) {
 			var html = $('<div>' + $.trim(match[ 1 ]) + '</div>');
@@ -36,6 +39,7 @@
 				vc_video_wrapper.data('videoPadding', vc_video_wrapper.css('padding-top'));
 				vc_video_wrapper.css('padding-top', '0px');
 			}
+			$(this).data('lazyLoadedVideo', true);
 		}
 	});
 	$(document).on('click', '[' + widgetAttr + ']', function () {
