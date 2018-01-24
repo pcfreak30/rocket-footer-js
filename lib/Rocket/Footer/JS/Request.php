@@ -20,7 +20,10 @@ class Request extends ComponentAbstract {
 				// Ensure zxcvbn is loaded normally, not async so it gets minified
 				add_action( 'wp_default_scripts', [ $this, 'deasync_zxcvbn' ] );
 			}
-			add_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
+			if ( $this->plugin->lazyload_manager->is_enabled() ) {
+				add_filter( 'pre_get_rocket_option_lazyload', '__return_zero' );
+				add_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
+			}
 		}
 		add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
