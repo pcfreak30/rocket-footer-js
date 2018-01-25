@@ -3,9 +3,9 @@
 
 namespace Rocket\Footer\JS;
 
-use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
+use ComposePress\Core\Abstracts\Component;
 
-class Request extends ComponentAbstract {
+class Request extends Component {
 	public function init() {
 		add_action( 'init', [ $this, 'init_action' ] );
 		if ( ! is_admin() ) {

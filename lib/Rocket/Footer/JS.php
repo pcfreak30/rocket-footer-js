@@ -4,7 +4,7 @@
 namespace Rocket\Footer;
 
 
-use pcfreak30\WordPress\Plugin\Framework\PluginAbstract;
+use ComposePress\Core\Abstracts\Plugin;
 use Rocket\Footer\JS\Cache\Manager;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
@@ -20,7 +20,7 @@ use Rocket\Footer\JS\Util;
  *
  * @package Rocket\Footer
  */
-class JS extends PluginAbstract {
+class JS extends Plugin {
 	/**
 	 * Plugin version
 	 */

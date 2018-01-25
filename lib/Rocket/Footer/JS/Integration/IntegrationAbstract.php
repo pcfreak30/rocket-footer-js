@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
+use ComposePress\Core\Abstracts\Component;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\TagHelperTrait;
@@ -15,7 +15,7 @@ use Rocket\Footer\JS\TagHelperTrait;
  * @package Rocket\Footer\JS\Integration
  * @property \Rocket\Footer\JS $plugin
  */
-abstract class IntegrationAbstract extends ComponentAbstract {
+abstract class IntegrationAbstract extends Component {
 	use TagHelperTrait;
 	/**
 	 * @var DOMDocument

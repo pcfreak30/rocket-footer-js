@@ -3,7 +3,7 @@
 namespace Rocket\Footer\JS\Cache;
 
 use pcfreak30\WordPress\Cache\Store;
-use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
+use ComposePress\Core\Abstracts\Component;
 use Rocket\Footer\JS;
 
 
@@ -13,7 +13,7 @@ use Rocket\Footer\JS;
  * @package Rocket\Footer\JS\Cache
  * @property \Rocket\Footer\JS $plugin
  */
-class Manager extends ComponentAbstract {
+class Manager extends Component {
 	/**
 	 * @var \pcfreak30\WordPress\Cache\Store
 	 */
