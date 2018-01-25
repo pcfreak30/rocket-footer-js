@@ -76,12 +76,16 @@ abstract class LazyloadAbstract extends ComponentAbstract {
 		$this->xpath            = new \DOMXPath( $content_document );
 		$this->before_do_lazyload();
 		while ( $this->tags->valid() ) {
-			$tag     = $this->tags->current();
-			$src     = $tag->getAttribute( 'src' );
+			$tag = $this->tags->current();
+			$src = $tag->getAttribute( 'src' );
 			if ( ! empty( $src ) ) {
 				$src = rocket_add_url_protocol( $src );
 			}
-			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
+			$content = $tag->textContent;
+			if ( empty( $src ) ) {
+				$content = $this->plugin->util->maybe_decode_script( $content );
+			}
+			$content = str_replace( [ "\n", "\r" ], '', $content );
 			$content = trim( $content, '/' );
 			if ( ! $this->is_enabled() || $this->is_no_lazyload() ) {
 				if ( static::is_match( $content, $src ) ) {

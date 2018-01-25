@@ -13,6 +13,7 @@ use Rocket\Footer\JS\Integration\Manager as IntegrationManager;
 use Rocket\Footer\JS\Lazyload\Manager as LazyloadManager;
 use Rocket\Footer\JS\Request;
 use Rocket\Footer\JS\Rewrite\Manager as RewriteManager;
+use Rocket\Footer\JS\Util;
 
 /**
  * Class JS
@@ -113,6 +114,12 @@ class JS extends PluginAbstract {
 	 * @var DOMCollection
 	 */
 	private $dom_collection;
+	/**
+	 * @var \Rocket\Footer\JS\Util
+	 */
+	private $util;
+
+	private $cache_hash;
 
 	/**
 	 * JS constructor.
@@ -125,8 +132,18 @@ class JS extends PluginAbstract {
 	 * @param \Rocket\Footer\JS\DOMDocument         $document
 	 * @param \Rocket\Footer\JS\DOMDocument         $variable_document
 	 * @param \Rocket\Footer\JS\DOMDocument         $script_document
+	 * @param \Rocket\Footer\JS\Util                $util
 	 */
-	public function __construct( RewriteManager $rewrite_manager, IntegrationManager $integration_manager, LazyloadManager $lazyload_manager, Request $request, Manager $cache_manager, DOMDocument $document, DOMDocument $variable_document, DOMDocument $script_document ) {
+	public function __construct(
+		RewriteManager $rewrite_manager,
+		IntegrationManager $integration_manager,
+		LazyloadManager $lazyload_manager,
+		Request $request, Manager $cache_manager,
+		DOMDocument $document,
+		DOMDocument $variable_document,
+		DOMDocument $script_document,
+		Util $util
+	) {
 		$this->rewrite_manager     = $rewrite_manager;
 		$this->integration_manager = $integration_manager;
 		$this->lazyload_manager    = $lazyload_manager;
@@ -136,6 +153,7 @@ class JS extends PluginAbstract {
 		$this->script_document     = $script_document;
 		$this->node_map            = new \SplObjectStorage();
 		$this->document            = $document;
+		$this->util                = $util;
 		parent::__construct();
 	}
 
@@ -219,7 +237,7 @@ class JS extends PluginAbstract {
 	 * @return mixed
 	 */
 	public function process_buffer( $buffer ) {
-		$this->disable_minify_overrides();
+		$this->disable_option_overrides();
 		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 			/** @noinspection UsageOfSilenceOperatorInspection */
@@ -266,9 +284,11 @@ class JS extends PluginAbstract {
 	/**
 	 *
 	 */
-	protected function disable_minify_overrides() {
+	protected function disable_option_overrides() {
 		remove_filter( 'pre_get_rocket_option_minify_js', '__return_zero' );
 		remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
+		remove_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
+		remove_filter( 'pre_get_rocket_option_lazyload', '__return_zero' );
 	}
 
 	/**
@@ -350,7 +370,7 @@ class JS extends PluginAbstract {
 	 * @return array
 	 */
 	protected function get_cache_id() {
-		$post_cache_id_hash = md5( serialize( $this->cache_list ) );
+		$post_cache_id_hash = $this->get_cache_hash();
 		$post_cache_id      = array();
 		if ( is_singular() ) {
 			$post_cache_id [] = 'post_' . get_the_ID();
@@ -367,6 +387,17 @@ class JS extends PluginAbstract {
 		}
 
 		return $post_cache_id;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function get_cache_hash() {
+		if ( null === $this->cache_hash ) {
+			$this->cache_hash = md5( serialize( $this->cache_list ) );
+		}
+
+		return $this->cache_hash;
 	}
 
 	/**
@@ -394,13 +425,6 @@ class JS extends PluginAbstract {
 	 */
 	public function get_cache_path() {
 		return WP_ROCKET_MINIFY_CACHE_PATH . get_current_blog_id() . '/';
-	}
-
-	/**
-	 * @return string
-	 */
-	protected function get_cache_hash() {
-		return md5( serialize( $this->cache_list ) );
 	}
 
 	/**
@@ -495,7 +519,7 @@ class JS extends PluginAbstract {
 			if ( ! empty( $file ) ) {
 				$js_part_cache = apply_filters( 'rocket_footer_js_process_remote_script', $file, $src );
 				$js_part       = $this->minify( $js_part_cache );
-				if ( $js_part_cache != $file ) {
+				if ( $js_part_cache != $file && apply_filters( 'rocket_footer_js_reprocess_remote_script', true, $file, $src ) ) {
 					$js_part_cache = $file;
 					$js_part_cache = $this->minify( $js_part_cache );
 				} else {
@@ -505,7 +529,11 @@ class JS extends PluginAbstract {
 				$this->js .= $js_part;
 			}
 		} else {
-			$this->js .= apply_filters( 'rocket_footer_js_process_remote_script', $item_cache, $src );
+			$js_part = $item_cache;
+			if ( apply_filters( 'rocket_footer_js_reprocess_remote_script', true, $js_part, $src ) ) {
+				$js_part = apply_filters( 'rocket_footer_js_process_remote_script', $js_part, $src );
+			}
+			$this->js .= $js_part;
 		}
 	}
 
@@ -645,7 +673,7 @@ class JS extends PluginAbstract {
 			$js_part       = $js_part_cache;
 
 			$js_part = $this->minify( $js_part );
-			if ( $js_part_cache != $file ) {
+			if ( $js_part_cache != $file && apply_filters( 'rocket_footer_js_reprocess_local_script', true, $file, $src ) ) {
 				$js_part_cache = $file;
 				$js_part_cache = $this->minify( $js_part_cache );
 			} else {
@@ -659,7 +687,11 @@ class JS extends PluginAbstract {
 			$this->js .= $js_part;
 			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part_cache );
 		} else {
-			$this->js .= apply_filters( 'rocket_footer_js_process_local_script', $item_cache, $url );
+			$js_part = $item_cache;
+			if ( apply_filters( 'rocket_footer_js_reprocess_local_script', true, $js_part, $src ) ) {
+				$js_part = apply_filters( 'rocket_footer_js_process_local_script', $js_part, $url );
+			}
+			$this->js .= $js_part;
 		}
 	}
 
@@ -681,12 +713,13 @@ class JS extends PluginAbstract {
 	 */
 	protected function process_inline_script() {
 		// Check item cache
-		$item_cache_id = [ md5( $this->dom_collection->current()->textContent ) ];
+		$content       = $this->util->maybe_decode_script( $this->dom_collection->current()->textContent );
+		$item_cache_id = [ md5( $content ) ];
 		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
 			// Remove any conditional comments for IE that somehow was put in the script tag
-			$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $this->dom_collection->current()->textContent );
+			$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $content );
 			$js_part = $this->minify( $js_part );
 			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part );
 		} else {
@@ -824,7 +857,10 @@ class JS extends PluginAbstract {
 	 *
 	 */
 	public function activate() {
-
+		if ( ! $this->get_dependancies_exist() ) {
+			return;
+		}
+		flush_rocket_htaccess();
 	}
 
 	/**
@@ -895,6 +931,48 @@ class JS extends PluginAbstract {
 
 	public function get_transient_prefix() {
 		return static::TRANSIENT_PREFIX;
+	}
+
+	/**
+	 * @return \Rocket\Footer\JS\Util
+	 */
+	public function get_util() {
+		return $this->util;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_cdn_domains() {
+		return $this->cdn_domains;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_domain() {
+		return $this->domain;
+	}
+
+	/**
+	 * @return \Rocket\Footer\JS\DOMElement
+	 */
+	public function get_body() {
+		return $this->body;
+	}
+
+	/**
+	 * @param $url
+	 *
+	 * @return \http\Url|string
+	 */
+	public function strip_cdn( $url ) {
+		$url_parts           = parse_url( $url );
+		$url_parts['host']   = $this->domain;
+		$url_parts['scheme'] = is_ssl() ? 'https' : 'http';
+		$url                 = http_build_url( $url_parts );
+
+		return $url;
 	}
 
 	/**

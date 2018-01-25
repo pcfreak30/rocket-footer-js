@@ -18,6 +18,9 @@ class Iframe extends LazyloadAbstract {
 	}
 
 	protected function after_do_lazyload() {
+		if ( ! $this->is_enabled() ) {
+			return;
+		}
 		foreach ( $this->get_tag_collection( 'iframe' ) as $tag ) {
 			if ( $this->is_no_lazyload( $tag ) ) {
 				continue;

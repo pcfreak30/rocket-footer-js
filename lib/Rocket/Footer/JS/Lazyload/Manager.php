@@ -24,6 +24,7 @@ class Manager extends ManagerAbstract {
 		'AvadaGoogleMaps',
 		'Iframe',
 		'Videos',
+		'GoogleAdsenseMobile',
 		'GoogleAdsense',
 		'AmazonAds',
 		'StumbleUpon',
@@ -32,6 +33,10 @@ class Manager extends ManagerAbstract {
 		'GoogleRemarketing',
 		'PinInterest',
 		'GoogleTranslate',
+		'Backgroundimages',
+		'GravityFormsRecaptcha',
+		'QcodeGoogleMaps',
+		'RevolutionSlider',
 	];
 
 	/**
@@ -40,7 +45,7 @@ class Manager extends ManagerAbstract {
 	public function is_enabled() {
 		$lazy_load = false;
 		if ( class_exists( 'A3_Lazy_Load' ) ) {
-			$lazy_load = (bool) $this->a3_lazy_load_global_settings['a3l_apply_lazyloadxt'];
+			$lazy_load = (bool) $this->a3_lazy_load_global_settings['a3l_apply_lazyloadxt'] && apply_filters( 'a3_lazy_load_run_filter', true );
 		}
 		if ( class_exists( 'LazyLoadXT' ) ) {
 			$lazy_load = true;

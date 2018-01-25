@@ -18,6 +18,21 @@ class Manager extends ManagerAbstract {
 		'WoocommerceSocialMediaSharesButtons',
 		'RevolutionSlider',
 		'McAfeeSecure',
+		'CrazyEgg',
+		'Woocommerce',
+		'WonderPluginCarousel',
+		'BridgeTheme',
+		'QcodeThemeFramework',
+		'DiviPopupBuilder',
+		'Audio',
+		'A3LazyLoad',
+		'MetaSlider',
+		'GoogleMapsWidgetPRO',
+		'SmartSlider3',
+		'DiviBuilder',
+		'BNEFlyOut',
+		'WPEXThemeFramework',
+		'PressCoreThemeFramework',
 	];
 
 }

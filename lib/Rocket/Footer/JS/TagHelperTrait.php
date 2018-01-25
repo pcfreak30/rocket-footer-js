@@ -35,11 +35,7 @@ trait TagHelperTrait {
 	 */
 	protected function create_script( $content = null, $src = null, $content_document = true ) {
 		/** @var DOMElement $external_tag */
-		if ( $content_document ) {
-			$external_tag = $this->create_tag( 'script', $content, $content_document );
-		} else {
-			$external_tag = $this->create_tag( 'script', $content, $content_document );
-		}
+		$external_tag = $this->create_tag( 'script', $content, $content_document );
 		$external_tag->setAttribute( 'type', 'text/javascript' );
 		if ( $src ) {
 			$external_tag->setAttribute( 'src', $src );
@@ -126,7 +122,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return false === trim( $tag->getAttribute( 'data-no-minify' ) );
+		return '1' === trim( $tag->getAttribute( 'data-no-minify' ) );
 	}
 
 	/**

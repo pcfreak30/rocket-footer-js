@@ -10,7 +10,7 @@ class WoocommerceSocialMediaSharesButtons extends IntegrationAbstract {
 
 	public function init() {
 		if ( function_exists( 'toastie_wc_smsb_social_init' ) ) {
-			add_filter( 'rocket_footer_js_process_local_script', [ $this, 'process' ] );
+			add_filter( 'rocket_footer_js_process_local_script', [ $this, 'process' ], 10, 2 );
 		}
 	}
 
@@ -30,8 +30,8 @@ class WoocommerceSocialMediaSharesButtons extends IntegrationAbstract {
 					$doc->appendChild( $tag );
 					$script = str_replace( $match, '', $script );
 				}
-				do_action( 'rocket_footer_js_do_rewrites', rocket_footer_js()->get_script_document(), $doc );
-				do_action( 'rocket_footer_js_do_lazyload', rocket_footer_js()->get_script_document(), $doc );
+				do_action( 'rocket_footer_js_do_rewrites', $this->plugin->script_document, $doc );
+				do_action( 'rocket_footer_js_do_lazyload', $this->plugin->script_document, $doc );
 			}
 		}
 

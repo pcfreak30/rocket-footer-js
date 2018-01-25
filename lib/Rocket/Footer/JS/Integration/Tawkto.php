@@ -8,7 +8,7 @@ class Tawkto extends IntegrationAbstract {
 
 	public function init() {
 		if ( function_exists( 'toastie_wc_smsb_social_init' ) ) {
-			add_filter( 'rocket_footer_js_process_remote_script', [ $this, 'process' ] );
+			add_filter( 'rocket_footer_js_process_remote_script', [ $this, 'process' ], 10, 2 );
 		}
 	}
 

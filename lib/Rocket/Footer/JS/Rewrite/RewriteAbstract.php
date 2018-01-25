@@ -43,7 +43,7 @@ abstract class RewriteAbstract extends ComponentAbstract {
 	 *
 	 */
 	public function init() {
-		add_action( 'rocket_footer_js_do_rewrites', [ $this, 'rewrite' ] );
+		add_action( 'rocket_footer_js_do_rewrites', [ $this, 'rewrite' ], 10, 2 );
 	}
 
 	/**
@@ -66,11 +66,19 @@ abstract class RewriteAbstract extends ComponentAbstract {
 		$this->before_do_rewrite();
 		while ( $this->tags->valid() ) {
 			$tag = $this->tags->current();
+			if ( $this->is_no_minify() ) {
+				$this->tags->next();
+				continue;
+			}
 			$src = $tag->getAttribute( 'src' );
 			if ( ! empty( $src ) ) {
 				$src = rocket_add_url_protocol( $src );
 			}
-			$content = str_replace( [ "\n", "\r" ], '', $tag->textContent );
+			$content = $tag->textContent;
+			if ( empty( $src ) ) {
+				$content = $this->plugin->util->maybe_decode_script( $content );
+			}
+			$content = str_replace( [ "\n", "\r" ], '', $content );
 			$content = trim( $content, '/' );
 			$this->do_rewrite( $content, $src );
 			$this->tags->next();

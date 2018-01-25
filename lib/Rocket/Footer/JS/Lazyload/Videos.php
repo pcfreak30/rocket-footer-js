@@ -17,8 +17,16 @@ class Videos extends LazyloadAbstract {
 	}
 
 	protected function after_do_lazyload() {
+		if ( ! $this->is_enabled() ) {
+			return;
+		}
+		$a3_lazy_load_global_settings = $this->a3_lazy_load_global_settings;
+		if ( ! $a3_lazy_load_global_settings['a3l_apply_to_videos'] ) {
+			return;
+		}
 		$oembed = _wp_oembed_get_object();
-		foreach ( $this->get_tag_collection( 'iframe' ) as $tag ) {
+		$tags   = $this->get_tag_collection( 'iframe' );
+		foreach ( $tags as $tag ) {
 			if ( $this->is_no_lazyload( $tag ) ) {
 				continue;
 			}
@@ -26,18 +34,32 @@ class Videos extends LazyloadAbstract {
 			if ( empty( $src ) ) {
 				$src = $tag->getAttribute( 'src' );
 			}
-			$src  = $this->maybe_translate_url( $src );
-			$info = $oembed->get_data( $src );
+			$src           = $this->maybe_translate_url( $src );
+			$info          = $oembed->get_data( $src );
+			$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$img = $this->create_tag( 'img' );
-				$img->setAttribute( 'data-src', $this->download_image( $info->thumbnail_url ) );
+				$img->setAttribute( 'data-src', $this->plugin->util->download_remote_file( $info->thumbnail_url ) );
 				$img->setAttribute( 'width', $info->thumbnail_width );
-				$img->setAttribute( 'style', 'max-width:100%;height:auto;cursor:pointer;' );
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
+				$img->setAttribute( 'data-lazy-video-embed-type', $this->get_video_type( $src ) );
 				$tag->parentNode->insertBefore( $img, $tag );
 				$this->lazyload_script( $this->get_tag_content( $tag ), "lazyload-video-{$this->instance}", $tag );
+				$tags->flag_removed();
 				$this->instance ++;
 			}
+		}
+		$tags = $this->get_tag_collection( 'source' );
+		foreach ( $tags as $tag ) {
+			if ( $this->is_no_lazyload( $tag ) ) {
+				continue;
+			}
+			$src = $tag->getAttribute( 'src' );
+			if ( empty( $src ) ) {
+				continue;
+			}
+			$tag->setAttribute( 'data-src', $src );
+			$tag->removeAttribute( 'src' );
 		}
 	}
 
@@ -48,7 +70,8 @@ class Videos extends LazyloadAbstract {
 		$url = parse_url( $url );
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
 			if ( false !== strpos( $url['path'], 'embed' ) ) {
-				$video_id     = pathinfo( $url['path'], PATHINFO_FILENAME );
+				$video_id = pathinfo( $url['path'], PATHINFO_FILENAME );
+
 				$url['path']  = '/watch';
 				$url['query'] = http_build_query( [ 'v' => $video_id ] );
 			}
@@ -58,21 +81,38 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
-	private function download_image( $url ) {
-		$data = $this->plugin->remote_fetch( $url );
-		if ( ! empty( $data ) ) {
-			$url_parts = parse_url( $url );
-			$info      = pathinfo( $url_parts['path'] );
-			$hash      = md5( $url_parts['scheme'] . '://' . ( ( ( empty( $url_parts['port'] ) || 80 === (int) $url_parts['port'] ) ) ? ':' . $url_parts['port'] : '' ) . $info['dirname'] . '/' . $info['filename'] );
-			$filename  = $this->plugin->get_cache_path() . $hash . '.' . $info['extension'];
-			$final_url = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
-			if ( ! $this->plugin->get_wp_filesystem()->is_file( $filename ) ) {
-				$this->plugin->put_content( $filename, $data );
+	private function maybe_translate_thumbnail_url( $url ) {
+		$url  = parse_url( $url );
+		$urls = [];
+		if ( 'i.ytimg.com' === $url['host'] ) {
+			$size_url = $url;
+			$video_id = basename( pathinfo( $url['path'], PATHINFO_FILENAME ) );
+			foreach ( [ 'maxresdefault', 'hqdefault', 'sddefault', 'mqdefault' ] as $size ) {
+				$size_url['path'] = "/vi/{$video_id}/{$size}.jpg";
+				$urls[]           = http_build_url( $size_url );
+				$size_url['path'] = "/vi/{$video_id}/{$size}.webp";
+				$urls[]           = http_build_url( $size_url );
 			}
-			$url = $final_url;
 		}
+		if ( ! empty( $urls ) ) {
+			return $urls;
+		}
+		$url = http_build_url( $url );
 
 		return $url;
+	}
+
+	protected function get_video_type( $url ) {
+		$url  = parse_url( $url );
+		$type = null;
+		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
+			$type = 'youtube';
+		}
+		if ( null !== $type ) {
+			return $type;
+		}
+
+		return 'generic';
 	}
 
 	protected function is_match( $content, $src ) {

@@ -20,6 +20,10 @@ class Request extends ComponentAbstract {
 				// Ensure zxcvbn is loaded normally, not async so it gets minified
 				add_action( 'wp_default_scripts', [ $this, 'deasync_zxcvbn' ] );
 			}
+			if ( $this->plugin->lazyload_manager->is_enabled() ) {
+				add_filter( 'pre_get_rocket_option_lazyload', '__return_zero' );
+				add_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
+			}
 		}
 		add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
@@ -35,7 +39,7 @@ class Request extends ComponentAbstract {
 			remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 			add_action( 'wp_footer', 'print_emoji_detection_script' );
 		}
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ], 999 );
 	}
 
 	public function enqueue_scripts() {
@@ -45,8 +49,22 @@ class Request extends ComponentAbstract {
 			$dep = 'jquery-lazyloadxt';
 		}
 
-		wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), array( $dep ) );
-		wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), array( $dep ) );
+		if ( wp_script_is( $dep, 'registered' ) ) {
+			/** @var \_WP_Dependency $script */
+			$script = wp_scripts()->registered[ $dep ];
+			wp_deregister_script( $dep );
+			wp_enqueue_script( $dep, plugins_url( 'assets/js/jquery.lazyloadxt.js', $this->plugin->get_plugin_file(), $script->deps ) );
+			foreach ( $script->extra as $key => $data ) {
+				wp_script_add_data( $dep, $key, $data );
+			}
+			wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			wp_enqueue_script( 'jquery-lazyloadxt.video', plugins_url( 'assets/js/jquery.lazyloadxt.video.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			wp_enqueue_script( 'jquery.lazyloadxt.imagefixes', plugins_url( 'assets/js/jquery.lazyloadxt.imagefixes.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			wp_enqueue_style( 'rocket-footer-js-video-lazyload', plugins_url( 'assets/css/video-lazyload.css', $this->plugin->get_plugin_file() ) );
+		}
+
 	}
 
 	/**
@@ -60,9 +78,19 @@ class Request extends ComponentAbstract {
 	}
 
 	public function add_js_to_htaccess_cors( $rules ) {
-		$rules    = explode( "\n", $rules );
-		$rules[4] = str_replace( ')$', '|js)$', $rules[4] );
-		$rules    = implode( "\n", $rules );
+		$rules = explode( "\n", $rules );
+		$match = false;
+		foreach ( $rules as $index => $rule ) {
+			if ( false !== stripos( $rule, 'FilesMatch' ) ) {
+				$match = $index;
+				break;
+			}
+		}
+		if ( $match ) {
+			$rules[ $match ] = str_replace( ')$', '|js)$', $rules[ $match ] );
+		}
+
+		$rules = implode( "\n", $rules );
 
 		return $rules;
 	}
