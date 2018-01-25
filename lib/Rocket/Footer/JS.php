@@ -704,10 +704,6 @@ class JS extends Plugin {
 		return $this->get_wp_filesystem()->get_contents( $file );
 	}
 
-	public function get_wp_filesystem() {
-		return parent::get_wp_filesystem();
-	}
-
 	/**
 	 *
 	 */
