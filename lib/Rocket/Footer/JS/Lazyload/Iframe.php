@@ -22,7 +22,7 @@ class Iframe extends LazyloadAbstract {
 			return;
 		}
 		foreach ( $this->get_tag_collection( 'iframe' ) as $tag ) {
-			if ( $this->is_no_lazyload( $tag ) ) {
+			if ( $this->is_no_lazyload( $tag ) || ( null !== $tag->parentNode && 'noscript' === strtolower( $tag->parentNode->tagName ) ) ) {
 				continue;
 			}
 			$data_src = $tag->getAttribute( 'data-src' );
