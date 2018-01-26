@@ -2,15 +2,13 @@
 
 namespace Rocket\Footer\JS\Lazyload;
 
-use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
-
 /**
  * Class Manager
  *
  * @package Rocket\Footer\JS\Lazyload
  * @property array $a3_lazy_load_global_settings
  */
-class Manager extends ManagerAbstract {
+class Manager extends \ComposePress\Core\Abstracts\Manager {
 	/**
 	 * @var array
 	 */

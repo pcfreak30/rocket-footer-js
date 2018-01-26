@@ -2,10 +2,7 @@
 
 namespace Rocket\Footer\JS\Integration;
 
-
-use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
-
-class Manager extends ManagerAbstract {
+class Manager extends \ComposePress\Core\Abstracts\Manager {
 	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
 	protected $modules = [
 		'Amp',

@@ -4,7 +4,7 @@
 namespace Rocket\Footer\JS\Lazyload;
 
 
-use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
+use ComposePress\Core\Abstracts\Component;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\DOMDocument;
 use Rocket\Footer\JS\DOMElement;
@@ -16,7 +16,7 @@ use Rocket\Footer\JS\TagHelperTrait;
  * @package Rocket\Footer\JS\Lazyload
  * @property \Rocket\Footer\JS $plugin
  */
-abstract class LazyloadAbstract extends ComponentAbstract {
+abstract class LazyloadAbstract extends Component {
 	use TagHelperTrait;
 	/**
 	 * @var DOMCollection

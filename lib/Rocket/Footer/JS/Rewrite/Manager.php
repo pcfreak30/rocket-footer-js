@@ -1,15 +1,12 @@
 <?php
 
 namespace Rocket\Footer\JS\Rewrite;
-
-use pcfreak30\WordPress\Plugin\Framework\ManagerAbstract;
-
 /**
  * Class Manager
  *
  * @package Rocket\Footer\JS\Rewrite
  */
-class Manager extends ManagerAbstract {
+class Manager extends \ComposePress\Core\Abstracts\Manager {
 	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
 	protected $modules = [
 		'AsyncDocumentWrite',

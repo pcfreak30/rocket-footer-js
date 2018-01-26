@@ -3,7 +3,7 @@
 
 namespace Rocket\Footer\JS\Rewrite;
 
-use pcfreak30\WordPress\Plugin\Framework\ComponentAbstract;
+use ComposePress\Core\Abstracts\Component;
 use Rocket\Footer\JS\DOMCollection;
 use Rocket\Footer\JS\TagHelperTrait;
 
@@ -13,7 +13,7 @@ use Rocket\Footer\JS\TagHelperTrait;
  * @package Rocket\Footer\JS\Rewrite
  * @property \Rocket\Footer\JS $plugin
  */
-abstract class RewriteAbstract extends ComponentAbstract {
+abstract class RewriteAbstract extends Component {
 
 	use TagHelperTrait;
 
