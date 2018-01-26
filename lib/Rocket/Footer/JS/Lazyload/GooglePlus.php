@@ -17,6 +17,7 @@ class GooglePlus extends LazyloadAbstract {
 	 */
 	protected function do_lazyload( $content, $src ) {
 		$this->lazyload_script( "<script type=\"text/javascript\">    (function() {      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;      po.src = 'https://apis.google.com/js/platform.js';      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);    })();  </script>", 'google-plus-platform' );
+		$this->xpath->registerNamespace( 'g', null );
 		/** @var DOMElement $tag */
 		foreach (
 			array(
