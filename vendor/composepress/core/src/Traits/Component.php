@@ -1,31 +1,20 @@
 <?php
 
+namespace ComposePress\Core\Traits;
 
-namespace pcfreak30\WordPress\Plugin\Framework;
+use ComposePress\Core\Abstracts\Plugin;
 
-
-/**
- * Class ComponentAbstract
- *
- * @package pcfreak30\WordPress\Plugin\Framework/*
- * @property PluginAbstract    $plugin
- * @property ComponentAbstract $parent
- */
-abstract class ComponentAbstract extends BaseObjectAbstract {
+trait Component {
+	use BaseObject;
 	/**
-	 * @var PluginAbstract
+	 * @var Plugin
 	 */
 	private $plugin;
 
 	/**
-	 * @var ComponentAbstract
+	 * @var Component
 	 */
 	private $parent;
-
-	/**
-	 *
-	 */
-	abstract public function init();
 
 	/**
 	 *
@@ -36,21 +25,21 @@ abstract class ComponentAbstract extends BaseObjectAbstract {
 	}
 
 	/**
-	 * @return ComponentAbstract
+	 * @return Component
 	 */
 	public function get_parent() {
 		return $this->parent;
 	}
 
 	/**
-	 * @param ComponentAbstract $parent
+	 * @param Component $parent
 	 */
 	public function set_parent( $parent ) {
 		$this->parent = $parent;
 	}
 
 	/**
-	 * @return PluginAbstract
+	 * @return Plugin
 	 */
 	public function get_plugin() {
 		if ( null === $this->plugin ) {
@@ -59,6 +48,10 @@ abstract class ComponentAbstract extends BaseObjectAbstract {
 				$parent = $parent->parent;
 			}
 			$this->plugin = $parent;
+		}
+
+		if ( $this->plugin === $this && ! ( $this instanceof Plugin ) ) {
+			throw new \Exception( 'Plugin property is equal to self. Did you forget to set the parent or create a getter?' );
 		}
 
 		return $this->plugin;
@@ -77,8 +70,11 @@ abstract class ComponentAbstract extends BaseObjectAbstract {
 	protected function setup_components() {
 		$components = $this->get_components();
 		$this->set_component_parents( $components );
+		/** @var \ComposePress\Core\Abstracts\Component[] $components */
 		foreach ( $components as $component ) {
-			$component->init();
+			if ( method_exists( $component, 'init' ) ) {
+				$component->init();
+			}
 		}
 	}
 
@@ -97,13 +93,33 @@ abstract class ComponentAbstract extends BaseObjectAbstract {
 			function ( $component ) {
 				$getter = 'get_' . $component->name;
 
-				return method_exists( $this, $getter ) && ( new \ReflectionMethod( $this, $getter ) )->isPublic() && $this->$getter() instanceof ComponentAbstract;
+				if ( ! ( method_exists( $this, $getter ) && ( new \ReflectionMethod( $this, $getter ) )->isPublic() ) ) {
+					return false;
+				}
+
+				$property = $this->$getter();
+
+				if ( ! is_object( $property ) ) {
+					return false;
+				}
+
+				$trait = __TRAIT__;
+				$used  = class_uses( $property );
+				if ( ! isset( $used[ $trait ] ) ) {
+					$parents = class_parents( $property );
+					while ( ! isset( $used[ $trait ] ) && $parents ) {
+						//get trait used by parents
+						$used = class_uses( array_pop( $parents ) );
+					}
+				}
+
+				return isset( array_flip( $used )[ $trait ] );
 			} );
 		$components = array_map(
 		/**
 		 * @param \ReflectionProperty $component
 		 *
-		 * @return ComponentAbstract
+		 * @return Component
 		 */
 			function ( $component ) {
 				$getter = 'get_' . $component->name;
@@ -118,10 +134,15 @@ abstract class ComponentAbstract extends BaseObjectAbstract {
 	 * @param $components
 	 */
 	protected function set_component_parents( $components ) {
-		/** @var ComponentAbstract $component */
+		/** @var Component $component */
 		foreach ( $components as $component ) {
 			$component->parent = $this;
 		}
 	}
+
+	/**
+	 *
+	 */
+	abstract public function init();
 
 }

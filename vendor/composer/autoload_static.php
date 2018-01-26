@@ -4,48 +4,53 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d {
-	public static $files = array(
-		'b45b351e6b6f7487d819961fef2fda77' => __DIR__ . '/..' . '/jakeasmith/http_build_url/src/http_build_url.php',
-	);
+class ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d
+{
+    public static $files = array (
+        'b45b351e6b6f7487d819961fef2fda77' => __DIR__ . '/..' . '/jakeasmith/http_build_url/src/http_build_url.php',
+    );
 
-	public static $prefixLengthsPsr4 = array(
-		'p' =>
-			array(
-				'pcfreak30\\WordPress\\Plugin\\Framework\\' => 37,
-				'pcfreak30\\'                               => 10,
-			),
-		'D' =>
-			array(
-				'Dice\\' => 5,
-			),
-	);
+    public static $prefixLengthsPsr4 = array (
+        'p' => 
+        array (
+            'pcfreak30\\' => 10,
+        ),
+        'D' => 
+        array (
+            'Dice\\' => 5,
+        ),
+        'C' => 
+        array (
+            'ComposePress\\Core\\' => 18,
+        ),
+    );
 
-	public static $prefixDirsPsr4 = array(
-		'pcfreak30\\WordPress\\Plugin\\Framework\\' =>
-			array(
-				0 => __DIR__ . '/..' . '/pcfreak30/wordpress-plugin-framework/src',
-			),
-		'pcfreak30\\'                               =>
-			array(
-				0 => __DIR__ . '/..' . '/pcfreak30/wordpress-cache-store/src',
-			),
-		'Dice\\'                                    =>
-			array(
-				0 => __DIR__ . '/..' . '/level-2/dice',
-			),
-	);
+    public static $prefixDirsPsr4 = array (
+        'pcfreak30\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pcfreak30/wordpress-cache-store/src',
+        ),
+        'Dice\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/level-2/dice',
+        ),
+        'ComposePress\\Core\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composepress/core/src',
+        ),
+    );
 
-	public static $fallbackDirsPsr4 = array(
-		0 => __DIR__ . '/../..' . '/lib',
-	);
+    public static $fallbackDirsPsr4 = array (
+        0 => __DIR__ . '/../..' . '/lib',
+    );
 
-	public static function getInitializer( ClassLoader $loader ) {
-		return \Closure::bind( function () use ( $loader ) {
-			$loader->prefixLengthsPsr4 = ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d::$prefixLengthsPsr4;
-			$loader->prefixDirsPsr4    = ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d::$prefixDirsPsr4;
-			$loader->fallbackDirsPsr4  = ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d::$fallbackDirsPsr4;
+    public static function getInitializer(ClassLoader $loader)
+    {
+        return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInitf083e9c8fa2764dca3bbaaacdc1b139d::$fallbackDirsPsr4;
 
-		}, null, ClassLoader::class );
-	}
+        }, null, ClassLoader::class);
+    }
 }
