@@ -62,6 +62,42 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.0 ###
+
+This is considered  a ***MAJOR*** release due to the amount of effort that has been invested since the last release in 2017
+
+* BUGS!: Too many bug fixes to give out in detail. It would be ideal to review git commits in this case
+* Feature: Add lazyloading for CSS background images
+* Feature: Add lazy load for google full page ads
+* Feature: Add Big Bat support
+* Feature: Add rewrite support for Klaviyo Analytics
+* Feature: Add rewrite support for Youtube embed/iframe API
+* Integration: Add integration with Wonder Plugin Carousel
+* Integration: Add integration with Smart Slider 3
+* Integration: Add integration with Qocode Theme Framework
+* Integration: Add integration with MetaSlider
+* Integration: Add integration with Google Maps Widget Pro
+* Integration: Add integration with Divi Popup Builder
+* Integration: Add integration with Bridge Theme
+* Integration: Add Audio integration to properly handle HTML 5 audio
+* Integration: Add a3 lazy load integration to ensure CDN is used for all content
+* Integration: Add integration with Gravity Forms
+* Integration: Add Lazyload support for Qode Framework google maps
+* Integration: Add integration with Divi Builder
+* Integration: Add integration with BNE flyout
+* Integration: Add integration with WPEX theme framework
+* Integration: Add integration with PressCore Theme framework
+* Enhancement/Bug: Bundle a patched and updated a3 lazy Load lazyload XT library version
+* Enhancement: Automatically download the most high resolution youtube thumbnail
+* Enhancement: Ensure lazy load supports iframes with new script
+* Compatibility: Add compatibility with Visual Composer
+* Compatibility: Add revslider lazy load compatibility
+* Compatibility: Add woocommerce integration to disable many cache hooks to reduce problems
+* Compatibility: Add Divi LazyLoad compatibility
+* Compatibility: Disable lazy load if divi frontend pagebuilder is running
+* Compatibility: Add workaround technique for processing inline javascript that has html
+* Deprecated: Remove google tag manager minify since it causes problems
+
 ### 2.0.0 ###
 
 This is a ***MAJOR*** release and over 50% of the code is rewritten. While it has been extensively tested, there may still be bugs! Please test in a development site before deploying! Due to the amount of work, only a summary of this version will be detailed below.
