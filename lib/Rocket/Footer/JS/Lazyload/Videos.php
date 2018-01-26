@@ -36,9 +36,9 @@ class Videos extends LazyloadAbstract {
 			}
 			$src           = $this->maybe_translate_url( $src );
 			$info          = $oembed->get_data( $src );
-			$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
-				$img = $this->create_tag( 'img' );
+				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
+				$img           = $this->create_tag( 'img' );
 				$img->setAttribute( 'data-src', $this->plugin->util->download_remote_file( $thumbnail_url ) );
 				$img->setAttribute( 'width', $info->thumbnail_width );
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
