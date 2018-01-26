@@ -4,7 +4,7 @@ Contributors: pcfreak30
 Donate link: http://www.paypal.me/pcfreak30
 Tags: optimize, wp-rocket, footer javascript, lazy load, async js, async javascript, speed
 Requires at least: 4.2.0
-Tested up to: 4.8.1
+Tested up to: 4.9.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -61,6 +61,11 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 3.0.1 ###
+
+* Fix Bug in Google Plus lazy loading
+
 
 ### 3.0.0 ###
 
