@@ -62,6 +62,12 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.2 ###
+
+* Fix Bugs in Video lazy loading
+* Prevent crash from undefined is_plugin_active in some situations
+* Skip lazy load iframe if is in a noscript
+
 ### 3.0.1 ###
 
 * Fix Bug in Google Plus lazy loading
