@@ -9,6 +9,7 @@ class Request extends Component {
 	public function init() {
 		add_action( 'init', [ $this, 'init_action' ] );
 		if ( ! is_admin() ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			if ( is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
 				remove_filter( 'rocket_buffer', 'rocket_minify_process', 13 );
 				remove_filter( 'rocket_buffer', 'rocket_minify_html', 20 );
