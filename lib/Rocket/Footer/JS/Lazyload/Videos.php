@@ -86,7 +86,7 @@ class Videos extends LazyloadAbstract {
 		$urls = [];
 		if ( 'i.ytimg.com' === $url['host'] ) {
 			$size_url = $url;
-			$video_id = basename( pathinfo( $url['path'], PATHINFO_FILENAME ) );
+			$video_id = basename( pathinfo( $url['path'], PATHINFO_DIRNAME ) );
 			foreach ( [ 'maxresdefault', 'hqdefault', 'sddefault', 'mqdefault' ] as $size ) {
 				$size_url['path'] = "/vi/{$video_id}/{$size}.jpg";
 				$urls[]           = http_build_url( $size_url );
