@@ -62,6 +62,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.3 ###
+
+* Remove accidental global font override
+* Remove bad lazy loading default that could interfere with minify
+
 ### 3.0.2 ###
 
 * Fix Bugs in Video lazy loading
