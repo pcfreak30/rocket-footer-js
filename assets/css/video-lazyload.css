@@ -72,10 +72,3 @@
     width: 0;
     z-index: 9;
 }
-
-/* Other */
-
-body, html {
-    font: 100 1em/1.5 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
