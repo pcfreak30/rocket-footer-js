@@ -130,7 +130,7 @@ abstract class LazyloadAbstract extends Component {
 			return (bool) preg_match( $this->regex, $content, $this->regex_match );
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
