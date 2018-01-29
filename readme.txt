@@ -62,6 +62,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.4 ###
+
+* Update framework
+
 ### 3.0.3 ###
 
 * Remove accidental global font override
