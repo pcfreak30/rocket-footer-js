@@ -810,14 +810,12 @@ class JS extends Plugin {
 	 *
 	 */
 	protected function fix_old_libxml() {
-		// Hack to fix a bug with libxml versions earlier than 2.9.x
-		if ( 1 === version_compare( '2.9.0', LIBXML_DOTTED_VERSION ) ) {
-			$body_class = $this->body->getAttribute( 'class' );
-			if ( empty( $body_class ) ) {
-				$this->body->setAttribute( 'class', implode( ' ', get_body_class() ) );
-			}
+		// Hack to fix a bug with some libxml versions
+		$body       = $this->document->getElementsByTagName( 'body' )->item( 0 );
+		$body_class = $body->getAttribute( 'class' );
+		if ( empty( $body_class ) ) {
+			$body->setAttribute( 'class', implode( ' ', get_body_class() ) );
 		}
-
 	}
 
 	/**
