@@ -29,6 +29,7 @@ class Facebook extends LazyloadAbstract {
 					array(
 						'fb-page',
 						'fb-like',
+						'fb-like-box',
 						'fb-quote',
 						'fb-send',
 						'fb-share-button',
