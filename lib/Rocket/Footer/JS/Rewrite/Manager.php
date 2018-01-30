@@ -28,5 +28,6 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'BingBat',
 		'Klaviyo',
 		'YouTubeEmbedAPI',
+		'Shareaholic',
 	];
 }
