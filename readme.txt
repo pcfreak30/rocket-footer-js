@@ -62,6 +62,12 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.5 ###
+
+* Add fb-like-box class to list of facebook widgets to lazyload
+* Don't check libxml version on body fix
+* Exclude Shareaholic JS from minify
+
 ### 3.0.4 ###
 
 * Update framework
