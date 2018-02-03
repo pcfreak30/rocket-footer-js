@@ -30,12 +30,16 @@ class Videos extends LazyloadAbstract {
 			if ( $this->is_no_lazyload( $tag ) ) {
 				continue;
 			}
-			$src = $tag->getAttribute( 'data-src' );
+			$src      = $tag->getAttribute( 'data-src' );
+			$data_src = true;
 			if ( empty( $src ) ) {
-				$src = $tag->getAttribute( 'src' );
+				$src      = $tag->getAttribute( 'src' );
+				$data_src = false;
 			}
-			$src           = $this->maybe_translate_url( $src );
-			$info          = $oembed->get_data( $src );
+			$original_src = $src;
+			$src          = $this->maybe_translate_url( $src );
+			$info         = $oembed->get_data( $src );
+			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
@@ -75,6 +79,19 @@ class Videos extends LazyloadAbstract {
 				$url['path']  = '/watch';
 				$url['query'] = http_build_query( [ 'v' => $video_id ] );
 			}
+		}
+		$url = http_build_url( $url );
+
+		return $url;
+	}
+
+	private function maybe_set_autoplay( $url ) {
+		$url = parse_url( $url );
+		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
+			$query = [];
+			parse_str( $url['query'], $query );
+
+			$url['query'] = http_build_query( array_merge( $query, [ 'autoplay' => '1' ] ) );
 		}
 		$url = http_build_url( $url );
 
