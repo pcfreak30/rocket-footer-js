@@ -62,6 +62,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.6 ###
+
+ * Enable autoplay on lazy load videos
+ * Add loading spinner CSS for lazy load videos
+
 ### 3.0.5 ###
 
 * Add fb-like-box class to list of facebook widgets to lazyload
