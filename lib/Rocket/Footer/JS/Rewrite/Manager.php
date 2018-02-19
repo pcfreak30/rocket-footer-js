@@ -29,5 +29,6 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Klaviyo',
 		'YouTubeEmbedAPI',
 		'Shareaholic',
+		'StripeJS',
 	];
 }
