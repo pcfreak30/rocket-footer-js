@@ -772,7 +772,12 @@ class JS extends Plugin {
 		if ( empty( $this->cache ) ) {
 			$data = [ 'filename' => $filename ];
 			$this->put_content( $filename, $this->js );
-			$data['src'] = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
+			$data['src'] = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ), [
+				'all',
+				'css',
+				'js',
+				'css_and_js',
+			] );
 			$this->cache_manager->get_store()->update_cache_fragment( $this->get_cache_id(), $data );
 
 			return $data;
