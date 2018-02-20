@@ -30,6 +30,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'BNEFlyOut',
 		'WPEXThemeFramework',
 		'PressCoreThemeFramework',
+		'Genesis',
 	];
 
 }
