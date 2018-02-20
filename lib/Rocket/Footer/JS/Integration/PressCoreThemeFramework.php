@@ -71,7 +71,7 @@ class PressCoreThemeFramework extends IntegrationAbstract {
 	public function add_cdn_srcset( $html ) {
 		if ( preg_match_all( '/(data-srcset|srcset)=[\'"]?([^\'">]+)[\'"]/i', $html, $attr_match ) ) {
 			foreach ( $attr_match[2] as $k => $image_url ) {
-				$url      = get_rocket_cdn_url( $image_url, array( 'all', 'images' ) );
+				$url      = get_rocket_cdn_url( $image_url, [ 'all', 'images' ] );
 				$new_attr = str_replace( $image_url, $url, $attr_match[0][ $k ] );
 				$html     = str_replace( $attr_match[0][ $k ], $new_attr, $html );
 			}

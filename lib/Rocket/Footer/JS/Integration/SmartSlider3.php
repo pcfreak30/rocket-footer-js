@@ -19,7 +19,10 @@ class SmartSlider3 extends IntegrationAbstract {
 		$xpath = new \DOMXPath( $this->plugin->document );
 		/** @var \Rocket\Footer\JS\DOMElement $tag */
 		foreach ( $xpath->query( '//div[@data-desktop]' ) as $tag ) {
-			$tag->setAttribute( 'data-desktop', get_rocket_cdn_url( $tag->getAttribute( 'data-desktop' ) ) );
+			$tag->setAttribute( 'data-desktop', get_rocket_cdn_url( $tag->getAttribute( 'data-desktop' ), [
+				'all',
+				'images',
+			] ) );
 		}
 	}
 }

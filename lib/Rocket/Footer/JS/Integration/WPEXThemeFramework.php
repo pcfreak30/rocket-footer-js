@@ -35,7 +35,10 @@ class WPEXThemeFramework extends IntegrationAbstract {
 				'ipad_icon_retina',
 			) as $icon
 		) {
-			$value[ $icon ] = get_rocket_cdn_url( wp_get_attachment_image_src( $value[ $icon ], 'full' ) );
+			$value[ $icon ] = get_rocket_cdn_url( wp_get_attachment_image_src( $value[ $icon ], 'full' ), [
+				'all',
+				'images',
+			] );
 		}
 
 		return $value;

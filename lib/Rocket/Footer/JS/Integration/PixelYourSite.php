@@ -30,9 +30,19 @@ class PixelYourSite extends IntegrationAbstract {
 	 */
 	public function process( $script, $url ) {
 		if ( set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite/js/public.js' ) === $url ||
-		     get_rocket_cdn_url( set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite/js/public.js' ) ) === $url ||
+		     get_rocket_cdn_url( set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite/js/public.js' ), [
+			     'all',
+			     'css',
+			     'js',
+			     'css_and_js',
+		     ] ) === $url ||
 		     set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite-pro/js/public.js' ) === $url ||
-		     get_rocket_cdn_url( set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite-pro/js/public.js' ) ) === $url ) {
+		     get_rocket_cdn_url( set_url_scheme( WP_PLUGIN_URL . '/pixelyoursite-pro/js/public.js' ), [
+			     'all',
+			     'css',
+			     'js',
+			     'css_and_js',
+		     ] ) === $url ) {
 			/** @var FacebookPixel $fb_pixel */
 			$fb_pixel = rocket_footer_js()->get_rewrite_manager()->get_module( 'FacebookPixel' );
 			if ( ! empty( $fb_pixel ) ) {

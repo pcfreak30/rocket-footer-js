@@ -40,7 +40,12 @@ class WonderPluginCarousel extends IntegrationAbstract {
 				$this->tags->next();
 				continue;
 			}
-			if ( get_rocket_cdn_url( WP_PLUGIN_URL . '/wonderplugin-carousel/engine/wonderplugincarousel.js' ) === $src ) {
+			if ( get_rocket_cdn_url( WP_PLUGIN_URL . '/wonderplugin-carousel/engine/wonderplugincarousel.js', [
+					'all',
+					'css',
+					'js',
+					'css_and_js',
+				] ) === $src ) {
 				$run = true;
 				break;
 			}
