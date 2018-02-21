@@ -296,7 +296,13 @@ class JS extends Plugin {
 	 */
 	protected function normalize_cdn_domains() {
 		// Remote fetch external scripts
-		$this->cdn_domains = get_rocket_cdn_cnames();
+		$this->cdn_domains = get_rocket_cdn_cnames( [
+			'all',
+			'css',
+			'js',
+			'css_and_js',
+			'images',
+		] );
 		// Get the hostname for each CDN CNAME
 		foreach ( array_keys( (array) $this->cdn_domains ) as $index ) {
 			$cdn_domain       = &$this->cdn_domains[ $index ];
