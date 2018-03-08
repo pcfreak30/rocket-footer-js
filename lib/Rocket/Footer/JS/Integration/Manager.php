@@ -31,6 +31,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'WPEXThemeFramework',
 		'PressCoreThemeFramework',
 		'Genesis',
+		'MagicZoom',
 	];
 
 }
