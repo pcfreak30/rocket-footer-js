@@ -3,6 +3,7 @@
     margin: auto;
     position: relative;
     cursor: pointer;
+    max-width: 100%;
 }
 
 [data-lazy-video-embed-container].loading-container {
