@@ -27,5 +27,12 @@
 			$(this).parent().fitVids({ customSelector: '.et_pb_video_overlay' }).end().parent().css('paddingTop', (ratio * 100) + '%');
 		}
 	});
+	/* Workaround to force divi parallax's to re-render on lazyload  */
+	$(document).on('lazyload', '.et_parallax_bg', function () {
+		var parent = $(this).parent();
+		window.et_parallax_set_height && window.et_parallax_set_height(parent);
+		window.et_apply_parallax && window.et_apply_parallax((parent));
+		window.et_parallax_set_height && $(window).on('scroll', $.proxy(window.et_parallax_set_height, parent));
+	});
 
 })(window.jQuery || window.Zepto || window.$);
