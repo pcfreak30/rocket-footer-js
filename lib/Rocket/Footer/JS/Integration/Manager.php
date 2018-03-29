@@ -32,6 +32,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'PressCoreThemeFramework',
 		'Genesis',
 		'MagicZoom',
+		'MemberPress',
 	];
 
 }
