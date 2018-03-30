@@ -30,5 +30,6 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'YouTubeEmbedAPI',
 		'Shareaholic',
 		'StripeJS',
+		'AddThis',
 	];
 }
