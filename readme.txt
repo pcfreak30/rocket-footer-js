@@ -62,10 +62,23 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
-### 3.0.6 ###
+### 3.0.7 ###
 
- * Enable autoplay on lazy load videos
- * Add loading spinner CSS for lazy load videos
+* Bug: Don't process background images if lazy load is not enabled
+* Bug: Add workaround to force divi parallax's to re-render on lazyload
+ as well as the default all
+* Integration: Add genesis framework integration
+* Enhancement: Ensure get_rocket_cdn_url uses all css/js zones
+* Enhancement: Better handling of video lazy load placeholder size and support p tags
+* Compatibility: Add rewrite module to Prevent Stripe.js from being minified as they don't allow it
+* Compatibility: Add magiczoom compatibility with lazy load
+* Compatibility: Add MemberPress integration to force bundled zxcvbn script to be CDN'ified
+* Compatibility: Add compatibility with AddThis script to exclude script since it doesn't function minified
+
+ ### 3.0.6 ###
+
+* Enable autoplay on lazy load videos
+* Add loading spinner CSS for lazy load videos
 
 ### 3.0.5 ###
 
