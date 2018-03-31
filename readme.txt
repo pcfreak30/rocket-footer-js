@@ -62,6 +62,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.8 ###
+
+* Don't use PHP_INT_MAX on rocket_buffer
+
 ### 3.0.7 ###
 
 * Bug: Don't process background images if lazy load is not enabled

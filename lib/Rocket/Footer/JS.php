@@ -24,7 +24,7 @@ class JS extends Plugin {
 	/**
 	 * Plugin version
 	 */
-	const VERSION = '3.0.7';
+	const VERSION = '3.0.8';
 	/**
 	 *
 	 */
