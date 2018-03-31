@@ -29,7 +29,7 @@ class Request extends Component {
 		add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_deferred_js_files', '__return_zero' );
-		add_filter( 'rocket_buffer', [ $this->plugin, 'process_buffer' ], PHP_INT_MAX );
+		add_filter( 'rocket_buffer', [ $this->plugin, 'process_buffer' ], 9999 );
 		add_filter( 'rocket_htaccess_web_fonts_access', [ $this, 'add_js_to_htaccess_cors' ] );
 		remove_filter( 'rocket_buffer', 'rocket_insert_deferred_js', 11 );
 		remove_filter( 'rocket_buffer', 'rocket_defer_js', 14 );
