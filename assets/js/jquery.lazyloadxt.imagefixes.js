@@ -4,7 +4,9 @@
 (function ($) {
 	'use strict';
 
+
 	$(function () {
+		// Prevent lazy load glitch with rev slider
 		$('.rev_slider').each(function () {
 			var $this = $(this);
 			$(this).one('revolution.slide.onloaded', function () {
@@ -22,6 +24,11 @@
 			});
 
 		});
+		// Force re-render of fusion slider when images inside load
+		$('.fusion-carousel-item img').on('lazyload', function () {
+				$(this).closest('.fusion-carousel').fusion_recalculate_carousel();
+			}
+		)
 	});
 
 })(window.jQuery || window.Zepto || window.$);
