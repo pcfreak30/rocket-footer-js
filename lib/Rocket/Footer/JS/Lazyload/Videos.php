@@ -40,6 +40,7 @@ class Videos extends LazyloadAbstract {
 			$src          = $this->maybe_translate_url( $src );
 			$info         = $oembed->get_data( $src );
 			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src ) );
+			$tag->setAttribute( 'class', $tag->getAttribute( 'class' ) . ' lazyloaded-video' );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
