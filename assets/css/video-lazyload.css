@@ -134,3 +134,9 @@
         transform: rotate(360deg);
     }
 }
+
+/* Visual Composer Compatibility */
+
+.wpb_text_column :last-child [data-lazy-video-embed-container] .play {
+    margin-bottom: auto !important;
+}
