@@ -32,7 +32,6 @@
     max-height: 100%;
 }
 
-
 [data-lazy-video-embed-container] .play {
     background: black;
     border-radius: 50% / 10%;
@@ -124,6 +123,10 @@
 
 [data-lazy-video-embed-container] .loading div:nth-child(3) {
     animation-delay: -0.15s;
+}
+
+.lazyloaded-video {
+    max-width: 100%;
 }
 
 @keyframes loading-ring {
