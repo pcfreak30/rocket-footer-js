@@ -13,9 +13,7 @@ class RevolutionSlider extends IntegrationAbstract {
 	}
 
 	public function modify_settings( $options ) {
-		if ( isset( $options['load_all_javascript'] ) ) {
-			$options['load_all_javascript'] = 'on';
-		}
+		$options['load_all_javascript'] = 'on';
 
 		return $options;
 	}
