@@ -13,6 +13,7 @@ class RevolutionSlider extends IntegrationAbstract {
 	}
 
 	public function modify_settings( $options ) {
+		$options                        = maybe_unserialize( $options );
 		$options['load_all_javascript'] = 'on';
 
 		return $options;
