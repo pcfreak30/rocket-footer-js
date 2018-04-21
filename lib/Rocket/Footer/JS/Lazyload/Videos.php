@@ -39,8 +39,15 @@ class Videos extends LazyloadAbstract {
 			$original_src = $src;
 			$src          = $this->maybe_translate_url( $src );
 			$info         = $oembed->get_data( $src );
+
+			$classes = $tag->getAttribute( 'class' );
+			$classes = explode( ' ', $classes );
+			$classes = array_map( 'trim', $classes );
+			$classes = array_filter( $classes );
+
+			$classes [] = 'lazyloaded-video';
+
 			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src ) );
-			$tag->setAttribute( 'class', $tag->getAttribute( 'class' ) . ' lazyloaded-video' );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
@@ -48,11 +55,28 @@ class Videos extends LazyloadAbstract {
 				$img->setAttribute( 'width', $info->thumbnail_width );
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
 				$img->setAttribute( 'data-lazy-video-embed-type', $this->get_video_type( $src ) );
+
+				$video_id = $this->get_video_id( $src );
+
+				if ( ! empty( $video_id ) ) {
+					$img->setAttribute( 'class', "video-id-{$video_id}" );
+				}
+
+				$linked = preg_grep( '/video-size-linked-to-[\w\__]+/', $classes );
+
+				if ( ! empty( $linked ) ) {
+					$linked_id = str_replace( 'video-size-linked-to-', '', end( $linked ) );
+					$img->setAttribute( 'data-size-linked-to', $linked_id );
+					unset( $classes[ array_search( $classes, end( $linked ) ) ] );
+				}
+
 				$tag->parentNode->insertBefore( $img, $tag );
 				$this->lazyload_script( $this->get_tag_content( $tag ), "lazyload-video-{$this->instance}", $tag );
 				$tags->flag_removed();
 				$this->instance ++;
 			}
+
+			$tag->setAttribute( 'class', implode( ' ', $classes ) );
 		}
 		$tags = $this->get_tag_collection( 'source' );
 		foreach ( $tags as $tag ) {
@@ -120,7 +144,7 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
-	protected function get_video_type( $url ) {
+	private function get_video_type( $url ) {
 		$url  = parse_url( $url );
 		$type = null;
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
@@ -131,6 +155,21 @@ class Videos extends LazyloadAbstract {
 		}
 
 		return 'generic';
+	}
+
+	private function get_video_id( $url ) {
+		$url = parse_url( $url );
+		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
+			if ( false !== strpos( $url['path'], 'embed' ) ) {
+				return pathinfo( $url['path'], PATHINFO_FILENAME );
+			}
+			$query = [];
+			parse_str( $url['query'], $query );
+
+			return $query['v'];
+		}
+
+		return false;
 	}
 
 	protected function is_match( $content, $src ) {
