@@ -143,3 +143,13 @@
 .wpb_text_column :last-child [data-lazy-video-embed-container] .play {
     margin-bottom: auto !important;
 }
+
+.wpb_text_column [data-lazy-video-embed-container] img {
+    position: static;
+}
+
+/* Avada Fusion Compatibility */
+
+.fusion-video [data-lazy-video-embed-container] img {
+    position: static;
+}
