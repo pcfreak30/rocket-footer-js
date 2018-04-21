@@ -24,11 +24,13 @@
 			var html = $('<div>' + $.trim(match[ 1 ]) + '</div>');
 			if (html.find('iframe')) {
 				$(this).wrap($('<div />', {
-					'data-lazy-video-embed-container': $(this).data('lazyVideoEmbedType'),
-					width: html.find('iframe').attr('width'),
-					height: html.find('iframe').attr('height')
+					'data-lazy-video-embed-container': $(this).data('lazyVideoEmbedType')
 				})).after($('<div />', { class: 'play' }));
 				var image = $(this);
+				image.parent().attr({
+					width: html.find('iframe').attr('width'),
+					height: html.find('iframe').attr('height')
+				});
 				$(this).siblings('.play').click(function () {
 					image.click();
 				})
@@ -43,6 +45,13 @@
 			var divi_video_wrapper = $(this).closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap');
 			if (divi_video_wrapper.length) {
 				$(this).parent().hide();
+			}
+
+			var fusion_video_wrapper = $(this).closest('.fusion-video, .wpb_wrapper');
+			if (fusion_video_wrapper.length && $.fn.fitVids) {
+				fusion_video_wrapper.fitVids({ customSelector: '[data-lazy-video-embed-container]' });
+				fusion_video_wrapper.find('.fluid-width-video-wrapper').removeAttr('style');
+				resize_linked_videos();
 			}
 
 			var embedContainer = $(this).parent();
@@ -60,6 +69,7 @@
 			else {
 				resizeContainer();
 			}
+
 			$(this).data('lazyLoadedVideo', true);
 		}
 	});
@@ -87,7 +97,7 @@
 					vc_video_wrapper.css('padding-top', vc_video_wrapper.data('videoPadding'));
 					vc_video_wrapper.removeData('videoPadding');
 				}
-				var embedContainer = $video.siblings('[data-lazy-video-embed-container]').add($video.prev('p').children('[data-lazy-video-embed-container]'));
+				var embedContainer = $video.siblings('[data-lazy-video-embed-container]').add($video.prev('p').children('[data-lazy-video-embed-container]')).add($video.siblings('.fluid-width-video-wrapper').children('[data-lazy-video-embed-container]'));
 				if (embedContainer.length) {
 					embedContainer.show();
 					embedContainer.append($video).addClass('loading-container');
@@ -126,6 +136,35 @@
 
 		$this.triggerHandler('load');
 	});
+
+	function resize_linked_videos () {
+		$('img[data-size-linked-to].lazy-loaded').each(function () {
+			var linked_video_id = $(this).data('sizeLinkedTo');
+			var id_class = 'img.lazy-loaded.video-id-' + linked_video_id;
+			var linked_video = $(id_class);
+			if (linked_video.length) {
+				$(this).css('height', linked_video.get(0).clientHeight + 'px');
+			}
+		});
+	}
+
+	$(window).on('resize', resize_linked_videos);
+	$(document).on('lazyload', 'img', resize_linked_videos);
+
+	// Avada Fusion/Visual Composer Resize Compatibility
+	$(function () {
+		$('.fusion-video[class*="video-size-linked-to-"]').each(function () {
+			var classes = $(this).attr("class").split(' ');
+			var id = classes.filter(function (item) {
+				return item.startsWith('video-size-linked-to-');
+			})
+			id = id.pop().replace('video-size-linked-to-', '');
+			$(this).find('img').attr('data-size-linked-to', id);
+			$(this).removeClass('video-size-linked-to-' + id);
+		})
+		resize_linked_videos();
+	});
+
 	/* Divi Builder Video Overlay Workaround */
 	$(function () {
 		if ($('.et_pb_video_overlay').length) {
