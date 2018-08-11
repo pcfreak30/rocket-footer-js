@@ -4,6 +4,8 @@
 namespace Rocket\Footer\JS\Lazyload;
 
 
+use Rocket\Footer\JS\DOMElement;
+
 class Videos extends LazyloadAbstract {
 	/**
 	 * @param string  $content
@@ -47,7 +49,7 @@ class Videos extends LazyloadAbstract {
 
 			$classes [] = 'lazyloaded-video';
 
-			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src ) );
+			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
@@ -110,13 +112,19 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
-	private function maybe_set_autoplay( $url ) {
+	private function maybe_set_autoplay( $url, DOMElement $tag ) {
 		$url = parse_url( $url );
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
 			$query = [];
 			parse_str( $url['query'], $query );
 
 			$url['query'] = http_build_query( array_merge( $query, [ 'autoplay' => '1' ] ) );
+			$allow        = explode( ';', $tag->getAttribute( 'allow' ) );
+			$allow        = array_map( 'trim', $allow );
+			$allow        = array_filter( $allow );
+			$allow[]      = 'autoplay';
+			$allow        = array_unique( $allow );
+			$tag->setAttribute( 'allow', implode( ';', $allow ) );
 		}
 		$url = http_build_url( $url );
 
