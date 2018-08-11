@@ -31,5 +31,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Shareaholic',
 		'StripeJS',
 		'AddThis',
+		'CookieBot',
+		'CallRail',
 	];
 }
