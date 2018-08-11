@@ -22,6 +22,12 @@ class GoogleAnalytics extends RewriteAbstract {
 			}
 			$this->inject_tag( $this->create_script( 'window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date; ' . implode( "\n", $ga_calls ) ) );
 			$this->inject_tag( $this->create_script( null, $matches[1] ) );
+			$content = trim( str_replace( $matches[0], '', $content ) );
+			$content = trim( str_replace( $ga_calls, '', $content ) );
+
+
+			$this->inject_tag( $this->create_script( $content ) );
+
 			$this->tags->remove();
 		}
 	}

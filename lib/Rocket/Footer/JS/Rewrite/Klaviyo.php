@@ -20,6 +20,9 @@ class Klaviyo extends RewriteAbstract {
 				$this->inject_tag( $this->create_script( $sub_content ) );
 			}
 			$this->inject_tag( $this->create_script( null, 'https://a.klaviyo.com/media/js/analytics/analytics.js' ) );
+			$content = trim( str_replace( $matches[0], '', $content ) );
+			$this->inject_tag( $this->create_script( $content ) );
+
 			$this->tags->remove();
 		}
 	}

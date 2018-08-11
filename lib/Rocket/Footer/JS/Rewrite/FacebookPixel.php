@@ -40,6 +40,11 @@ class FacebookPixel extends RewriteAbstract {
 				if ( ! empty( $content ) ) {
 					$this->inject_tag( $this->create_script( $content ) );
 				}
+
+				$content = trim( str_replace( $matches[0], '', $content ) );
+				$content = trim( str_replace( $fbq_calls, '', $content ) );
+				$this->inject_tag( $this->create_script( $content ) );
+
 				$this->tags->remove();
 			}
 

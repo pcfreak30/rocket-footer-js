@@ -84,6 +84,10 @@ class TypeKit extends RewriteAbstract {
 						$classes    = array_unique( $classes );
 						$this->document->documentElement->setAttribute( 'class', implode( ' ', $classes ) );
 					}
+
+					$content = trim( str_replace( $matches[0], '', $content ) );
+					$this->inject_tag( $this->create_script( $content ) );
+
 					$this->tags->remove();
 				}
 			}
