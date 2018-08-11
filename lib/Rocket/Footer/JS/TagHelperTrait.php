@@ -35,7 +35,7 @@ trait TagHelperTrait {
 	 */
 	protected function create_script( $content = null, $src = null, $content_document = true ) {
 		/** @var DOMElement $external_tag */
-		$external_tag = $this->create_tag( 'script', $content, $content_document );
+		$external_tag = $this->create_tag( 'script', ( null !== $content ? rocket_footer_js()->util->encode_script( $content ) : $content ), $content_document );
 		$external_tag->setAttribute( 'type', 'text/javascript' );
 		if ( $src ) {
 			$external_tag->setAttribute( 'src', $src );
@@ -69,14 +69,14 @@ trait TagHelperTrait {
 			$tag = $this->tags->current();
 		}
 
-		return str_replace(
+		return rocket_footer_js()->util->maybe_decode_script( str_replace(
 			[ "\n", "\r", '<script>//', '//</script>' ],
 			[
 				'',
 				'',
 				'<script>',
 				'</script>',
-			], $this->get_tag_content( $tag ) );
+			], $this->get_tag_content( $tag ) ) );
 	}
 
 	protected function get_tag_content( $tag = null ) {
