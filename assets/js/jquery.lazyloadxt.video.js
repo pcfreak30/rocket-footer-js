@@ -30,6 +30,17 @@
 			this.load();
 		}
 		$el.triggerHandler('load')
+		if ($el.hasClass('wp-video-shortcode-lazyload') || $el.hasClass('wp-audio-shortcode-lazyload')) {
+			if ($el.hasClass('wp-video-shortcode-lazyload')) {
+				$el.removeClass('wp-video-shortcode-lazyload').addClass('wp-video-shortcode');
+			}
+			if ($el.hasClass('wp-audio-shortcode-lazyload')) {
+				$el.removeClass('wp-audio-shortcode-lazyload').addClass('wp-audio-shortcode');
+			}
+			if (window.wp && window.wp.mediaelement) {
+				window.wp.mediaelement.initialize();
+			}
+		}
 		$el.children('source,track').triggerHandler('load');
 	});
 

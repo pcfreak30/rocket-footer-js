@@ -51,6 +51,23 @@
 			if (fusion_video_wrapper.length && $.fn.fitVids) {
 				fusion_video_wrapper.fitVids({ customSelector: '[data-lazy-video-embed-container]' });
 				fusion_video_wrapper.find('.fluid-width-video-wrapper').removeAttr('style');
+				var fusion_privacy_placeholder = fusion_video_wrapper.find('.fusion-privacy-placeholder');
+				// Avada/Fusion privacy box compatibility
+				if (fusion_privacy_placeholder.length) {
+					fusion_privacy_placeholder.siblings('.fluid-width-video-wrapper').hide();
+					var padding,
+						parent = fusion_privacy_placeholder.parent(),
+						prev = fusion_privacy_placeholder.prev(),
+						width = fusion_privacy_placeholder.outerWidth(),
+						height = fusion_privacy_placeholder.outerHeight();
+
+					if (!(parent.hasClass("fusion-background-video-wrapper") || parent.hasClass("fluid-width-video-wrapper"))) {
+						padding = (height / width * 100) + "%";
+						fusion_privacy_placeholder.wrap('<div class="fluid-width-video-wrapper" style="padding-top:' + padding + '" />');
+						fusion_privacy_placeholder.parent().append(prev)
+					}
+				}
+
 				resize_linked_videos();
 			}
 
@@ -73,6 +90,15 @@
 			$(this).data('lazyLoadedVideo', true);
 		}
 	});
+
+	// Avada/Fusion privacy box compatibility
+
+	$('.fusion-privacy-placeholder').find('.fusion-privacy-consent').on('click', function () {
+		$('.fusion-privacy-consent').each(function () {
+			$(this).closest('.fluid-width-video-wrapper').siblings('.fluid-width-video-wrapper').show().end().remove();
+		});
+	});
+
 	$(document).on('click', '[' + widgetAttr + ']', function () {
 		var $this = $(this),
 			$target = $this,
@@ -120,6 +146,14 @@
 						}
 					});
 				}
+
+				var fusion_video_wrapper = $video.closest('.fusion-video, .wpb_wrapper');
+				if (fusion_video_wrapper.length) {
+					if ($video.is('[data-privacy-src-disabled]')) {
+						$video.removeClass('fusion-hidden');
+					}
+				}
+
 				var divi_video_wrapper = $video.closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap');
 				if (divi_video_wrapper.length) {
 					divi_video_wrapper.show();
