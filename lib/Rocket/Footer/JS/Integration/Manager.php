@@ -33,6 +33,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Genesis',
 		'MagicZoom',
 		'MemberPress',
+		'FusionFramework',
 	];
 
 }
