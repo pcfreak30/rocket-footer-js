@@ -62,19 +62,32 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.10 ###
+
+* Bug: Always encrypt scripts if there is content to prevent processing edge cases
+* Bug: Remove found script in rewrite modules and inject remaining code as a new script to get re-processed to ensure nothing gets silently deleted
+* Bug: Handle case where CDN domain may be just a domain and not a url
+* Integration: Add CookieBot rewrite module
+* Integration: Add CallRail rewrite module to skip processing
+* Enhancement: Prevent any mediaelement embeds from auto starting for lazy loads
+* Compatibility: Add integration with fusion framework to handle the privacy feature for lazy load compatibility
+* Compatibility: Put autoplay in allow attribute due to chrome video changes
+* Compatibility: Add compatibility with wp-rocket 3.1 due to JS minify class change
+
+
 ### 3.0.9 ###
 
 * Bug: jQuery wrap appears to set the style attribute and not with and height so work around it
 * Bug: Use maybe_unserialize in revolution slider integration module for forcing javascript options
 * Bug: Set iframes with lazyloaded-video class to max width of 100% to prevent overflowing in video
 * Feature: Add function to enable using a class video-size-linked-to-VIDEOID on a video iframe to force it to use the size of another video via jQuery in edge cases where the image sizes don't match
+* Enhancement: Disable a3 lazy load if enabled but we are logged in and not caching logged in users, but allow filter `rocket_footer_js_lazy_load_members_override` to override
+* Enhancement: Add css class lazyloaded-video to processed videos to be styled
 * Compatibility: Add compatibility with theme fusion avada/fusion builder
 * Compatibility: Add compatibility with fusion builder/visual composer combination to convert css class to data-attribute  for video size linking
 * Compatibility: Add further CSS compatibility with Visual Composer
 * Compatibility: Re-render fusion carousel when any of its images are lazy loaded
 * Compatibility: Add compatibility CSS with visual composer to override margins
-* Enhancement: Disable a3 lazy load if enabled but we are logged in and not caching logged in users, but allow filter `rocket_footer_js_lazy_load_members_override` to override
-* Enhancement: Add css class lazyloaded-video to processed videos to be styled
 
 ### 3.0.8 ###
 
