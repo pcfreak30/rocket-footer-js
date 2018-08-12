@@ -636,7 +636,12 @@ class JS extends Plugin {
 
 
 		$script = preg_replace( '~(?<!(?:["\'/]))<!--.*-->(?![\'"/])~Us', '', $script );
-		$script = rocket_minify_inline_js( $script );
+		if ( class_exists( '\MatthiasMullie\Minify\CSS' ) ) {
+			$minify = new \MatthiasMullie\Minify\JS( $script );
+			$css    = $minify->minify();
+		} else {
+			$css = rocket_minify_inline_css( $script );
+		}
 		$script = preg_replace( '~/\*!?\s+.*\*/~sU', '', $script );
 
 		return $script;
