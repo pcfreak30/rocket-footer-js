@@ -62,6 +62,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.11 ###
+
+* Bug: Inline tag encoding processed empty tags and outputted garbled data that caused JS errors. Empty tags are no longer encoded
+
 ### 3.0.10 ###
 
 * Bug: Always encrypt scripts if there is content to prevent processing edge cases
