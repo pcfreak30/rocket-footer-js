@@ -35,7 +35,7 @@ trait TagHelperTrait {
 	 */
 	protected function create_script( $content = null, $src = null, $content_document = true ) {
 		/** @var DOMElement $external_tag */
-		$external_tag = $this->create_tag( 'script', ( null !== $content ? rocket_footer_js()->util->encode_script( $content ) : $content ), $content_document );
+		$external_tag = $this->create_tag( 'script', ( null !== $content && '' !== $content ? rocket_footer_js()->util->encode_script( $content ) : $content ), $content_document );
 		$external_tag->setAttribute( 'type', 'text/javascript' );
 		if ( $src ) {
 			$external_tag->setAttribute( 'src', $src );
