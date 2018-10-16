@@ -14,6 +14,21 @@ class FusionFramework extends IntegrationAbstract {
 				add_filter( 'a3_lazy_load_videos_after', [ $this, 'privacy_lazyload' ] );
 
 			}
+			if ( 0 < (int) get_rocket_option( 'cdn' ) ) {
+				foreach (
+					[
+						'favicon[url]',
+						'iphone_icon[url]',
+						'iphone_icon_retina[url]',
+						'ipad_icon[url]',
+						'ipad_icon_retina[url]',
+					] as $setting
+				) {
+					add_filter( "avada_setting_get_{$setting}", 'rocket_cdn_file' );
+				}
+				add_filter( 'after_setup_theme', [ $this, 'setup_opengraph_cdn' ] );
+
+			}
 		}
 	}
 
@@ -45,5 +60,15 @@ class FusionFramework extends IntegrationAbstract {
 		}
 
 		return str_replace( $matches[0], $replacements, $html );
+	}
+
+	public function setup_opengraph_cdn() {
+		add_filter( 'option_' . \Avada_Settings::get_option_name(), [ $this, 'opengraph_cdn' ] );
+	}
+
+	public function opengraph_cdn( $settings ) {
+		$settings['logo']['url'] = get_rocket_cdn_url( $settings['logo']['url'] );
+
+		return $settings;
 	}
 }
