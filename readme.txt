@@ -64,6 +64,16 @@ This section describes how to install the plugin and get it working.
 
 ### 3.0.11 ###
 
+* Compatibility: Add support for use proof to be optimized
+* Compatibility: Add support for convert kit to be optimized
+* Compatibility: Add compatibility with thrive theme framework to ensure the logo's are processed for CDN replacements
+* Compatibility: Add compatibility with thrive leads to ensure that shortcodes get processed for CDN replacements
+* Compatibility: Add elementor ultimate addons compatibility for the gallery element and before/after slider
+* Compatibility: Add elementor compatibility for the tab element
+* Compatibility: Add CDN/device icon compatibility with avada/fusion framework
+
+### 3.0.11 ###
+
 * Bug: Inline tag encoding processed empty tags and outputted garbled data that caused JS errors. Empty tags are no longer encoded
 
 ### 3.0.10 ###
