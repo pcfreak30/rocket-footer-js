@@ -62,7 +62,7 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
-### 3.0.11 ###
+### 3.0.12 ###
 
 * Compatibility: Add support for use proof to be optimized
 * Compatibility: Add support for convert kit to be optimized
