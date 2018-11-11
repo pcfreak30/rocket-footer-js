@@ -34,6 +34,10 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'MagicZoom',
 		'MemberPress',
 		'FusionFramework',
+		'Elementor',
+		'ElementorUltimateAddons',
+		'ThriveThemeFramework',
+		'ThriveLeads',
 	];
 
 }
