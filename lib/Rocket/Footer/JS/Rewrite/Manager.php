@@ -33,5 +33,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'AddThis',
 		'CookieBot',
 		'CallRail',
+		'UseProof',
+		'ConvertKit',
 	];
 }
