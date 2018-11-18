@@ -27,7 +27,6 @@ class FusionFramework extends IntegrationAbstract {
 					add_filter( "avada_setting_get_{$setting}", 'rocket_cdn_file' );
 				}
 				add_filter( 'after_setup_theme', [ $this, 'setup_opengraph_cdn' ] );
-
 			}
 		}
 	}
@@ -63,7 +62,11 @@ class FusionFramework extends IntegrationAbstract {
 	}
 
 	public function setup_opengraph_cdn() {
-		add_filter( 'option_' . \Avada_Settings::get_option_name(), [ $this, 'opengraph_cdn' ] );
+		if ( class_exists( 'Avada' ) ) {
+			add_filter( 'option_' . \Avada_Settings::get_option_name(), [ $this, 'opengraph_cdn' ] );
+		} else if ( class_exists( 'FusionCore_Plugin' ) ) {
+			add_filter( 'option_' . \Fusion_Settings::get_option_name(), [ $this, 'opengraph_cdn' ] );
+		}
 	}
 
 	public function opengraph_cdn( $settings ) {
