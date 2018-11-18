@@ -62,6 +62,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.13 ###
+
+* Bug: Bug fix fusion framework integration with opengraph and cdn causing crash
+* Compatibility: Force override html minification outside admin to ensure it does not process before plugin html minification runs. This is prep for a sister CSS plugin update
+
 ### 3.0.12 ###
 
 * Compatibility: Add support for use proof to be optimized
