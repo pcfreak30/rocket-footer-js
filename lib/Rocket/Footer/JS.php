@@ -845,6 +845,7 @@ class JS extends Plugin {
 	 * @return mixed|string
 	 */
 	protected function do_minify_html( $buffer ) {
+		remove_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
 		// If HTML minify is on, process it
 		if ( get_rocket_option( 'minify_html' ) && ! is_rocket_post_excluded_option( 'minify_html' ) ) {
 			$buffer = rocket_minify_html( $buffer );
