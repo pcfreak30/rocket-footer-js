@@ -123,7 +123,7 @@
 					vc_video_wrapper.css('padding-top', vc_video_wrapper.data('videoPadding'));
 					vc_video_wrapper.removeData('videoPadding');
 				}
-				var embedContainer = $video.siblings('[data-lazy-video-embed-container]').add($video.prev('p').children('[data-lazy-video-embed-container]')).add($video.siblings('.fluid-width-video-wrapper').children('[data-lazy-video-embed-container]'));
+				var embedContainer = $video.siblings('[data-lazy-video-embed-container]').add($video.prevAll('p').find('[data-lazy-video-embed-container]')).add($video.siblings('.fluid-width-video-wrapper').children('[data-lazy-video-embed-container]'));
 				if (embedContainer.length) {
 					embedContainer.show();
 					embedContainer.append($video).addClass('loading-container');
