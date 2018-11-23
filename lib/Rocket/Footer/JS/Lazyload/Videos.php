@@ -114,7 +114,7 @@ class Videos extends LazyloadAbstract {
 
 	private function maybe_set_autoplay( $url, DOMElement $tag ) {
 		$url = parse_url( $url );
-		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
+		if ( in_array( $url['host'], [ 'youtube.com', 'www.youtube.com', 'player.vimeo.com' ] ) ) {
 			$query = [];
 			parse_str( $url['query'], $query );
 
