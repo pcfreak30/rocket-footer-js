@@ -98,6 +98,7 @@ class Videos extends LazyloadAbstract {
 	 * @param string $url
 	 */
 	private function maybe_translate_url( $url ) {
+		$url = set_url_scheme( $url );
 		$url = parse_url( $url );
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
 			if ( false !== strpos( $url['path'], 'embed' ) ) {
@@ -113,6 +114,7 @@ class Videos extends LazyloadAbstract {
 	}
 
 	private function maybe_set_autoplay( $url, DOMElement $tag ) {
+		$url = set_url_scheme( $url );
 		$url = parse_url( $url );
 		if ( in_array( $url['host'], [ 'youtube.com', 'www.youtube.com', 'player.vimeo.com' ] ) ) {
 			$query = [];
@@ -132,6 +134,7 @@ class Videos extends LazyloadAbstract {
 	}
 
 	private function maybe_translate_thumbnail_url( $url ) {
+		$url  = set_url_scheme( $url );
 		$url  = parse_url( $url );
 		$urls = [];
 		if ( 'i.ytimg.com' === $url['host'] ) {
