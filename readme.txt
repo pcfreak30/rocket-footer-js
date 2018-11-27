@@ -62,6 +62,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.14 ###
+
+* Compatibility: Add compatibility with wp-rocket 3.2 and a purge behavior change
+
 ### 3.0.13 ###
 
 * Bug: Bug fix fusion framework integration with opengraph and cdn causing crash
