@@ -39,7 +39,7 @@ class Manager extends Component {
 		add_action( 'after_rocket_clean_domain', [ $this, 'purge_cache' ], 10, 0 );
 		add_action( 'after_rocket_clean_post', [ $this, 'purge_post' ] );
 		add_action( 'after_rocket_clean_term', [ $this, 'purge_term' ] );
-		add_action( 'after_rocket_clean_files', [ $this, 'purge_url' ] );
+		add_action( 'after_rocket_clean_file', [ $this, 'purge_url' ] );
 		$this->store->set_prefix( JS::TRANSIENT_PREFIX );
 		$interval = 0;
 		if ( function_exists( 'get_rocket_purge_cron_interval' ) ) {
