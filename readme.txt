@@ -15,6 +15,8 @@ This is NOT an official addon to WP-Rocket!
 
 == Description ==
 
+**This is NOT an official addon to WP-Rocket!**
+
 This plugin will do the following:
 
 * Process all inline and external JS to one file, not multiple, and put at the footer with async on
