@@ -26,6 +26,9 @@ class Request extends Component {
 				add_filter( 'pre_get_rocket_option_lazyload_iframes', '__return_zero' );
 			}
 			add_filter( 'pre_get_rocket_option_minify_html', '__return_zero' );
+			if ( 0 < (int) get_rocket_option( 'cdn' ) ) {
+				add_filter( 'get_avatar_url', 'rocket_cdn_file' );
+			}
 		}
 		add_filter( 'pre_get_rocket_option_minify_js_combine_all', '__return_zero' );
 		add_filter( 'pre_get_rocket_option_defer_all_js', '__return_zero' );
