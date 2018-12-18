@@ -39,6 +39,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'ThriveThemeFramework',
 		'ThriveLeads',
 		'MasterSlider',
+		'Buttonizer',
 	];
 
 }
