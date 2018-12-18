@@ -38,6 +38,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'ElementorUltimateAddons',
 		'ThriveThemeFramework',
 		'ThriveLeads',
+		'MasterSlider',
 	];
 
 }
