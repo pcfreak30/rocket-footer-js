@@ -40,6 +40,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'ThriveLeads',
 		'MasterSlider',
 		'Buttonizer',
+		'Listify',
 	];
 
 }
