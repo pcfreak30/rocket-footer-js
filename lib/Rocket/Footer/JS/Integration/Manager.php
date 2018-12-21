@@ -41,6 +41,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'MasterSlider',
 		'Buttonizer',
 		'Listify',
+		'RecaptchaInWPCommentsForm',
 	];
 
 }
