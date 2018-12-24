@@ -42,6 +42,7 @@ This plugin will do the following:
  * All Twitter social widgets
  * All Google Plus social widgets
  * All Google Adsense advertisements
+ * Google Re-captcha
  * Tumbler
  * Amazon Ads
  * Stumble Upon
@@ -63,6 +64,21 @@ This section describes how to install the plugin and get it working.
 4. Clear WP-Rocket cache and view HTML source!
 
 == Changelog ==
+
+### 3.0.14 ###
+
+* Bug: Set url scheme to prevent no protocol urls from bugging output
+* Bug: Use prevAll and use find over children
+* Bug: Don't process if url is empty
+* Enhancement: Ensure avatar images are processed though CDN
+* Enhancement: Add autoplay support for vimeo
+* Compatibility: Add lazy load compatibility with "Recaptcha In WP Comments Form" plugin
+* Compatibility: Add generic recaptcha lazy load support
+* Compatibility: Add integration with Listify for lazyload compatibility
+* Compatibility: Add integration with Buttonizer for lazy load compatibility
+* Compatibility: Add integration with Masterslider for lazylopad compatibility
+* Compatibility: Change file purge filter for compatibility with wp-rocket 3.2
+* Misc: Update readme with more clear disclaimer
 
 ### 3.0.13 ###
 
