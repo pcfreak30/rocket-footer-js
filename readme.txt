@@ -65,6 +65,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.15 ###
+
+* Bug: Fix using css minify instead of JS minify
+
 ### 3.0.14 ###
 
 * Bug: Set url scheme to prevent no protocol urls from bugging output
