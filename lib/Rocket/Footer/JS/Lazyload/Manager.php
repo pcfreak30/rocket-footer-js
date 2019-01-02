@@ -15,8 +15,6 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 	/** @noinspection ClassOverridesFieldOfSuperClassInspection */
 	protected $modules = [
 		'Facebook',
-		'GooglePlus',
-		'GooglePlusJS',
 		'Twitter',
 		'Tumbler',
 		'AvadaGoogleMaps',
