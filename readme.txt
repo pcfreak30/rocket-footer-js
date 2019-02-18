@@ -31,7 +31,7 @@ This plugin will do the following:
  * Clicky Tracking
  * Facebook Pixel Tracking
  * MCAfee Secure
- * Sumo Ne
+ * Sumo Me
  * Pingdom Prum
  * Google Tag Manager
  * Mouse Flow
