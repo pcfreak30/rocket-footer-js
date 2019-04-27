@@ -65,6 +65,12 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.0.16 ###
+
+* Bug: Fix lazy load CSS to not be position absolute
+* Bug: Fix edge case bug with DOMDocument mangling HTML entities
+* Compatibility: Google Plus shut down, so support removed
+
 ### 3.0.15 ###
 
 * Bug: Fix using css minify instead of JS minify
