@@ -25,6 +25,8 @@ class DOMDocument extends \DOMDocument {
 	public function saveHTML( \DOMNode $node = null ) {
 		$html = parent::saveHTML( $node );
 
+		$html = preg_replace( '/&amp;(#?[a-z]+);/i', '&$1;', $html);
+
 		return $this->post_process_scripts( $html );
 	}
 
