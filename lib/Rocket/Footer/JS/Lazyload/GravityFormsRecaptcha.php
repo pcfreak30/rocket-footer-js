@@ -28,6 +28,7 @@ class GravityFormsRecaptcha extends LazyloadAbstract {
 				}
 				if ( ( 'google.com' === parse_url( $src, PHP_URL_HOST ) || 'www.google.com' === parse_url( $src, PHP_URL_HOST ) ) && '/recaptcha/api.js' === parse_url( $src, PHP_URL_PATH ) ) {
 					$tag_content = $this->get_tag_content( $tag ) . $tag_content;
+					$tag_content .= $this->get_tag_content( $this->create_script( ';(function($) {$(document).trigger(\'gform_post_render\');})(jQuery);' ) );
 					$tag->remove();
 					break;
 				}
