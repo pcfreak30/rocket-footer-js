@@ -680,7 +680,7 @@ class JS extends Plugin {
 
 
 		// Check item cache
-		$item_cache_id = [ md5( $src ) ];
+		$item_cache_id = [ md5( $url ) ];
 		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
