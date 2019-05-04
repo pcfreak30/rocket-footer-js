@@ -12,11 +12,14 @@
 	$(document).on('lazyshow', function (e) {
 		var $this = $(e.target),
 			url = $this.attr(bgAttr);
-		if (!!url) {
+		if (!!url && '1' !== url) {
 			$this
 				.css('background-image', "url('" + url + "')")
 				.removeAttr(bgAttr)
 				.triggerHandler('load');
+		}
+		if ('1' === url) {
+			$this.removeAttr(bgAttr).triggerHandler('load');
 		}
 	});
 	/* Workaround to auto resize divi video posters */
