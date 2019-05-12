@@ -31,7 +31,6 @@ class QcodeThemeFramework extends IntegrationAbstract {
 					wp_script_is( 'default_dynamic' ) ? 'default_dynamic' : null,
 					'jquery-lazyloadxt.bg',
 				] ) ) );
-				wp_add_inline_script( 'default', '(function($){$(function(){$(".carousel .item .image").on("lazyshow", function(){$(this).removeClass("lazy-hidden");}).trigger("lazyshow")})})(jQuery);', 'before' );
 			}
 			wp_add_inline_script( 'default', '(function($){$(function(){window.qode_body = $("body")});})(jQuery);', 'before' );
 

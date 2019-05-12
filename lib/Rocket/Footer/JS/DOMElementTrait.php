@@ -51,4 +51,22 @@ trait DOMElementTrait {
 
 		return false;
 	}
+
+	public function addClass( $class ) {
+		$classes   = explode( ' ', $this->getAttribute( 'class' ) );
+		$classes[] = $class;
+		$classes   = array_unique( $classes );
+		$this->setAttribute( 'class', implode( ' ', $classes ) );
+	}
+
+	public function lazyLoad() {
+		$this->addClass( 'lazyload' );
+	}
+
+	public function setAttribute( $name, $value ) {
+		parent::setAttribute( $name, $value );
+		if ( 'data-lazy-widget' === $name || 'data-lazy-video-embed' === $name ) {
+			$this->lazyLoad();
+		}
+	}
 }

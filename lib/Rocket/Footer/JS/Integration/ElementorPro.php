@@ -34,7 +34,7 @@ class ElementorPro extends IntegrationAbstract {
 
 	public function lazyload_slider( $widget_content, Widget_Base $widget_base ) {
 		if ( 'slides' === $widget_base->get_name() ) {
-			$widget_content = str_replace( 'class="slick-slide-bg', 'data-lazyload-bg="1" class="slick-slide-bg hide', $widget_content );
+			$widget_content = str_replace( 'class="slick-slide-bg', 'data-lazyload-bg="1" class="lazyload slick-slide-bg hide', $widget_content );
 		}
 
 		return $widget_content;

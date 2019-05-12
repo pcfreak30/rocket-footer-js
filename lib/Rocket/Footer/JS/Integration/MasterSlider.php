@@ -18,6 +18,6 @@ class MasterSlider extends IntegrationAbstract {
 	}
 
 	public function scripts() {
-		wp_add_inline_script( 'masterslider-core', '(function($){$(window).load(function(){$.each(window.masterslider_instances,function(index,instance){var cb=function(){$(window).lazyLoadXT();if(0===instance.slideController.currentSlide.$bg_img.data("lazied"))instance.slideController.currentSlide.$bg_img.removeClass("lazy-hidden")};instance.slideController.addEventListener(MSSliderEvent.CHANGE_START,cb,instance);instance.slideController.addEventListener(MSSliderEvent.CHANGE_END,cb,instance)})})})(jQuery);' );
+		wp_add_inline_script( 'masterslider-core', '(function($){$(window).load(function(){$.each(window.masterslider_instances,function(index,instance){var cb=function(){$(window).lazyLoadXT();if(0===instance.slideController.currentSlide.$bg_img.data("lazied"))instance.slideController.addEventListener(MSSliderEvent.CHANGE_START,cb,instance);instance.slideController.addEventListener(MSSliderEvent.CHANGE_END,cb,instance)})})})(jQuery);' );
 	}
 }

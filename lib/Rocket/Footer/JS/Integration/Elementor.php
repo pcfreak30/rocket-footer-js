@@ -9,7 +9,7 @@ use Elementor\Element_Base;
 
 class Elementor extends IntegrationAbstract {
 	public function init() {
-		if ( class_exists( '\Elementor\Plugin' ) && $this->plugin->lazyload_manager->is_enabled() ) {
+		if ( class_exists( '\Elementor\Plugin' ) && $this->plugin->lazyload_manager->is_enabled() && ( ( defined( 'DONOTROCKETOPTIMIZE' ) && ! DONOTROCKETOPTIMIZE ) || ! defined( 'DONOTROCKETOPTIMIZE' ) ) ) {
 			add_action( 'elementor/frontend/after_register_scripts', [ $this, 'elementor_scripts' ] );
 			add_action( 'elementor/frontend/column/before_render', [ $this, 'lazyload_background' ] );
 			add_action( 'elementor/frontend/section/before_render', [ $this, 'lazyload_background' ] );
@@ -19,7 +19,6 @@ class Elementor extends IntegrationAbstract {
 
 	public function elementor_scripts() {
 		wp_add_inline_script( 'elementor-frontend', '(function(a){a(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/tabs.default",function(a,b){a.find(".elementor-tab-content.elementor-active").css("display","block")},11)})})(jQuery);' );
-		wp_add_inline_script( 'elementor-frontend', '(function(a){a(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/image.default",function(a,b){a.find("img").on("lazyload", function(){b(this).removeClass("lazy-hidden")})})})})(jQuery);' );
 	}
 
 	public function lazyload_background( Element_Base $element ) {
@@ -39,6 +38,7 @@ class Elementor extends IntegrationAbstract {
 		$found        = array_intersect_key( $settings, $setting_keys );
 		if ( $found ) {
 			$element->add_render_attribute( '_wrapper', 'data-lazyload-bg', 1 );
+			$element->add_render_attribute( '_wrapper', 'class', 'lazyload' );
 		}
 	}
 

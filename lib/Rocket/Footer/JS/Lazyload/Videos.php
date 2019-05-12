@@ -55,7 +55,6 @@ class Videos extends LazyloadAbstract {
 				$img           = $this->create_tag( 'img' );
 				$img->setAttribute( 'data-src', $this->plugin->util->download_remote_file( $thumbnail_url ) );
 				$img->setAttribute( 'width', $info->thumbnail_width );
-				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
 				$img->setAttribute( 'data-lazy-video-embed-type', $this->get_video_type( $src ) );
 
 				$video_id = $this->get_video_id( $src );
@@ -63,6 +62,8 @@ class Videos extends LazyloadAbstract {
 				if ( ! empty( $video_id ) ) {
 					$img->setAttribute( 'class', "video-id-{$video_id}" );
 				}
+
+				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
 
 				$linked = preg_grep( '/video-size-linked-to-[\w\__]+/', $classes );
 
@@ -114,7 +115,7 @@ class Videos extends LazyloadAbstract {
 	}
 
 	private function maybe_set_autoplay( $url, DOMElement $tag ) {
-		$url = set_url_scheme( $url );
+		$url = set_url_scheme( $url, 'https' );
 		$url = parse_url( $url );
 		if ( in_array( $url['host'], [ 'youtube.com', 'www.youtube.com', 'player.vimeo.com' ] ) ) {
 			$query = [];

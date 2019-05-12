@@ -17,6 +17,6 @@ class ElementorUltimateAddons extends IntegrationAbstract {
 	}
 
 	public function elementor_scripts() {
-		wp_add_inline_script( 'elementor-frontend', '(function($){$(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/uael-ba-slider.default",function($scope){$scope.imagesLoaded(function(){$scope.removeAttr("style");$scope.lazyLoadXT().on("lazyload",function(){$(this).removeClass("lazy-hidden");$(window).trigger("resize.twentytwenty")})})},11)});window.addEventListener("PreloaderDestroyed",function(){$(".elementor-widget-uael-ba-slider").removeAttr("style");$(window).trigger("resize.twentytwenty")})})(jQuery);' );
+		wp_add_inline_script( 'elementor-frontend', '(function($){$(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/uael-ba-slider.default",function($scope){$scope.imagesLoaded(function(){$scope.removeAttr("style");$scope.lazyLoadXT().on("lazyload",function(){$(window).trigger("resize.twentytwenty")})})},11)});window.addEventListener("PreloaderDestroyed",function(){$(".elementor-widget-uael-ba-slider").removeAttr("style");$(window).trigger("resize.twentytwenty")})})(jQuery);' );
 	}
 }
