@@ -37,8 +37,14 @@ class Elementor extends IntegrationAbstract {
 		$setting_keys = array_merge( $setting_keys, $setting_keys_desktop );
 		$found        = array_intersect_key( $settings, $setting_keys );
 		if ( $found ) {
-			$element->add_render_attribute( '_wrapper', 'data-lazyload-bg', 1 );
-			$element->add_render_attribute( '_wrapper', 'class', 'lazyload' );
+			foreach ( $found as $item ) {
+				$item = array_filter( $item );
+				if ( ! empty( $item ) ) {
+					$element->add_render_attribute( '_wrapper', 'data-lazyload-bg', 1 );
+					$element->add_render_attribute( '_wrapper', 'class', 'lazyload' );
+					break;
+				}
+			}
 		}
 	}
 
