@@ -69,7 +69,7 @@ class TypeKit extends RewriteAbstract {
 										$css .= ',';
 									}
 								}
-								$css .= ";font-weight: {$font->descriptors->weight}; font-style:{$font->descriptors->style}}";
+								$css .= ";font-weight: {$font->descriptors->weight}; font-style:{$font->descriptors->style}; font-display:swap; }";
 							}
 							$all_css .= $css;
 
