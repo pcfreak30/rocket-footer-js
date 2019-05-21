@@ -65,6 +65,17 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.1.0 ###
+
+* Bug: Fix lazy load CSS to not be position absolute
+* Bug: Hash the url without possible use of a CDN
+* Bug: Fix gravity forms recaptcha lazy load support
+* Enhancement:Migrate from lazyLoadXT to lazysizes for increase performance and less bugs with lazy load. For technical details the "intersection observer" version is used with polyfill's
+* Compatibility: Fix with wp-rocket 3.1.x to prevent the default minify from processing and causing edge cases
+* Compatibility: Add lazy load compatibility with Elementor image widget and sections/column backgrounds and overlays
+* Compatibility: Add lazy load compatibility with Elementor Pro posst grid cards and slick slider
+* Compatibility: Add lazy load support for Google Maps widgets and combine Google Maps Pro module
+
 ### 3.0.16 ###
 
 * Bug: Fix lazy load CSS to not be position absolute
