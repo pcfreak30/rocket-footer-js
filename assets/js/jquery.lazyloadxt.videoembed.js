@@ -144,7 +144,7 @@
 							if ($.fn.fitVids) {
 								$(this).parent().fitVids();
 							}
-						}/**/
+						}
 					});
 				}
 
