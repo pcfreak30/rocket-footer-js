@@ -65,12 +65,18 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.1.1 ###
+
+* Bug: Verify that the found background properties have settings in elementor compatibility module
+* Bug: Add background lazyload attribute to lazy load compatibility code
+* Enhancement: Add font display swap to TypeKit module
+
 ### 3.1.0 ###
 
 * Bug: Fix lazy load CSS to not be position absolute
 * Bug: Hash the url without possible use of a CDN
 * Bug: Fix gravity forms recaptcha lazy load support
-* Enhancement:Migrate from lazyLoadXT to lazysizes for increase performance and less bugs with lazy load. For technical details the "intersection observer" version is used with polyfill's
+* Enhancement: Migrate from lazyLoadXT to lazysizes for increase performance and less bugs with lazy load. For technical details the "intersection observer" version is used with polyfill's
 * Compatibility: Fix with wp-rocket 3.1.x to prevent the default minify from processing and causing edge cases
 * Compatibility: Add lazy load compatibility with Elementor image widget and sections/column backgrounds and overlays
 * Compatibility: Add lazy load compatibility with Elementor Pro posst grid cards and slick slider
