@@ -65,6 +65,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.1.2 ###
+
+* Compatibility: Remove lazy load compatibility script for master slider as it is no longer needed
+
 ### 3.1.1 ###
 
 * Bug: Verify that the found background properties have settings in elementor compatibility module
