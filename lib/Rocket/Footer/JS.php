@@ -397,7 +397,7 @@ class JS extends Plugin {
 			$post_cache_id [] = wp_get_current_user()->roles[0];
 		}
 
-		return $post_cache_id;
+		return apply_filters( 'rocket_footer_js_get_cache_id', $post_cache_id );
 	}
 
 	/**
@@ -638,7 +638,7 @@ class JS extends Plugin {
 		$script = preg_replace( '~(?<!(?:["\'/]))<!--.*-->(?![\'"/])~Us', '', $script );
 		if ( class_exists( '\MatthiasMullie\Minify\JS' ) ) {
 			$minify = new \MatthiasMullie\Minify\JS( $script );
-			$script    = $minify->minify();
+			$script = $minify->minify();
 		} else {
 			$script = rocket_minify_inline_js( $script );
 		}
