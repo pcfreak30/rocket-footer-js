@@ -8,15 +8,22 @@ use Elementor\Core\Responsive\Responsive;
 use Elementor\Widget_Base;
 
 class ElementorPro extends IntegrationAbstract {
+
 	public function init() {
-		if ( class_exists( '\ElementorPro\Plugin' ) && $this->plugin->lazyload_manager->is_enabled() ) {
-			add_action( 'elementor/frontend/after_register_scripts', [ $this, 'elementor_scripts' ] );
-			add_action( 'elementor/widget/render_content', [ $this, 'lazyload_slider' ], 10, 2 );
-			add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'enqueue_styles' ] );
+		if ( ! class_exists( '\Elementor\Plugin' ) ) {
+			return;
 		}
+		if ( ! $this->plugin->lazyload_manager->is_enabled() ) {
+			return;
+		}
+		add_action( 'elementor/frontend/after_register_scripts', [ $this, 'elementor_scripts' ] );
+		add_action( 'elementor/widget/render_content', [ $this, 'lazyload_slider' ], 10, 2 );
+		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'enqueue_styles' ] );
+		add_filter( 'rocket_footer_js_elementor_lazyload_widgets', [ $this, 'lazyload_widgets' ] );
 	}
 
-	public function elementor_scripts() {
+	public
+	function elementor_scripts() {
 		wp_add_inline_script( 'elementor-frontend', '(function(a){a(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/posts.cards",function(a,b){a(window).trigger("resize")},11)})})(jQuery);' );
 		wp_add_inline_script( 'elementor-frontend', '(function(a) {
     a(window).on("elementor/frontend/init", function() {
@@ -32,7 +39,10 @@ class ElementorPro extends IntegrationAbstract {
 })(jQuery);' );
 	}
 
-	public function lazyload_slider( $widget_content, Widget_Base $widget_base ) {
+	public
+	function lazyload_slider(
+		$widget_content, Widget_Base $widget_base
+	) {
 		if ( 'slides' === $widget_base->get_name() ) {
 			$widget_content = str_replace( 'class="slick-slide-bg', 'data-lazyload-bg="1" class="lazyload slick-slide-bg hide', $widget_content );
 		}
@@ -40,7 +50,8 @@ class ElementorPro extends IntegrationAbstract {
 		return $widget_content;
 	}
 
-	public function enqueue_styles() {
+	public
+	function enqueue_styles() {
 		$breakpoints = Responsive::get_breakpoints();
 		$style       = <<<CSS
  .elementor-widget-slides .slick-slide > .slick-slide-bg[data-lazyload-bg]  {
@@ -56,5 +67,16 @@ CSS;
 			$css .= "@media(max-width:{$breakpoint}px){$style}";
 		}
 		wp_add_inline_style( 'elementor-frontend', $css );
+	}
+
+	public
+	function lazyload_widgets(
+		$widgets
+	) {
+		return array_merge( $widgets, [
+			'theme-site-logo',
+			'theme-post-featured-image',
+			'woocommerce-category-image',
+		] );
 	}
 }
