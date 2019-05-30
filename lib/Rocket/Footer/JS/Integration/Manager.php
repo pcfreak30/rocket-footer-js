@@ -43,6 +43,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Buttonizer',
 		'Listify',
 		'RecaptchaInWPCommentsForm',
+		'WebPExpress',
 	];
 
 }
