@@ -85,7 +85,7 @@
     z-index: 9;
 }
 
-[data-lazy-video-embed-container] .loading {
+[data-lazy-video-embed-container] .loading, .elementor-fit-aspect-ratio .loading {
     display: inline-block;
     position: absolute;
     width: 64px;
@@ -100,7 +100,7 @@
     bottom: 0;
 }
 
-[data-lazy-video-embed-container] .loading div {
+[data-lazy-video-embed-container] .loading div, .elementor-fit-aspect-ratio .loading div {
     box-sizing: border-box;
     display: block;
     position: absolute;
