@@ -72,15 +72,20 @@
 			}
 
 			var embedContainer = $(this).parent();
-			var resizeContainer = function () {
+			var resizeContainer = lazySizes.debounce(lazySizes.rAFIt(function () {
 				var embedContainerClientHeight = embedContainer.children('img').get(0).clientHeight;
 				var embedContainerHeight = parseFloat(embedContainer.css('height').replace('px', ''));
+				if (!!embedContainerHeight && !!embedContainerHeight) {
+					resizeContainer();
+					return;
+				}
 				if (embedContainerHeight > embedContainerClientHeight) {
 					embedContainer.css('height', embedContainerClientHeight + 'px');
 					embedContainer.attr('height', embedContainerClientHeight + 'px');
 				}
-			}
-			if (embedContainer.children('img').data('lazied')) {
+			}, true));
+
+			if (embedContainer.children('img').is('.lazyload, .lazyloading')) {
 				embedContainer.children('img').on('lazyload', resizeContainer);
 			} else {
 				resizeContainer();
@@ -133,8 +138,11 @@
 					var div = $('<div />');
 					$icon.append(div, div.clone(), div.clone(), div.clone());
 					var iframe = embedContainer.children('iframe');
+					if (embedContainer.closest('.elementor-fit-aspect-ratio').length) {
+						embedContainer.parent().prepend($icon)
+					}
 					iframe.attr('src', iframe.data('src')).addClass('lazyload').one('load', function () {
-						embedContainer.find('.loading').remove();
+						$icon.remove();
 						embedContainer.parent().append(embedContainer.children());
 						embedContainer.remove();
 						var fluid_wrapper = $(this).closest('.fluid-width-video-wrapper');
