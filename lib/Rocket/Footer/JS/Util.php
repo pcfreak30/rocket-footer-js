@@ -10,6 +10,7 @@ use ComposePress\Core\Abstracts\Component;
  * Class Util
  *
  * @package Rocket\Footer\JS
+ * @property \Rocket\Footer\JS $plugin
  */
 class Util extends Component {
 
@@ -26,7 +27,7 @@ class Util extends Component {
 	 *
 	 * @return string
 	 */
-	public function download_remote_file( $urls, $extension = null ) {
+	public function download_remote_file( $urls, $extension = null, $cdn = true ) {
 		foreach ( (array) $urls as $url ) {
 			$data = $this->plugin->remote_fetch( $url );
 			if ( ! empty( $data ) ) {
@@ -43,7 +44,11 @@ class Util extends Component {
 				}
 				$hash      = md5( $url_parts['scheme'] . '://' . $info['dirname'] . ( ! empty( $url_parts['port'] ) ? ":{$url_parts['port']}" : '' ) . '/' . $info['filename'] );
 				$filename  = $this->plugin->get_cache_path() . $hash . '.' . $info['extension'];
-				$final_url = get_rocket_cdn_url( set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) ) );
+				$final_url = set_url_scheme( str_replace( WP_CONTENT_DIR, WP_CONTENT_URL, $filename ) );
+				if ( $cdn ) {
+					$final_url = get_rocket_cdn_url( $final_url );
+				}
+
 				if ( ! $this->plugin->get_wp_filesystem()->is_file( $filename ) ) {
 					$this->plugin->put_content( $filename, $data );
 				}
@@ -64,15 +69,15 @@ class Util extends Component {
 		return $data;
 	}
 
-	public function encode_script( $data ) {
-		return base64_encode( json_encode( $data ) );
-	}
-
 	protected function is_base64_encoded( $data ) {
 		if ( base64_decode( $data, true ) && json_decode( base64_decode( $data ) ) ) {
 			return true;
 		}
 
 		return false;
+	}
+
+	public function encode_script( $data ) {
+		return base64_encode( json_encode( $data ) );
 	}
 }
