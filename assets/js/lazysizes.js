@@ -538,6 +538,8 @@
 		fire: triggerEvent,
 		gW: getWidth,
 		rAF: rAF,
+		rAFIt: rAFIt,
+		debounce: debounce,
 	};
 
 	return lazysizes;
