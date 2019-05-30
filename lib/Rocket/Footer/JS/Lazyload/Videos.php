@@ -6,11 +6,64 @@ namespace Rocket\Footer\JS\Lazyload;
 
 use Rocket\Footer\JS\DOMElement;
 
+/**
+ * Class Videos
+ *
+ * @package Rocket\Footer\JS\Lazyload
+ */
 class Videos extends LazyloadAbstract {
+
 	/**
-	 * @param string  $content
+	 * @var array
+	 */
+	private $srcsets = [];
+	/**
+	 * @var string
+	 */
+	private $srcset_attr;
+	/**
+	 * @var string
+	 */
+	private $sizes_attr;
+
+	/**
+	 * @param $upload_dir
 	 *
-	 * @param  string $src
+	 * @return mixed
+	 */
+	public function modify_upload_dir( $upload_dir ) {
+		$upload_dir['basedir'] = $this->plugin->get_cache_path();
+		$upload_dir['baseurl'] = site_url( str_replace( ABSPATH, '/', $this->plugin->get_cache_path() ) );
+
+		return $upload_dir;
+	}
+
+	/**
+	 * @param $srcsets
+	 *
+	 * @return mixed
+	 */
+	public function save_srcsets( $srcsets ) {
+
+		foreach ( $srcsets as $key => $srcset ) {
+			$srcsets[ $key ]['url'] = get_rocket_cdn_url( $srcsets[ $key ]['url'], [
+				'css',
+				'js',
+				'css_and_js',
+				'all',
+			] );
+		}
+
+
+		$this->srcsets = $srcsets;
+
+		return $srcsets;
+	}
+
+	/**
+	 * @param string $content
+	 *
+	 * @param string $src
 	 *
 	 * @return void
 	 */
@@ -18,6 +71,9 @@ class Videos extends LazyloadAbstract {
 
 	}
 
+	/**
+	 *
+	 */
 	protected function after_do_lazyload() {
 		if ( ! $this->is_enabled() ) {
 			return;
@@ -53,7 +109,18 @@ class Videos extends LazyloadAbstract {
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
-				$img->setAttribute( 'data-src', $this->plugin->util->download_remote_file( $thumbnail_url ) );
+
+				$local_thumbnail = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', $this->plugin->util->download_remote_file( $thumbnail_url, null, false ) );
+				$this->maybe_generate_thumbnails( $local_thumbnail );
+				$local_thumbnail = get_rocket_cdn_url( $local_thumbnail, [ 'css', 'js', 'css_and_js' ] );
+
+				if ( ! empty( $this->srcset_attr ) ) {
+					$img->setAttribute( 'data-srcset', $this->srcset_attr );
+					$img->setAttribute( 'data-sizes', $this->sizes_attr );
+				} else {
+					$img->setAttribute( 'data-src', $local_thumbnail );
+				}
+
 				$img->setAttribute( 'width', $info->thumbnail_width );
 				$img->setAttribute( 'data-lazy-video-embed-type', $this->get_video_type( $src ) );
 
@@ -114,6 +181,12 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
+	/**
+	 * @param                              $url
+	 * @param \Rocket\Footer\JS\DOMElement $tag
+	 *
+	 * @return mixed|string
+	 */
 	private function maybe_set_autoplay( $url, DOMElement $tag ) {
 		$url = set_url_scheme( $url, 'https' );
 		$url = parse_url( $url );
@@ -134,6 +207,11 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
+	/**
+	 * @param $url
+	 *
+	 * @return array|mixed|string
+	 */
 	private function maybe_translate_thumbnail_url( $url ) {
 		$url  = set_url_scheme( $url );
 		$url  = parse_url( $url );
@@ -156,6 +234,65 @@ class Videos extends LazyloadAbstract {
 		return $url;
 	}
 
+	/**
+	 * @param $thumbnail_url
+	 */
+	private function maybe_generate_thumbnails( $thumbnail_url ) {
+		$path = trailingslashit( $this->plugin->get_cache_path() );
+		$info = pathinfo( parse_url( $thumbnail_url, PHP_URL_PATH ) );
+
+		$editor = wp_get_image_editor( $path . $info['basename'] );
+		if ( is_wp_error( $editor ) ) {
+			return;
+		}
+
+		$file = trailingslashit( $path ) . $info['basename'];
+
+		list( $width, $height ) = getimagesize( $file );
+
+		add_filter( 'wp_calculate_image_srcset', [ $this, 'save_srcsets' ] );
+		add_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
+
+		$image_sizes = [];
+
+
+		foreach ( get_intermediate_image_sizes() as $image_size ) {
+			$image_size    = image_constrain_size_for_editor( $width, $height, $image_size );
+			$image_sizes[] = [
+				'width'  => $image_size[0],
+				'height' => $image_size[1],
+				'file'   => $info['filename'] . "-{$image_size[0]}x{$image_size[1]}" . '.' . $info['extension'],
+			];
+		}
+
+		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
+			'sizes' => $image_sizes,
+			'file'  => $info['basename'],
+		] );
+		$this->sizes_attr  = wp_calculate_image_sizes( [
+			$width,
+			$height,
+		], $info['basename'], [ 'sizes' => $image_sizes ] );
+
+		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
+
+		$image_sizes = array_filter( $image_sizes, function ( $size ) use ( $path ) {
+			return false === $this->plugin->wp_filesystem->is_file( $path . $size['file'] );
+		} );
+
+
+		$resize_result = $editor->multi_resize( $image_sizes );
+
+		foreach ( $resize_result as $resize ) {
+			apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $path ) . $resize['file'] ) );
+		}
+	}
+
+	/**
+	 * @param $url
+	 *
+	 * @return string|null
+	 */
 	private function get_video_type( $url ) {
 		$url  = parse_url( $url );
 		$type = null;
@@ -169,6 +306,11 @@ class Videos extends LazyloadAbstract {
 		return 'generic';
 	}
 
+	/**
+	 * @param $url
+	 *
+	 * @return bool|mixed
+	 */
 	private function get_video_id( $url ) {
 		$url = parse_url( $url );
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
@@ -184,6 +326,12 @@ class Videos extends LazyloadAbstract {
 		return false;
 	}
 
+	/**
+	 * @param $content
+	 * @param $src
+	 *
+	 * @return bool
+	 */
 	protected function is_match( $content, $src ) {
 		return false;
 	}
