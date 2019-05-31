@@ -65,7 +65,11 @@ trait DOMElementTrait {
 
 	public function setAttribute( $name, $value ) {
 		parent::setAttribute( $name, $value );
-		if ( in_array( $name, [ 'data-lazyload-bg', 'data-lazy-widget', 'data-lazy-video-embed', 'data-src' ] ) ) {
+		if ( in_array( $name, [
+				'data-lazyload-bg',
+				'data-lazy-widget',
+				'data-lazy-video-embed',
+			] ) || ( 'data-src' === $name && 'source' !== $this->tagName ) ) {
 			$this->lazyLoad();
 		}
 	}
