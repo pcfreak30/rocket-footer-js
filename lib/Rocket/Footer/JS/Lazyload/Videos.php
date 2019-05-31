@@ -157,6 +157,8 @@ class Videos extends LazyloadAbstract {
 			if ( empty( $src ) ) {
 				continue;
 			}
+
+			$tag->parentNode->lazyLoad();
 			$tag->setAttribute( 'data-src', $src );
 			$tag->removeAttribute( 'src' );
 		}
