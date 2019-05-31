@@ -4,7 +4,6 @@
 namespace Rocket\Footer\JS\Integration;
 
 
-use ComposePress\Core\Abstracts\Component;
 use WebPConvert\Converters\ConverterHelper;
 use WebPConvert\Converters\Exceptions\ConversionDeclinedException;
 use WebPConvert\Converters\Exceptions\ConverterFailedException;
@@ -16,7 +15,7 @@ use WebPExpress\Option;
  *
  * @package Rocket\Async\CSS\Integration
  */
-class WebPExpress extends Component {
+class WebPExpress extends IntegrationAbstract {
 
 	/**
 	 * @var bool
