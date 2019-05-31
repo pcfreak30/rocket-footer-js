@@ -3,8 +3,9 @@
 		lazySizes.init();
 	}
 	document.addEventListener('lazybeforeunveil', function (e) {
-		e.target[ 'lazyLoadXT' ] = { srcAttr: 'data-src' };
-		$(e.target).trigger('lazyshow');
+		var $e = $(e.target);
+		$e.lazyLoadXT = $.extend($e.lazyLoadXT, { srcAttr: 'data-src' });
+		$(e.target).trigger('lazyshow', [ $e ]);
 	});
 	document.addEventListener('lazyunveilread', function (e) {
 		$(e.target).trigger('lazyload');
