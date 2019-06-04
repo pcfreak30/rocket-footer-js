@@ -58,16 +58,24 @@ class WebPExpress extends IntegrationAbstract {
 			add_filter( 'rocket_footer_js_lazyload_video_thumbnail', [ $this, 'maybe_process' ] );
 			add_filter( 'image_get_intermediate_size', [ $this, 'filter_image_get_intermediate_size' ], 999999, 1 );
 			add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_wp_calculate_image_srcset' ], 999999, 1 );
-			add_filter( 'wp_calculate_image_srcset_meta', [
-				$this,
-				'filter_wp_calculate_image_srcset_meta',
-			], 999999, 1 );
+			$this->enable_srcset_meta_filter();
+			add_filter( 'mime_types', [ $this, 'add_webp_mime' ] );
 
 
 			if ( false !== strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) ) {
 				add_filter( 'rocket_footer_js_get_cache_id', [ $this, 'modify_cache_key' ] );
 			}
 		}
+	}
+
+	public function enable_srcset_meta_filter() {
+		if ( ! $this->webp_available ) {
+			return;
+		}
+		add_filter( 'wp_calculate_image_srcset_meta', [
+			$this,
+			'filter_wp_calculate_image_srcset_meta',
+		], 999999, 1 );
 	}
 
 	public function filter_image_get_intermediate_size( $image ) {
@@ -103,6 +111,16 @@ class WebPExpress extends IntegrationAbstract {
 		}
 
 		return $url;
+	}
+
+	public function disable_srcset_meta_filter() {
+		if ( ! $this->webp_available ) {
+			return;
+		}
+		remove_filter( 'wp_calculate_image_srcset_meta', [
+			$this,
+			'filter_wp_calculate_image_srcset_meta',
+		], 999999 );
 	}
 
 	public function filter_wp_calculate_image_srcset( $sources ) {
@@ -209,4 +227,9 @@ class WebPExpress extends IntegrationAbstract {
 		return $this->webp_available;
 	}
 
+	public function add_webp_mime( $mimes ) {
+		$mimes['webp'] = 'image/webp';
+
+		return $mimes;
+	}
 }
