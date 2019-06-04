@@ -285,18 +285,23 @@ class Videos extends LazyloadAbstract {
 			$webp_module->enable_srcset_meta_filter();
 		}
 
-		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
-
-		$image_sizes = array_filter( $image_sizes, function ( $size ) use ( $path ) {
+		$missing_image_sizes = array_filter( $image_sizes, function ( $size ) use ( $path ) {
 			return false === $this->plugin->wp_filesystem->is_file( $path . $size['file'] );
 		} );
 
 
-		$resize_result = $editor->multi_resize( $image_sizes );
+		$editor->multi_resize( $missing_image_sizes );
 
-		foreach ( $resize_result as $resize ) {
-			apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $path ) . $resize['file'] ) );
-		}
+		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
+			'sizes' => $image_sizes,
+			'file'  => $info['basename'],
+		] );
+		$this->sizes_attr  = wp_calculate_image_sizes( [
+			$width,
+			$height,
+		], $info['basename'], [ 'sizes' => $image_sizes ] );
+
+		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
 	}
 
 	/**
