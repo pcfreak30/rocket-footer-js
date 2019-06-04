@@ -60,13 +60,19 @@ class HubSpot extends RewriteAbstract {
 	}
 
 	/**
-	 * @param string  $content
+	 * @param string $content
 	 *
-	 * @param  string $src
+	 * @param string $src
 	 *
 	 * @return void
 	 */
 	protected function do_rewrite( $content, $src ) {
+		if ( 'js.hsforms.net' === parse_url( $src, PHP_URL_HOST ) ) {
+			$this->set_no_minify();
+
+			return;
+		}
+
 		if ( 'js.hs-scripts.com' === parse_url( $src, PHP_URL_HOST ) ) {
 			$file = $this->plugin->remote_fetch( $src );
 			if ( ! empty( $file ) ) {
