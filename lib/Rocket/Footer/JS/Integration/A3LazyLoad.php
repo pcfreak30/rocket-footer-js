@@ -22,7 +22,7 @@ class A3LazyLoad extends IntegrationAbstract {
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_hidden_class' ] );
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_dummy_src' ] );
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_duplicate_srcset' ] );
-			add_filter( 'rocket_cdn_images_html', [ $this, 'fix_fake_src' ] );
+			add_filter( 'rocket_cdn_images_html', [ $this, 'fix_data_src' ] );
 		}
 	}
 
@@ -63,8 +63,8 @@ class A3LazyLoad extends IntegrationAbstract {
 		return $html;
 	}
 
-	public function fix_fake_src( $html ) {
-		return str_replace( 'data-fake- src', 'data-fake-src', $html );
+	public function fix_data_src( $html ) {
+		return preg_replace( '/data-([\w\-]+-)? src/', 'data-$1src', $html );
 	}
 
 	public function remove_duplicate_srcset( $html ) {
