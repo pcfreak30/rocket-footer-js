@@ -292,7 +292,13 @@ class Videos extends LazyloadAbstract {
 
 		$editor->multi_resize( $missing_image_sizes );
 
-		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
+		$file = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $file ) ) );
+		$file = str_replace( site_url( '/' ), ABSPATH, $file );
+
+		$this->srcset_attr = wp_calculate_image_srcset( [
+			$width,
+			$height,
+		], $file, [
 			'sizes' => $image_sizes,
 			'file'  => $info['basename'],
 		] );
