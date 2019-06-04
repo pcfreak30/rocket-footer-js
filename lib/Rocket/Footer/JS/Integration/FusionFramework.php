@@ -32,7 +32,7 @@ class FusionFramework extends IntegrationAbstract {
 	}
 
 	public function scripts() {
-		wp_add_inline_script( 'jquery-core', '(function($){$(function(){$("img").on("lazyload",function(){if(!$.fn.isotope){return;}$(this).closest(".iso-grid, .iso-container, .fusion-gallery").isotope("layout")})})})(jQuery);' );
+		wp_add_inline_script( 'jquery-core', '(function($){$(function(){var selector=".iso-grid, .iso-container, .fusion-gallery, .fusion-portfolio-wrapper";$("img").on("lazyload",function(){if(!$.fn.isotope)return;var isotope=$(this).closest(selector);if(isotope.data("isotope"))isotope.isotope("layout")});$(".fusion-portfolio-wrapper article").one("transitionend",function(){var isotope=$(this).closest(selector);if(isotope.data("isotope"))isotope.isotope("layout")})})})(jQuery);' );
 	}
 
 	public function privacy_lazyload( $html ) {
