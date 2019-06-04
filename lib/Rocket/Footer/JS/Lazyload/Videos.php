@@ -110,8 +110,9 @@ class Videos extends LazyloadAbstract {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
 
-				$local_thumbnail = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', $this->plugin->util->download_remote_file( $thumbnail_url, null, false ) );
+				$local_thumbnail = $this->plugin->util->download_remote_file( $thumbnail_url, null, false );
 				$this->maybe_generate_thumbnails( $local_thumbnail );
+				$local_thumbnail = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', $local_thumbnail );
 				$local_thumbnail = get_rocket_cdn_url( $local_thumbnail, [ 'css', 'js', 'css_and_js' ] );
 
 				if ( ! empty( $this->srcset_attr ) ) {
@@ -224,8 +225,6 @@ class Videos extends LazyloadAbstract {
 			foreach ( [ 'maxresdefault', 'hqdefault', 'sddefault', 'mqdefault' ] as $size ) {
 				$size_url['path'] = "/vi/{$video_id}/{$size}.jpg";
 				$urls[]           = http_build_url( $size_url );
-				$size_url['path'] = "/vi/{$video_id}/{$size}.webp";
-				$urls[]           = http_build_url( $size_url );
 			}
 		}
 		if ( ! empty( $urls ) ) {
@@ -244,6 +243,7 @@ class Videos extends LazyloadAbstract {
 		$info = pathinfo( parse_url( $thumbnail_url, PHP_URL_PATH ) );
 
 		$editor = wp_get_image_editor( $path . $info['basename'] );
+
 		if ( is_wp_error( $editor ) ) {
 			return;
 		}
@@ -267,6 +267,11 @@ class Videos extends LazyloadAbstract {
 			];
 		}
 
+		$webp_module = $this->plugin->integration_manager->get_module( 'WebPExpress' );
+		if ( $webp_module ) {
+			$webp_module->disable_srcset_meta_filter();
+		}
+
 		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
 			'sizes' => $image_sizes,
 			'file'  => $info['basename'],
@@ -275,6 +280,10 @@ class Videos extends LazyloadAbstract {
 			$width,
 			$height,
 		], $info['basename'], [ 'sizes' => $image_sizes ] );
+
+		if ( $webp_module ) {
+			$webp_module->enable_srcset_meta_filter();
+		}
 
 		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
 
