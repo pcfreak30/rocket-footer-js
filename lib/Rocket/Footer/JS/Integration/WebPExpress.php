@@ -158,8 +158,8 @@ class WebPExpress extends IntegrationAbstract {
 			}
 
 			$image_baseurl = $baseurl . $dirname;
-
-			$new_url = $this->process_url( $image_baseurl . $image_size['file'] );
+			$url           = $image_baseurl . $image_meta['file'];
+			$new_url       = $this->process_url( $url );
 			if ( $new_url === $url ) {
 				continue;
 			}
