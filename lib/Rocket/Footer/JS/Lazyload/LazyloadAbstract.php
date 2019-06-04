@@ -191,9 +191,10 @@ abstract class LazyloadAbstract extends Component {
 		if ( $collection ) {
 			$this->tags->remove();
 
-			return;
+			return $external_tag;
 		}
 		$tag->parentNode->removeChild( $tag );
+		return $external_tag;
 	}
 
 	/**
