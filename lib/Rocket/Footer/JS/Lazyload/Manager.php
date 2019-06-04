@@ -34,6 +34,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Recaptcha',
 		'QcodeGoogleMaps',
 		'RevolutionSlider',
+		'HubSpotForms',
 	];
 
 	/**
