@@ -5,6 +5,9 @@ namespace Rocket\Footer\JS\Integration;
 
 
 class FusionFramework extends IntegrationAbstract {
+
+	private $fusion_images_filter_priority;
+
 	public function init() {
 		if ( class_exists( 'Avada' ) || class_exists( 'FusionCore_Plugin' ) ) {
 			add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ] );
@@ -28,6 +31,14 @@ class FusionFramework extends IntegrationAbstract {
 				}
 				add_filter( 'after_setup_theme', [ $this, 'setup_opengraph_cdn' ] );
 			}
+			add_action( 'rocket_footer_js_lazyload_video_before_calculate_srcset', [
+				$this,
+				'remove_fusion_image_srcset_filter',
+			] );
+			add_action( 'rocket_footer_js_lazyload_video_after_calculate_srcset', [
+				$this,
+				'add_fusion_image_srcset_filter',
+			] );
 		}
 	}
 
@@ -73,5 +84,27 @@ class FusionFramework extends IntegrationAbstract {
 		$settings['logo']['url'] = get_rocket_cdn_url( $settings['logo']['url'] );
 
 		return $settings;
+	}
+
+
+	public function remove_fusion_image_srcset_filter() {
+		$fusion_images                       = Avada()->fusion_library->images;
+		$this->fusion_images_filter_priority = has_filter( 'wp_calculate_image_srcset', [
+			$fusion_images,
+			'set_largest_image_size',
+		] );
+		if ( $this->fusion_images_filter_priority ) {
+			remove_filter( 'wp_calculate_image_srcset', [ $fusion_images, 'set_largest_image_size' ] );
+		}
+	}
+
+	public function add_fusion_image_srcset_filter() {
+		$fusion_images = Avada()->fusion_library->images;
+		if ( $this->fusion_images_filter_priority ) {
+			add_filter( 'wp_calculate_image_srcset', [
+				$fusion_images,
+				'set_largest_image_size',
+			], $this->fusion_images_filter_priority, 5 );
+		}
 	}
 }
