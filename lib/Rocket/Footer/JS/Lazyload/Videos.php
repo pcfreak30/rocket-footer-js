@@ -257,7 +257,6 @@ class Videos extends LazyloadAbstract {
 
 		$image_sizes = [];
 
-
 		foreach ( get_intermediate_image_sizes() as $image_size ) {
 			$image_size    = image_constrain_size_for_editor( $width, $height, $image_size );
 			$image_sizes[] = [
@@ -272,9 +271,13 @@ class Videos extends LazyloadAbstract {
 			$webp_module->disable_srcset_meta_filter();
 		}
 
+		do_action( 'rocket_footer_js_lazyload_video_before_calculate_srcset' );
+
 		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
-			'sizes' => $image_sizes,
-			'file'  => $info['basename'],
+			'sizes'  => $image_sizes,
+			'file'   => $info['basename'],
+			'width'  => $width,
+			'height' => $height,
 		] );
 		$this->sizes_attr  = wp_calculate_image_sizes( [
 			$width,
@@ -299,8 +302,10 @@ class Videos extends LazyloadAbstract {
 			$width,
 			$height,
 		], $file, [
-			'sizes' => $image_sizes,
-			'file'  => $info['basename'],
+			'sizes'  => $image_sizes,
+			'file'   => $info['basename'],
+			'width'  => $width,
+			'height' => $height,
 		] );
 		$this->sizes_attr  = wp_calculate_image_sizes( [
 			$width,
@@ -308,6 +313,8 @@ class Videos extends LazyloadAbstract {
 		], $info['basename'], [ 'sizes' => $image_sizes ] );
 
 		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
+
+		do_action( 'rocket_footer_js_lazyload_video_after_calculate_srcset' );
 	}
 
 	/**
