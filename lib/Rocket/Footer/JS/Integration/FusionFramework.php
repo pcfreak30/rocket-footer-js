@@ -15,7 +15,7 @@ class FusionFramework extends IntegrationAbstract {
 				add_filter( 'the_content', [ $this, 'privacy_lazyload' ], 100000 );
 				add_filter( 'privacy_iframe_embed', [ $this, 'privacy_lazyload' ], 21 );
 				add_filter( 'a3_lazy_load_videos_after', [ $this, 'privacy_lazyload' ] );
-
+				add_filter( 'wp_enqueue_scripts', [ $this, 'remove_lazysizes' ], 11 );
 			}
 			if ( 0 < (int) get_rocket_option( 'cdn' ) ) {
 				foreach (
@@ -106,5 +106,9 @@ class FusionFramework extends IntegrationAbstract {
 				'set_largest_image_size',
 			], $this->fusion_images_filter_priority, 5 );
 		}
+	}
+
+	public function remove_lazysizes() {
+		wp_dequeue_script( 'lazysizes' );
 	}
 }
