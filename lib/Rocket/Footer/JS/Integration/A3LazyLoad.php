@@ -64,7 +64,7 @@ class A3LazyLoad extends IntegrationAbstract {
 	}
 
 	public function fix_data_src( $html ) {
-		return preg_replace( '/data-([\w\-]+-)? src/', 'data-$1src', $html );
+		return preg_replace( '/data-([\w\-]+-)?\s+src/', 'data-$1src', $html );
 	}
 
 	public function remove_duplicate_srcset( $html ) {
