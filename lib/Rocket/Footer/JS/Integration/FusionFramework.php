@@ -16,6 +16,7 @@ class FusionFramework extends IntegrationAbstract {
 				add_filter( 'privacy_iframe_embed', [ $this, 'privacy_lazyload' ], 21 );
 				add_filter( 'a3_lazy_load_videos_after', [ $this, 'privacy_lazyload' ] );
 				add_filter( 'wp_enqueue_scripts', [ $this, 'remove_lazysizes' ], 11 );
+				add_filter( 'avada_setting_get_lazy_load', '__return_zero' );
 			}
 			if ( 0 < (int) get_rocket_option( 'cdn' ) ) {
 				foreach (
