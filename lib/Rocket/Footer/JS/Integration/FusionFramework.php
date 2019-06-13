@@ -33,6 +33,10 @@ class FusionFramework extends IntegrationAbstract {
 					] as $setting
 				) {
 					add_filter( "avada_setting_get_{$setting}", 'rocket_cdn_file' );
+
+					$setting = explode( '[', $setting );
+					$setting = $setting[0];
+					add_filter( "avada_setting_get_{$setting}", [ $this, 'cdnify_logo' ] );
 				}
 				add_filter( 'after_setup_theme', [ $this, 'setup_opengraph_cdn' ] );
 			}
@@ -45,6 +49,16 @@ class FusionFramework extends IntegrationAbstract {
 				'add_fusion_image_srcset_filter',
 			] );
 		}
+	}
+
+	public function cdnify_logo( $setting ) {
+		$setting['url'] = rocket_cdn_file( $setting['url'] );
+
+		if ( isset( $setting['thumbnail'] ) ) {
+			$setting['thumbnail'] = rocket_cdn_file( $setting['thumbnail'] );
+		}
+
+		return $setting;
 	}
 
 	public function scripts() {
