@@ -44,6 +44,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Listify',
 		'RecaptchaInWPCommentsForm',
 		'WebPExpress',
+		'RankMathSEO',
 	];
 
 }
