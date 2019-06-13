@@ -57,7 +57,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 				$dep = 'jquery-lazyloadxt';
 			}
 
-			if ( wp_script_is( $dep, 'registered' ) ) {
+			if ( ! wp_script_is( $dep, 'registered' ) ) {
 				$lazy_load = false;
 			}
 		}
