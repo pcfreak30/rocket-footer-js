@@ -26,6 +26,8 @@ class FusionFramework extends IntegrationAbstract {
 						'iphone_icon_retina[url]',
 						'ipad_icon[url]',
 						'ipad_icon_retina[url]',
+						'mobile_logo[url]',
+						'mobile_logo_retina[url]',
 					] as $setting
 				) {
 					add_filter( "avada_setting_get_{$setting}", 'rocket_cdn_file' );
