@@ -49,7 +49,19 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 			$lazy_load = true;
 		}
 
+
+		if ( $lazy_load ) {
+			global $a3_lazy_load_global_settings;
+			$dep = 'lazy-load-xt-script';
+			if ( ! empty( $a3_lazy_load_global_settings ) ) {
+				$dep = 'jquery-lazyloadxt';
+			}
+
+			if ( wp_script_is( $dep, 'registered' ) ) {
+				$lazy_load = false;
+			}
+		}
+
 		return $lazy_load;
 	}
-
 }
