@@ -10,7 +10,13 @@ class A3LazyLoad extends IntegrationAbstract {
 	 *
 	 */
 	public function init() {
-		if ( $this->plugin->lazyload_manager->is_enabled() && class_exists( 'A3_Lazy_Load' ) ) {
+		if ( class_exists( 'A3_Lazy_Load' ) ) {
+			add_action( 'wp', [ $this, 'wp_init' ], 11, 0 );
+		}
+	}
+
+	public function wp_init() {
+		if ( $this->plugin->lazyload_manager->is_enabled() ) {
 			if ( 0 < (int) get_rocket_option( 'cdn' ) ) {
 				add_filter( 'a3_lazy_load_images_before', 'rocket_cdn_images' );
 			}
@@ -68,8 +74,8 @@ class A3LazyLoad extends IntegrationAbstract {
 		$placeholder     = A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif';
 		$placeholder_cdn = get_rocket_cdn_url( A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif', [ 'images' ], $placeholder );
 
-		$buffer          = str_replace( sprintf( 'data-fake-src="%s"', $placeholder ), '', $buffer );
-		$buffer          = str_replace( sprintf( 'data-fake-src="%s"', $placeholder_cdn ), '', $buffer );
+		$buffer = str_replace( sprintf( 'data-fake-src="%s"', $placeholder ), '', $buffer );
+		$buffer = str_replace( sprintf( 'data-fake-src="%s"', $placeholder_cdn ), '', $buffer );
 
 		return $buffer;
 	}
