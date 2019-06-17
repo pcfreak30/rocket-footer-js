@@ -71,8 +71,11 @@ class A3LazyLoad extends IntegrationAbstract {
 	}
 
 	public function remove_fake_src( $buffer ) {
-		$placeholder     = A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif';
-		$placeholder_cdn = get_rocket_cdn_url( A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif', [ 'images' ], $placeholder );
+		$placeholder = A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif';
+		$placeholder_cdn = get_rocket_cdn_url( A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif', [
+			'images',
+			'all',
+		], $placeholder );
 
 		$buffer = str_replace( sprintf( 'data-fake-src="%s"', $placeholder ), '', $buffer );
 		$buffer = str_replace( sprintf( 'data-fake-src="%s"', $placeholder_cdn ), '', $buffer );
