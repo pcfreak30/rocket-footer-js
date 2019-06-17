@@ -29,7 +29,11 @@ class A3LazyLoad extends IntegrationAbstract {
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_dummy_src' ] );
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_duplicate_srcset' ] );
 			add_filter( 'rocket_cdn_images_html', [ $this, 'fix_data_src' ] );
-			add_filter( 'rocket_buffer', [ $this, 'remove_fake_src' ], 10000 );
+			if ( is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
+				add_filter( 'rocket_async_css_request_buffer', [ $this, 'remove_fake_src' ], 10001 );
+			} else {
+				add_filter( 'rocket_buffer', [ $this, 'remove_fake_src' ], 10000 );
+			}
 		}
 	}
 
@@ -71,7 +75,7 @@ class A3LazyLoad extends IntegrationAbstract {
 	}
 
 	public function remove_fake_src( $buffer ) {
-		$placeholder = A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif';
+		$placeholder     = A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif';
 		$placeholder_cdn = get_rocket_cdn_url( A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif', [
 			'images',
 			'all',
