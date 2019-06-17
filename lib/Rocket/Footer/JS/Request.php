@@ -8,7 +8,7 @@ use ComposePress\Core\Abstracts\Component;
 class Request extends Component {
 	public function init() {
 		add_action( 'init', [ $this, 'init_action' ] );
-		if ( ! is_admin() ) {
+		if ( ! is_admin() && ! wp_is_json_request() ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			if ( is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
 				remove_filter( 'rocket_buffer', 'rocket_minify_process', 13 );
