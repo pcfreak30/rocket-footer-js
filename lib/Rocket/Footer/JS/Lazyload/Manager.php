@@ -49,7 +49,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 			$lazy_load = true;
 		}
 
-		if ( $lazy_load && class_exists( 'A3_Lazy_Load' ) && did_action('wp') ) {
+		if ( $lazy_load && class_exists( 'A3_Lazy_Load' ) && did_action( 'wp' ) ) {
 			$lazy_load = has_filter( 'a3_lazy_load_html' );
 		}
 
@@ -60,7 +60,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 				$dep = 'jquery-lazyloadxt';
 			}
 
-			if ( ! wp_script_is( $dep, 'registered' ) ) {
+			if ( ! ( wp_script_is( $dep, 'registered' ) || wp_script_is( "{$dep}-dummy", 'registered' ) ) ) {
 				$lazy_load = false;
 			}
 		}
