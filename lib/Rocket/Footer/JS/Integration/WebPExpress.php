@@ -47,6 +47,11 @@ class WebPExpress extends IntegrationAbstract {
 			}
 
 			$autoload = WEBPEXPRESS_PLUGIN_DIR . '/vendor/autoload.php';
+
+			if ( ! defined( 'WEBPEXPRESS_PLUGIN_DIR' ) ) {
+				return;
+			}
+			
 			if ( ! $this->plugin->wp_filesystem->is_file( $autoload ) ) {
 				return;
 			}
