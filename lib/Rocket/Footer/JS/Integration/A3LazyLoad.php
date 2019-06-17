@@ -23,6 +23,7 @@ class A3LazyLoad extends IntegrationAbstract {
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_dummy_src' ] );
 			add_filter( 'a3_lazy_load_images_after', [ $this, 'remove_duplicate_srcset' ] );
 			add_filter( 'rocket_cdn_images_html', [ $this, 'fix_data_src' ] );
+			add_filter( 'rocket_buffer', [ $this, 'remove_fake_src' ], 10000 );
 		}
 	}
 
@@ -61,6 +62,16 @@ class A3LazyLoad extends IntegrationAbstract {
 		$html = str_replace( sprintf( $src_string, $placeholder_cdn ), sprintf( $fake_src_string, $placeholder_cdn ), $html );
 
 		return $html;
+	}
+
+	public function remove_fake_src( $buffer ) {
+		$placeholder     = A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif';
+		$placeholder_cdn = get_rocket_cdn_url( A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif', [ 'images' ], $placeholder );
+
+		$buffer          = str_replace( sprintf( 'data-fake-src="%s"', $placeholder ), '', $buffer );
+		$buffer          = str_replace( sprintf( 'data-fake-src="%s"', $placeholder_cdn ), '', $buffer );
+
+		return $buffer;
 	}
 
 	public function fix_data_src( $html ) {
