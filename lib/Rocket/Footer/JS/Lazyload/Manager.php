@@ -49,8 +49,11 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 			$lazy_load = true;
 		}
 
+		if ( $lazy_load && class_exists( 'A3_Lazy_Load' ) ) {
+			$lazy_load = has_filter( 'a3_lazy_load_html' );
+		}
 
-		if ( $lazy_load ) {
+		if ( $lazy_load && did_action( 'wp_enqueue_scripts' ) ) {
 			global $a3_lazy_load_global_settings;
 			$dep = 'lazy-load-xt-script';
 			if ( ! empty( $a3_lazy_load_global_settings ) ) {
