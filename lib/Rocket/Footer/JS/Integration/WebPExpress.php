@@ -4,10 +4,14 @@
 namespace Rocket\Footer\JS\Integration;
 
 
+use WebPConvert\Convert\ConverterFactory;
 use WebPConvert\Converters\ConverterHelper;
 use WebPConvert\Converters\Exceptions\ConversionDeclinedException;
 use WebPConvert\Converters\Exceptions\ConverterFailedException;
+use WebPConvert\Exceptions\WebPConvertException;
 use WebPExpress\AlterHtmlImageUrls;
+use WebPExpress\Config;
+use WebPExpress\ConvertersHelper;
 use WebPExpress\Option;
 
 /**
@@ -209,11 +213,12 @@ class WebPExpress extends IntegrationAbstract {
 							return $url;
 						}
 					}
+					/** @var \WebPConvert\Convert\Converters\AbstractConverter $converter */
+					$converter = ConvertersHelper::getFirstWorkingAndActiveConverter( Config::loadConfigAndFix( false ) );
+					$converter = ConverterFactory::makeConverter( $converter['converter'], $file, $webp_file, $converter['options'] );
 					try {
-						ConverterHelper::runConverterStack( $file, $webp_file );
-					} catch ( ConversionDeclinedException $e ) {
-						return $url;
-					} catch ( ConverterFailedException $e ) {
+						$converter->doConvert();
+					} catch ( WebPConvertException $e ) {
 						return $url;
 					}
 				}
