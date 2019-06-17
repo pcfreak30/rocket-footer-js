@@ -202,7 +202,12 @@ class WebPExpress extends IntegrationAbstract {
 				$webp_file = preg_replace( "/\.{$ext}$/", '.webp', $file );
 				if ( ! $this->plugin->wp_filesystem->is_file( $webp_file ) ) {
 					if ( ! class_exists( '\WebPConvert\Converters\ConverterHelper' ) ) {
-						require_once WEBPEXPRESS_PLUGIN_DIR . '/vendor/rosell-dk/webp-convert/build/webp-convert.inc';
+						$convert_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/rosell-dk/webp-convert/src-build/webp-convert.inc';
+						if ( ! $this->plugin->wp_filesystem->is_file( $convert_file ) ) {
+							error_log( strtoupper( $this->plugin->safe_slug ) . ': WebPExpress class file ' . $convert_file . ' not found!' );
+
+							return $url;
+						}
 					}
 					try {
 						ConverterHelper::runConverterStack( $file, $webp_file );
