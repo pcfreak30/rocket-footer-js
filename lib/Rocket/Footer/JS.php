@@ -536,7 +536,7 @@ class JS extends Plugin {
 				} else {
 					$js_part_cache = $js_part;
 				}
-				$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part_cache );
+				$this->update_cache_fragment( $item_cache_id, $js_part_cache );
 				$this->js .= $js_part;
 			}
 		} else {
@@ -647,6 +647,12 @@ class JS extends Plugin {
 		return $script;
 	}
 
+	private function update_cache_fragment( $cache_id, $data ) {
+		if ( apply_filters( 'rocket_footer_js_save_cache', true ) ) {
+			$this->cache_manager->get_store()->update_cache_fragment( $cache_id, $data );
+		}
+	}
+
 	/**
 	 * @param string $src
 	 *
@@ -701,7 +707,7 @@ class JS extends Plugin {
 				$js_part = trim( $js_part );
 			}
 			$this->js .= $js_part;
-			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part_cache );
+			$this->update_cache_fragment( $item_cache_id, $js_part_cache );
 		} else {
 			$js_part = $item_cache;
 			if ( apply_filters( 'rocket_footer_js_reprocess_local_script', true, $js_part, $src ) ) {
@@ -733,7 +739,7 @@ class JS extends Plugin {
 			// Remove any conditional comments for IE that somehow was put in the script tag
 			$js_part = preg_replace( '/(?:<!--)?\[if[^\]]*?\]>.*?<!\[endif\]-->/is', '', $content );
 			$js_part = $this->minify( $js_part );
-			$this->cache_manager->get_store()->update_cache_fragment( $item_cache_id, $js_part );
+			$this->update_cache_fragment( $item_cache_id, $js_part );
 		} else {
 			$js_part = $item_cache;
 		}
@@ -794,7 +800,7 @@ class JS extends Plugin {
 				'js',
 				'css_and_js',
 			] );
-			$this->cache_manager->get_store()->update_cache_fragment( $this->get_cache_id(), $data );
+			$this->update_cache_fragment( $this->get_cache_id(), $data );
 
 			return $data;
 		}
