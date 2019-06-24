@@ -97,9 +97,14 @@
 				$(el).data('lazyLoadedVideo', true);
 			})
 			var resizeContainer = lazySizes.debounce(lazySizes.rAFIt(function () {
-				var embedContainerClientHeight = embedContainer.children('img').get(0).clientHeight;
+				var embedContainerNode = embedContainer.children('img').get(0);
 				var embedContainerHeight = parseFloat(embedContainer.css('height').replace('px', ''));
-				if (!!embedContainerHeight && !!embedContainerHeight) {
+				if (!!embedContainerNode && !!embedContainerHeight) {
+					resizeContainer();
+					return;
+				}
+				var embedContainerClientHeight = embedContainerNode.clientHeight;
+				if (!!embedContainerClientHeight) {
 					resizeContainer();
 					return;
 				}
