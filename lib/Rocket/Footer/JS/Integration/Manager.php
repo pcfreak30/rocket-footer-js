@@ -45,6 +45,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'RecaptchaInWPCommentsForm',
 		'WebPExpress',
 		'RankMathSEO',
+		'Divi',
 	];
 
 }
