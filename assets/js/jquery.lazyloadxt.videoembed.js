@@ -206,7 +206,6 @@
 								ignore: ['iframe[src*="player.vimeo.com"]', 'iframe[src*="youtube.com"]', 'iframe[src*="youtube-nocookie.com"]', 'iframe[src*="kickstarter.com"][src*="video.html"]', 'object', 'embed']
 							});
 						}
-						divi_video_wrapper.fitVids({ customSelector: '[data-lazy-video-embed-container]' });
 					});
 				}
 			}
