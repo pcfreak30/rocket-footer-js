@@ -169,7 +169,7 @@
 					if (embedContainer.closest('.elementor-fit-aspect-ratio').length) {
 						embedContainer.parent().prepend($icon)
 					}
-					iframe.attr('src', iframe.data('src')).addClass('lazyload').one('load', function () {
+					iframe.attr('src', iframe.data('src')).addClass('lazyload').one('load', lazySizes.rAFIt(function () {
 						$icon.remove();
 						embedContainer.parent().append(embedContainer.children());
 						embedContainer.remove();
@@ -181,7 +181,7 @@
 								$(this).parent().fitVids();
 							}
 						}
-					});
+					}));
 				}
 
 				var fusion_video_wrapper = $video.closest('.fusion-video, .wpb_wrapper');
