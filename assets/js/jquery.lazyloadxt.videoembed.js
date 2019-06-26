@@ -99,12 +99,16 @@
 			var resizeContainer = lazySizes.debounce(lazySizes.rAFIt(function () {
 				var embedContainerNode = embedContainer.children('img').get(0);
 				var embedContainerHeight = parseFloat(embedContainer.css('height').replace('px', ''));
-				if (!!embedContainerNode && !!embedContainerHeight) {
+				if (!embedContainerNode && !embedContainerHeight) {
+					resizeContainer();
+					return;
+				}
+				if (!embedContainerNode) {
 					resizeContainer();
 					return;
 				}
 				var embedContainerClientHeight = embedContainerNode.clientHeight;
-				if (!!embedContainerClientHeight) {
+				if (!embedContainerClientHeight) {
 					resizeContainer();
 					return;
 				}
