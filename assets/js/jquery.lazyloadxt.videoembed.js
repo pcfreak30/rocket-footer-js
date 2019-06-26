@@ -197,6 +197,10 @@
 							var embedContainerHeight = parseFloat(embedContainer.css('height').replace('px', ''));
 							embedContainer.attr('width', embedContainer.css('width').replace('px', ''));
 							embedContainer.attr('height', embedContainerHeight);
+							divi_video_wrapper.fitVids({
+								customSelector: '[data-lazy-video-embed-container]',
+								ignore: ['iframe[src*="player.vimeo.com"]', 'iframe[src*="youtube.com"]', 'iframe[src*="youtube-nocookie.com"]', 'iframe[src*="kickstarter.com"][src*="video.html"]', 'object', 'embed']
+							});
 						}
 						divi_video_wrapper.fitVids({ customSelector: '[data-lazy-video-embed-container]' });
 					});
