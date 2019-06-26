@@ -52,7 +52,7 @@
 				});
 			}
 
-			var divi_video_wrapper = $(el).closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap');
+			var divi_video_wrapper = $(el).closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap').find('.et_pb_video_overlay');
 			if (divi_video_wrapper.length) {
 				lazySizes.rAF(function () {
 					$(el).parent().hide();
