@@ -5,9 +5,6 @@ namespace Rocket\Footer\JS\Integration;
 
 
 use WebPConvert\Convert\ConverterFactory;
-use WebPConvert\Converters\ConverterHelper;
-use WebPConvert\Converters\Exceptions\ConversionDeclinedException;
-use WebPConvert\Converters\Exceptions\ConverterFailedException;
 use WebPConvert\Exceptions\WebPConvertException;
 use WebPExpress\AlterHtmlImageUrls;
 use WebPExpress\Config;
@@ -212,13 +209,13 @@ class WebPExpress extends IntegrationAbstract {
 				$webp_file = preg_replace( "/\.{$ext}$/", '.webp', $file );
 				if ( ! $this->plugin->wp_filesystem->is_file( $webp_file ) ) {
 					$class_found = false;
-					if ( ! class_exists( '\WebPConvert\Converters\ConverterHelper' ) ) {
+					if ( ! class_exists( '\WebPConvert\ConverterHelper' ) ) {
 						$autoload_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/autoload.php';
 						if ( $this->plugin->wp_filesystem->is_file( $autoload_file ) ) {
 							$class_found = true;
 						}
 					}
-					if ( ! class_exists( '\WebPConvert\Converters\ConverterHelper' ) ) {
+					if ( ! class_exists( '\WebPConvert\ConverterHelper' ) ) {
 						$convert_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/rosell-dk/webp-convert/src-build/webp-convert.inc';
 						if ( $this->plugin->wp_filesystem->is_file( $convert_file ) ) {
 							$class_found = true;
