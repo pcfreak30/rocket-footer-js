@@ -25,7 +25,6 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'A3LazyLoad',
 		'MetaSlider',
 		'GoogleMapsWidget',
-		'SmartSlider3',
 		'DiviBuilder',
 		'BNEFlyOut',
 		'WPEXThemeFramework',

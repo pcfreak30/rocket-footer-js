@@ -31,11 +31,31 @@ class NExtend extends IntegrationAbstract {
 		}
 	}
 
+	public function rewrite() {
+		$xpath = new \DOMXPath( $this->plugin->document );
+		/** @var \Rocket\Footer\JS\DOMElement $tag */
+		$attributes = [ 'desktop', 'tablet', 'mobile' ];
+		$attributes = array_merge( $attributes, array_map( function ( $item ) {
+			return "{$item}-retina";
+		}, $attributes ) );
+
+		foreach ( $attributes as $attribute ) {
+			foreach ( $xpath->query( "//div[@data-{$attribute}]" ) as $tag ) {
+				$tag->setAttribute( 'data-desktop', get_rocket_cdn_url( apply_filters( 'rocket_footer_js_webp_process_url', $tag->getAttribute( "data-{$attribute}" ) ), [
+					'all',
+					'images',
+				] ) );
+			}
+		}
+
+	}
+
 	public function check() {
 		if ( class_exists( 'N2SmartsliderApplicationInfo' ) ) {
 			\N2AssetsManager::getInstance();
 			\N2AssetsManager::disableCacheAll();
 			add_filter( 'do_shortcode_tag', [ $this, 'maybe_add_override_js' ], 10, 2 );
+			add_action( 'rocket_footer_js_do_rewrites', [ $this, 'rewrite' ] );
 		}
 	}
 
