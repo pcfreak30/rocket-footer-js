@@ -65,7 +65,9 @@ class WebPExpress extends IntegrationAbstract {
 			add_filter( 'rocket_footer_js_webp_process_url', [ $this, 'maybe_process' ] );
 			add_filter( 'image_get_intermediate_size', [ $this, 'filter_image_get_intermediate_size' ], 999999, 1 );
 			add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_wp_calculate_image_srcset' ], 999999, 1 );
-			$this->enable_srcset_meta_filter();
+			if ( ! is_admin() ) {
+				$this->enable_srcset_meta_filter();
+			}
 			add_filter( 'mime_types', [ $this, 'add_webp_mime' ] );
 
 
