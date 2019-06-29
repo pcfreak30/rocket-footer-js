@@ -51,7 +51,7 @@ class WebPExpress extends IntegrationAbstract {
 			if ( ! defined( 'WEBPEXPRESS_PLUGIN_DIR' ) ) {
 				return;
 			}
-			
+
 			if ( ! $this->plugin->wp_filesystem->is_file( $autoload ) ) {
 				return;
 			}
@@ -65,6 +65,7 @@ class WebPExpress extends IntegrationAbstract {
 			$this->image_replace = new AlterHtmlImageUrls;
 
 			add_filter( 'rocket_footer_js_lazyload_video_thumbnail', [ $this, 'maybe_process' ] );
+			add_filter( 'rocket_footer_js_webp_process_url', [ $this, 'maybe_process' ] );
 			add_filter( 'image_get_intermediate_size', [ $this, 'filter_image_get_intermediate_size' ], 999999, 1 );
 			add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_wp_calculate_image_srcset' ], 999999, 1 );
 			$this->enable_srcset_meta_filter();
@@ -211,19 +212,21 @@ class WebPExpress extends IntegrationAbstract {
 				$webp_file = preg_replace( "/\.{$ext}$/", '.webp', $file );
 				if ( ! $this->plugin->wp_filesystem->is_file( $webp_file ) ) {
 					if ( ! class_exists( '\WebPConvert\Converters\ConverterHelper' ) ) {
-						$convert_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/rosell-dk/webp-convert/src-build/webp-convert.inc';
-						if ( ! $this->plugin->wp_filesystem->is_file( $convert_file ) ) {
-							error_log( strtoupper( $this->plugin->safe_slug ) . ': WebPExpress class file ' . $convert_file . ' not found!' );
+						$autoload_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/autoload.php';
+						if ( ! $this->plugin->wp_filesystem->is_file( $autoload_file ) ) {
+							error_log( sprintf( '%s: WebPExpress autoload file: %s not found!', strtoupper( $this->plugin->safe_slug ), $autoload_file ) );
 
 							return $url;
 						}
 					}
-					/** @var \WebPConvert\Convert\Converters\AbstractConverter $converter */
-					$converter = ConvertersHelper::getFirstWorkingAndActiveConverter( Config::loadConfigAndFix( false ) );
-					$converter = ConverterFactory::makeConverter( $converter['converter'], $file, $webp_file, $converter['options'] );
 					try {
+						/** @var \WebPConvert\Convert\Converters\AbstractConverter $converter */
+						$converter = ConvertersHelper::getFirstWorkingAndActiveConverter( Config::loadConfigAndFix( false ) );
+						$converter = ConverterFactory::makeConverter( $converter['converter'], $file, $webp_file, $converter['options'] );
 						$converter->doConvert();
 					} catch ( WebPConvertException $e ) {
+						error_log( sprintf( '%s: WebPExpress conversion attempt failed: %s', strtoupper( $this->plugin->safe_slug ), $e->getMessage() ) );
+
 						return $url;
 					}
 				}
