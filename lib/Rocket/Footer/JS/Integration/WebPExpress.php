@@ -67,6 +67,10 @@ class WebPExpress extends IntegrationAbstract {
 			add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_wp_calculate_image_srcset' ], 999999, 1 );
 			if ( ! is_admin() ) {
 				$this->enable_srcset_meta_filter();
+				add_filter( 'wp_get_attachment_metadata', [
+					$this,
+					'filter_wp_calculate_image_srcset_meta',
+				], 999999, 1 );
 			}
 			add_filter( 'mime_types', [ $this, 'add_webp_mime' ] );
 
