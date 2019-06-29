@@ -66,10 +66,12 @@ class A3LazyLoad extends IntegrationAbstract {
 		$placeholder_cdn = get_rocket_cdn_url( A3_LAZY_LOAD_IMAGES_URL . '/lazy_placeholder.gif', [ 'images' ], $placeholder );
 
 		$src_string      = ' src="%s"';
+		$data_src_string = ' data-src="%s"';
 		$fake_src_string = ' data-fake-src="%s"';
 
 		$html = str_replace( sprintf( $src_string, $placeholder ), sprintf( $fake_src_string, $placeholder ), $html );
 		$html = str_replace( sprintf( $src_string, $placeholder_cdn ), sprintf( $fake_src_string, $placeholder_cdn ), $html );
+		$html = str_replace( sprintf( $data_src_string, $placeholder_cdn ), sprintf( $fake_src_string, $placeholder_cdn ), $html );
 
 		return $html;
 	}
