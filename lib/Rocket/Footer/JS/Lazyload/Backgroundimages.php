@@ -7,9 +7,9 @@ namespace Rocket\Footer\JS\Lazyload;
 class Backgroundimages extends LazyloadAbstract {
 
 	/**
-	 * @param string  $content
+	 * @param string $content
 	 *
-	 * @param  string $src
+	 * @param string $src
 	 *
 	 * @return void
 	 */
@@ -37,6 +37,8 @@ class Backgroundimages extends LazyloadAbstract {
 				if ( empty( $match ) ) {
 					continue;
 				}
+
+				$match = apply_filters( 'rocket_footer_js_webp_process_url', $match );
 				$match = get_rocket_cdn_url( $match );
 				$style = str_replace( $matches[0][0], 'none', $tag->getAttribute( 'style' ) );
 				$tag->setAttribute( 'style', $style );
