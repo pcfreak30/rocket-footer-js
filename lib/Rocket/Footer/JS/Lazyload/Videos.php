@@ -248,7 +248,14 @@ class Videos extends LazyloadAbstract {
 			return;
 		}
 
+
 		$file = trailingslashit( $path ) . $info['basename'];
+
+		$file_info = wp_check_filetype( $file );
+		$filetype  = null;
+		if ( $file_info ) {
+			$filetype = $file_info['type'];
+		}
 
 		list( $width, $height ) = getimagesize( $file );
 
@@ -274,7 +281,7 @@ class Videos extends LazyloadAbstract {
 		do_action( 'rocket_footer_js_lazyload_video_before_calculate_srcset' );
 
 		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
-			'sizes'  => $image_sizes,
+			'sizes'  => array_merge( $image_sizes, [ 'thumbnail' => [ 'mime-type' => $file_info ] ] ),
 			'file'   => $info['basename'],
 			'width'  => $width,
 			'height' => $height,
@@ -295,14 +302,13 @@ class Videos extends LazyloadAbstract {
 
 		$editor->multi_resize( $missing_image_sizes );
 
-		$file = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $file ) ) );
-		$file = str_replace( site_url( '/' ), ABSPATH, $file );
-
+		$file              = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $file ) ) );
+		$file              = str_replace( site_url( '/' ), ABSPATH, $file );
 		$this->srcset_attr = wp_calculate_image_srcset( [
 			$width,
 			$height,
 		], $file, [
-			'sizes'  => $image_sizes,
+			'sizes'  => array_merge( $image_sizes, [ 'thumbnail' => [ 'mime-type' => $filetype ] ] ),
 			'file'   => $info['basename'],
 			'width'  => $width,
 			'height' => $height,
