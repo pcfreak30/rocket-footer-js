@@ -211,14 +211,26 @@ class WebPExpress extends IntegrationAbstract {
 				$ext       = pathinfo( $url_parts['path'], PATHINFO_EXTENSION );
 				$webp_file = preg_replace( "/\.{$ext}$/", '.webp', $file );
 				if ( ! $this->plugin->wp_filesystem->is_file( $webp_file ) ) {
+					$class_found = false;
 					if ( ! class_exists( '\WebPConvert\Converters\ConverterHelper' ) ) {
 						$autoload_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/autoload.php';
-						if ( ! $this->plugin->wp_filesystem->is_file( $autoload_file ) ) {
-							error_log( sprintf( '%s: WebPExpress autoload file: %s not found!', strtoupper( $this->plugin->safe_slug ), $autoload_file ) );
-
-							return $url;
+						if ( $this->plugin->wp_filesystem->is_file( $autoload_file ) ) {
+							$class_found = true;
 						}
 					}
+					if ( ! class_exists( '\WebPConvert\Converters\ConverterHelper' ) ) {
+						$convert_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/rosell-dk/webp-convert/src-build/webp-convert.inc';
+						if ( $this->plugin->wp_filesystem->is_file( $convert_file ) ) {
+							$class_found = true;
+						}
+					}
+
+					if ( ! $class_found ) {
+						error_log( sprintf( '%s: WebPExpress classes not found!', strtoupper( $this->plugin->safe_slug ) ) );
+
+						return $url;
+					}
+
 					try {
 						/** @var \WebPConvert\Convert\Converters\AbstractConverter $converter */
 						$converter = ConvertersHelper::getFirstWorkingAndActiveConverter( Config::loadConfigAndFix( false ) );
