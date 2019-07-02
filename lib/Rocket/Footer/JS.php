@@ -369,6 +369,11 @@ class JS extends Plugin {
 	 *
 	 */
 	protected function fetch_cache() {
+		if ( ! apply_filters( 'rocket_footer_js_save_cache', true ) ) {
+			$this->cache = false;
+
+			return;
+		}
 		$this->cache = $this->cache_manager->get_store()->get_cache_fragment( $this->get_cache_id() );
 
 		// Cached file is gone, we dont have cache
