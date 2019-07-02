@@ -374,12 +374,20 @@ class JS extends Plugin {
 
 			return;
 		}
-		$this->cache = $this->cache_manager->get_store()->get_cache_fragment( $this->get_cache_id() );
+		$this->cache = $this->get_cache_fragment( $this->get_cache_id() );
 
 		// Cached file is gone, we dont have cache
 		if ( ! empty( $this->cache ) && ! file_exists( $this->cache  ['filename'] ) ) {
 			$this->cache = false;
 		}
+	}
+
+	private function get_cache_fragment( $cache_id ) {
+		if ( apply_filters( 'rocket_footer_js_save_cache', true ) ) {
+			return $this->cache_manager->get_store()->get_cache_fragment( $cache_id );
+		}
+
+		return false;
 	}
 
 	/**
@@ -527,7 +535,7 @@ class JS extends Plugin {
 	protected function process_remote_script( $src ) {
 		// Check item cache
 		$item_cache_id = [ md5( $src ) ];
-		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
+		$item_cache    = $this->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
 			$file = $this->remote_fetch( $src );
@@ -692,7 +700,7 @@ class JS extends Plugin {
 
 		// Check item cache
 		$item_cache_id = [ md5( $url ) ];
-		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
+		$item_cache    = $this->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
 			$file          = $this->get_content( str_replace( $this->home, ABSPATH, $url ) );
@@ -738,7 +746,7 @@ class JS extends Plugin {
 		// Check item cache
 		$content       = $this->util->maybe_decode_script( $this->dom_collection->current()->textContent );
 		$item_cache_id = [ md5( $content ) ];
-		$item_cache    = $this->cache_manager->get_store()->get_cache_fragment( $item_cache_id );
+		$item_cache    = $this->get_cache_fragment( $item_cache_id );
 		// Only run if there is no item cache
 		if ( empty( $item_cache ) ) {
 			// Remove any conditional comments for IE that somehow was put in the script tag
