@@ -55,7 +55,7 @@
 			var divi_video_wrapper = $(el).closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap').find('.et_pb_video_overlay');
 			if (divi_video_wrapper.length) {
 				lazySizes.rAF(function () {
-					$(el).parent().hide();
+					$(el).siblings('.play').hide();
 				});
 			}
 
@@ -161,7 +161,7 @@
 				if (embedContainer.length) {
 					embedContainer.show();
 					embedContainer.append($video).addClass('loading-container');
-					var $icon = embedContainer.find('.play');
+					var $icon = embedContainer.find('.play').show();
 					$icon.removeClass('play').addClass('loading');
 					var div = $('<div />');
 					$icon.append(div, div.clone(), div.clone(), div.clone());
