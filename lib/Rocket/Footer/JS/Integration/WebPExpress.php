@@ -71,6 +71,7 @@ class WebPExpress extends IntegrationAbstract {
 					$this,
 					'filter_wp_calculate_image_srcset_meta',
 				], 999999, 1 );
+				add_action( 'shutdown', [ $this, 'shutdown_hook_uploads' ], 0 );
 			}
 			add_filter( 'mime_types', [ $this, 'add_webp_mime' ] );
 
@@ -89,6 +90,10 @@ class WebPExpress extends IntegrationAbstract {
 			$this,
 			'filter_wp_calculate_image_srcset_meta',
 		], 999999, 1 );
+	}
+
+	public function shutdown_hook_uploads() {
+		add_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
 	}
 
 	public function filter_image_get_intermediate_size( $image ) {
@@ -207,6 +212,7 @@ class WebPExpress extends IntegrationAbstract {
 	public function maybe_process( $url ) {
 
 		if ( ( $this->conditional && false !== strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) ) || ! $this->conditional ) {
+			add_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
 			$new_url = $this->image_replace->replaceUrl( $url );
 			if ( $new_url ) {
 				$url_parts = parse_url( $url );
@@ -215,7 +221,7 @@ class WebPExpress extends IntegrationAbstract {
 				$webp_file = preg_replace( "/\.{$ext}$/", '.webp', $file );
 				if ( ! $this->plugin->wp_filesystem->is_file( $webp_file ) ) {
 					$class_found = false;
-					if ( ! class_exists( '\WebPConvert\ConverterHelper' ) ) {
+					if ( ! class_exists( '\WebPExpress\ConvertersHelper' ) ) {
 						$autoload_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/autoload.php';
 
 						if ( $this->plugin->wp_filesystem->is_file( $autoload_file ) ) {
@@ -223,7 +229,7 @@ class WebPExpress extends IntegrationAbstract {
 							require_once $autoload_file;
 						}
 					}
-					if ( ! class_exists( '\WebPConvert\ConverterHelper' ) ) {
+					if ( ! class_exists( '\WebPExpress\ConvertersHelper' ) ) {
 						$convert_file = WEBPEXPRESS_PLUGIN_DIR . '/vendor/rosell-dk/webp-convert/src-build/webp-convert.inc';
 						if ( $this->plugin->wp_filesystem->is_file( $convert_file ) ) {
 							$class_found = true;
@@ -231,26 +237,59 @@ class WebPExpress extends IntegrationAbstract {
 						}
 					}
 
+					if ( class_exists( '\WebPExpress\ConvertersHelper' ) ) {
+						$class_found = true;
+					}
+
 					if ( ! $class_found ) {
 						error_log( sprintf( '%s: WebPExpress classes not found!', strtoupper( $this->plugin->safe_slug ) ) );
+						remove_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
 
 						return $url;
 					}
 
 					try {
 						/** @var \WebPConvert\Convert\Converters\AbstractConverter $converter */
-						$converter = ConvertersHelper::getFirstWorkingAndActiveConverter( Config::loadConfigAndFix( false ) );
+						$converters = ConvertersHelper::getWorkingAndActiveConverters( Config::loadConfigAndFix( false ) );
+
+						if ( ! is_array( $converters ) ) {
+							remove_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
+							error_log( sprintf( '%s: WebPExpress has no converters setup', strtoupper( $this->plugin->safe_slug ) ) );
+
+							return $url;
+						}
+
+						$converters = array_filter( $converters, function ( $item ) {
+							if ( isset( $item['deactivated'] ) && $item['deactivated'] ) {
+								return false;
+							}
+							if ( isset( $item['working'] ) && ! $item['working'] ) {
+								return false;
+							}
+
+							return 'gd' !== $item['converter'];
+						} );
+
+						if ( 0 === count( $converters ) ) {
+							remove_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
+							error_log( sprintf( '%s: WebPExpress has no supported converters setup', strtoupper( $this->plugin->safe_slug ) ) );
+
+							return $url;
+						}
+						$converter = $converters[0];
+
 						$converter = ConverterFactory::makeConverter( $converter['converter'], $file, $webp_file, $converter['options'] );
 						$converter->doConvert();
 					} catch ( WebPConvertException $e ) {
 						error_log( sprintf( '%s: WebPExpress conversion attempt failed: %s', strtoupper( $this->plugin->safe_slug ), $e->getMessage() ) );
+						remove_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
 
 						return $url;
 					}
 				}
 				$url = preg_replace( "/\.{$ext}$/", '.webp', $url );
 			}
-
+			remove_filter( 'upload_dir', [ $this, 'override_upload_dir' ] );
 		}
 
 		return $url;
@@ -267,5 +306,16 @@ class WebPExpress extends IntegrationAbstract {
 		$mimes['webp'] = 'image/webp';
 
 		return $mimes;
+	}
+
+	public function override_upload_dir( $upload ) {
+		if ( false === strpos( $upload['subdir'], $this->plugin->cache_path ) ) {
+			foreach ( [ 'path', 'url', 'basedir', 'baseurl' ] as $key ) {
+				$upload[ $key ] = str_replace( $upload['subdir'], '', $upload[ $key ] );
+				$upload[ $key ] = trailingslashit( dirname( $upload[ $key ] ) );
+			}
+		}
+
+		return $upload;
 	}
 }
