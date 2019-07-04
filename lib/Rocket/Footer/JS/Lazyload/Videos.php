@@ -242,6 +242,8 @@ class Videos extends LazyloadAbstract {
 		$path = trailingslashit( $this->plugin->get_cache_path() );
 		$info = pathinfo( parse_url( $thumbnail_url, PHP_URL_PATH ) );
 
+		do_action( 'rocket_footer_js_lazyload_video_before_maybe_generate_thumbnails' );
+
 		$editor = wp_get_image_editor( $path . $info['basename'] );
 
 		if ( is_wp_error( $editor ) ) {

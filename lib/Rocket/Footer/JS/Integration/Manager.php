@@ -45,6 +45,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'WebPExpress',
 		'RankMathSEO',
 		'Divi',
+		'Ewww',
 	];
 
 }
