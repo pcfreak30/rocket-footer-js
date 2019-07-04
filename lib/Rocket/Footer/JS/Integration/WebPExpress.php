@@ -65,6 +65,10 @@ class WebPExpress extends IntegrationAbstract {
 			add_filter( 'rocket_footer_js_webp_process_url', [ $this, 'maybe_process' ] );
 			add_filter( 'image_get_intermediate_size', [ $this, 'filter_image_get_intermediate_size' ], 999999, 1 );
 			add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_wp_calculate_image_srcset' ], 999999, 1 );
+			add_action( 'rocket_footer_js_lazyload_video_before_maybe_generate_thumbnails', [
+				$this,
+				'disable_intermediate_size',
+			] );
 			if ( ! is_admin() ) {
 				$this->enable_srcset_meta_filter();
 				add_filter( 'wp_get_attachment_metadata', [
@@ -90,6 +94,13 @@ class WebPExpress extends IntegrationAbstract {
 			$this,
 			'filter_wp_calculate_image_srcset_meta',
 		], 999999, 1 );
+	}
+
+	public function disable_intermediate_size() {
+		remove_filter( 'image_make_intermediate_size', array(
+			'\WebPExpress\HandleUploadHooks',
+			'handleMakeIntermediateSize',
+		) );
 	}
 
 	public function shutdown_hook_uploads() {
