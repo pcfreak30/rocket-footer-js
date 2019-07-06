@@ -198,9 +198,14 @@
 					lazySizes.rAF(function () {
 						divi_video_wrapper.show();
 						if ($.fn.fitVids) {
-							var embedContainerHeight = parseFloat(embedContainer.css('height').replace('px', ''));
-							embedContainer.attr('width', embedContainer.css('width').replace('px', ''));
-							embedContainer.attr('height', embedContainerHeight);
+							var embedContainerHeight = embedContainer.css('height');
+							if (embedContainerHeight) {
+								embedContainer.attr('height', parseFloat(embedContainerHeight.replace('px', '')));
+							}
+							var embedContainerWidth = embedContainer.css('width');
+							if (embedContainerWidth) {
+								embedContainer.attr('width', parseFloat(embedContainerWidth.replace('px', '')));
+							}
 							divi_video_wrapper.fitVids({
 								customSelector: '[data-lazy-video-embed-container]',
 								ignore: ['iframe[src*="player.vimeo.com"]', 'iframe[src*="youtube.com"]', 'iframe[src*="youtube-nocookie.com"]', 'iframe[src*="kickstarter.com"][src*="video.html"]', 'object', 'embed']
