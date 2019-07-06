@@ -80,7 +80,7 @@ class WebPExpress extends IntegrationAbstract {
 			add_filter( 'mime_types', [ $this, 'add_webp_mime' ] );
 
 
-			if ( false !== strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) ) {
+			if ( isset( $_SERVER['HTTP_ACCEPT'] ) && false !== strpos( $_SERVER['HTTP_ACCEPT'], 'image/webp' ) ) {
 				add_filter( 'rocket_footer_js_get_cache_id', [ $this, 'modify_cache_key' ] );
 			}
 		}
