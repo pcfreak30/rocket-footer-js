@@ -38,6 +38,19 @@ class Request extends Component {
 		remove_filter( 'rocket_buffer', 'rocket_insert_deferred_js', 11 );
 		remove_filter( 'rocket_buffer', 'rocket_defer_js', 14 );
 		add_action( 'save_post', 'rocket_clean_post' );
+		add_action( 'shutdown', [ $this, 'maybe_ajax_spoof' ], - 1 );
+
+	}
+
+	public function maybe_ajax_spoof() {
+		if ( did_action( 'after_rocket_clean_post' ) || did_action( 'after_rocket_clean_term' ) ) {
+			add_filter( 'wp_doing_ajax', '__return_false' );
+			add_action( 'shutdown', [ $this, 'remove_ajax_spoof' ], 1 );
+		}
+	}
+
+	public function remove_ajax_spoof() {
+		add_filter( 'wp_doing_ajax', '__return_false' );
 	}
 
 	public function init_action() {
