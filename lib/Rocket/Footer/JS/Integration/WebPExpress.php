@@ -168,32 +168,38 @@ class WebPExpress extends IntegrationAbstract {
 		if ( $dirname ) {
 			$dirname = trailingslashit( $dirname );
 		}
-		$image_meta['file'] = str_replace( $dirname, '', $image_meta['file'] );
-		$image_baseurl      = $baseurl . $dirname;
-		$url                = $this->process_url( $image_baseurl . $image_meta['file'] );
-		$dir                = $dirname;
-		$image_meta['file'] = str_replace( $baseurl, '', $url );
+		if ( isset( $image_meta['file'] ) ) {
+			$image_meta['file'] = str_replace( $dirname, '', $image_meta['file'] );
+		}
+		$image_baseurl = $baseurl . $dirname;
+		$url           = $this->process_url( $image_baseurl . $image_meta['file'] );
+		$dir           = $dirname;
+		if ( isset( $image_meta['file'] ) ) {
+			$image_meta['file'] = str_replace( $baseurl, '', $url );
+		}
 
 
-		foreach ( $image_meta['sizes'] as $key => $image_size ) {
-			$dirname = _wp_get_attachment_relative_path( $image_size['file'] );
+		if ( isset( $image_meta['sizes'] ) ) {
+			foreach ( $image_meta['sizes'] as $key => $image_size ) {
+				$dirname = _wp_get_attachment_relative_path( $image_size['file'] );
 
-			if ( $dirname ) {
-				$dirname = trailingslashit( $dirname );
+				if ( $dirname ) {
+					$dirname = trailingslashit( $dirname );
+				}
+
+				if ( empty( $dirname ) ) {
+					$dirname = $dir;
+				}
+
+				$image_baseurl = $baseurl . $dirname;
+				$url           = $image_baseurl . $image_size['file'];
+				$new_url       = $this->process_url( $url );
+				if ( $new_url === $url ) {
+					continue;
+				}
+				$image_meta['sizes'][ $key ]['mime-type'] = 'image/webp';
+				$image_meta['sizes'][ $key ]['file']      = str_replace( $image_baseurl, '', $new_url );
 			}
-
-			if ( empty( $dirname ) ) {
-				$dirname = $dir;
-			}
-
-			$image_baseurl = $baseurl . $dirname;
-			$url           = $image_baseurl . $image_size['file'];
-			$new_url       = $this->process_url( $url );
-			if ( $new_url === $url ) {
-				continue;
-			}
-			$image_meta['sizes'][ $key ]['mime-type'] = 'image/webp';
-			$image_meta['sizes'][ $key ]['file']      = str_replace( $image_baseurl, '', $new_url );
 		}
 
 		return $image_meta;
