@@ -37,6 +37,7 @@ class Request extends Component {
 		add_filter( 'rocket_htaccess_web_fonts_access', [ $this, 'add_js_to_htaccess_cors' ] );
 		remove_filter( 'rocket_buffer', 'rocket_insert_deferred_js', 11 );
 		remove_filter( 'rocket_buffer', 'rocket_defer_js', 14 );
+		add_action( 'save_post', 'rocket_clean_post' );
 	}
 
 	public function init_action() {
