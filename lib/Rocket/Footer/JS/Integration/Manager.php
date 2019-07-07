@@ -46,6 +46,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'RankMathSEO',
 		'Divi',
 		'Ewww',
+		'EssentialAddonsElementor',
 	];
 
 }
