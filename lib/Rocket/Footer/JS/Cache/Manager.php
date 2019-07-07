@@ -2,8 +2,8 @@
 
 namespace Rocket\Footer\JS\Cache;
 
-use pcfreak30\WordPress\Cache\Store;
 use ComposePress\Core\Abstracts\Component;
+use pcfreak30\WordPress\Cache\Store;
 use Rocket\Footer\JS;
 
 
@@ -26,13 +26,6 @@ class Manager extends Component {
 	 */
 	public function __construct( Store $store ) {
 		$this->store = $store;
-	}
-
-	/**
-	 * @return \pcfreak30\WordPress\Cache\Store
-	 */
-	public function get_store() {
-		return $this->store;
 	}
 
 	public function init() {
@@ -77,5 +70,18 @@ class Manager extends Component {
 	public function purge_url( $url ) {
 		$url = md5( $url );
 		$this->store->delete_cache_branch( [ 'cache', "url_{$url}" ] );
+	}
+
+	public function clear_minify_url( $url ) {
+		$key = [ md5( $url ) ];
+
+		return $this->get_store()->delete_cache_branch( $key );
+	}
+
+	/**
+	 * @return \pcfreak30\WordPress\Cache\Store
+	 */
+	public function get_store() {
+		return $this->store;
 	}
 }
