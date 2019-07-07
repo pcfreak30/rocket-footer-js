@@ -171,7 +171,7 @@ class Videos extends LazyloadAbstract {
 	private function maybe_translate_url( $url ) {
 		$url = set_url_scheme( $url );
 		$url = parse_url( $url );
-		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
+		if ( isset( $url['host'] ) && ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) ) {
 			if ( false !== strpos( $url['path'], 'embed' ) ) {
 				$video_id = pathinfo( $url['path'], PATHINFO_FILENAME );
 
