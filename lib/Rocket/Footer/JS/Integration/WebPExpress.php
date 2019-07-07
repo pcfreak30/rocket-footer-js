@@ -162,22 +162,20 @@ class WebPExpress extends IntegrationAbstract {
 	}
 
 	public function filter_wp_calculate_image_srcset_meta( $image_meta ) {
+		if ( ! isset( $image_meta['file'] ) ) {
+			return $image_meta;
+		}
 		$upload_dir = wp_get_upload_dir();
 		$baseurl    = trailingslashit( $upload_dir['baseurl'] );
 		$dirname    = _wp_get_attachment_relative_path( $image_meta['file'] );
 		if ( $dirname ) {
 			$dirname = trailingslashit( $dirname );
 		}
-		if ( isset( $image_meta['file'] ) ) {
-			$image_meta['file'] = str_replace( $dirname, '', $image_meta['file'] );
-		}
-		$image_baseurl = $baseurl . $dirname;
-		$url           = $this->process_url( $image_baseurl . $image_meta['file'] );
-		$dir           = $dirname;
-		if ( isset( $image_meta['file'] ) ) {
-			$image_meta['file'] = str_replace( $baseurl, '', $url );
-		}
-
+		$image_meta['file'] = str_replace( $dirname, '', $image_meta['file'] );
+		$image_baseurl      = $baseurl . $dirname;
+		$url                = $this->process_url( $image_baseurl . $image_meta['file'] );
+		$dir                = $dirname;
+		$image_meta['file'] = str_replace( $baseurl, '', $url );
 
 		if ( isset( $image_meta['sizes'] ) ) {
 			foreach ( $image_meta['sizes'] as $key => $image_size ) {
