@@ -63,6 +63,7 @@ class WebPExpress extends IntegrationAbstract {
 
 			add_filter( 'rocket_footer_js_lazyload_video_thumbnail', [ $this, 'maybe_process' ] );
 			add_filter( 'rocket_footer_js_webp_process_url', [ $this, 'maybe_process' ] );
+			add_action( 'rocket_footer_js_webp_clear_minify_file_cache', [ $this, 'clear_minify_file_cache' ] );
 			add_filter( 'image_get_intermediate_size', [ $this, 'filter_image_get_intermediate_size' ], 999999, 1 );
 			add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_wp_calculate_image_srcset' ], 999999, 1 );
 			add_action( 'rocket_footer_js_lazyload_video_before_maybe_generate_thumbnails', [
@@ -94,6 +95,27 @@ class WebPExpress extends IntegrationAbstract {
 			$this,
 			'filter_wp_calculate_image_srcset_meta',
 		], 999999, 1 );
+	}
+
+	public function clear_minify_file_cache( $url ) {
+		$key = [ md5( $url ) ];
+		$key = $this->modify_cache_key( $key );
+		$this->plugin->cache_manager->get_store()->delete_cache_branch( $key );
+	}
+
+	/**
+	 * @param $key
+	 *
+	 * @return array
+	 */
+	public function modify_cache_key( $key ) {
+		if ( 2 === count( $key ) ) {
+			$key[] = 'webp';
+		} else {
+			array_splice( $key, count( $key ) - 2, 0, [ 'webp' ] );
+		}
+
+		return $key;
 	}
 
 	public function disable_intermediate_size() {
@@ -201,21 +223,6 @@ class WebPExpress extends IntegrationAbstract {
 		}
 
 		return $image_meta;
-	}
-
-	/**
-	 * @param $key
-	 *
-	 * @return array
-	 */
-	public function modify_cache_key( $key ) {
-		if ( 2 === count( $key ) ) {
-			$key[] = 'webp';
-		} else {
-			array_splice( $key, count( $key ) - 2, 0, [ 'webp' ] );
-		}
-
-		return $key;
 	}
 
 	/**
