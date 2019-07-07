@@ -287,7 +287,13 @@ class Videos extends LazyloadAbstract {
 		do_action( 'rocket_footer_js_lazyload_video_before_calculate_srcset' );
 
 		$this->srcset_attr = wp_calculate_image_srcset( [ $width, $height ], $file, [
-			'sizes'  => array_merge( $image_sizes, [ 'thumbnail' => [ 'mime-type' => $file_info ] ] ),
+			'sizes'  => array_merge( $image_sizes, [
+				'thumbnail' => [
+					'width'     => $width,
+					'height'    => $height,
+					'mime-type' => $file_info,
+				],
+			] ),
 			'file'   => $info['basename'],
 			'width'  => $width,
 			'height' => $height,
@@ -314,7 +320,13 @@ class Videos extends LazyloadAbstract {
 			$width,
 			$height,
 		], $file, [
-			'sizes'  => array_merge( $image_sizes, [ 'thumbnail' => [ 'mime-type' => $filetype ] ] ),
+			'sizes'  => array_merge( $image_sizes, [
+				'thumbnail' => [
+					'width'     => $width,
+					'height'    => $height,
+					'mime-type' => $file_info,
+				],
+			] ),
 			'file'   => $info['basename'],
 			'width'  => $width,
 			'height' => $height,
