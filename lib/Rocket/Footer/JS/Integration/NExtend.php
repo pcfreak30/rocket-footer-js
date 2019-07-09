@@ -61,7 +61,7 @@ class NExtend extends IntegrationAbstract {
 
 	public function maybe_add_override_js( $output, $tag ) {
 		if ( in_array( $tag, [ 'smartslider3', 'fusion_smartslider3' ] ) && ! $this->override_added ) {
-			\N2JS::addCode( '(function(){var original=N2Classes.SmartSliderAbstract.prototype.constructor;N2Classes.SmartSliderAbstract.prototype.constructor=function(){var that = this;var args=[].slice.call(arguments);jQuery(window).load(function(){original.apply(that,args)})}})();', 'smartslider-frontend-override' );
+			\N2JS::addCode( '(function(){var original=N2Classes.SmartSliderAbstract.prototype.constructor;N2Classes.SmartSliderAbstract.prototype.constructor=function(){var that=this;var args=[].slice.call(arguments);if("complete"===document.readyState)return original.apply(that,args);jQuery(window).load(function(){original.apply(that,args)})}})();', 'smartslider-frontend-override' );
 			$this->override_added = true;
 		}
 
