@@ -193,7 +193,8 @@
 					}
 				}
 
-				var divi_video_wrapper = $video.closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap').find('.et_pb_video_overlay');
+				var divi_video_box = $video.closest('.et_pb_video, .et_main_video_container, .et_pb_video_wrap')
+				var divi_video_wrapper = divi_video_box.find('.et_pb_video_overlay');
 				if (!divi_video_wrapper.length) {
 					lazySizes.rAF(function () {
 						divi_video_wrapper.show();
@@ -206,7 +207,7 @@
 							if (embedContainerWidth) {
 								embedContainer.attr('width', parseFloat(embedContainerWidth.replace('px', '')));
 							}
-							divi_video_wrapper.fitVids({
+							divi_video_box.fitVids({
 								customSelector: '[data-lazy-video-embed-container]',
 								ignore: ['iframe[src*="player.vimeo.com"]', 'iframe[src*="youtube.com"]', 'iframe[src*="youtube-nocookie.com"]', 'iframe[src*="kickstarter.com"][src*="video.html"]', 'object', 'embed']
 							});
