@@ -141,6 +141,13 @@ class Videos extends LazyloadAbstract {
 					unset( $classes[ array_search( $classes, end( $linked ) ) ] );
 				}
 
+				if ( isset( $info->width ) ) {
+					$img->setAttribute( 'data-lazy-video-width', $info->width );
+				}
+				if ( isset( $info->height ) ) {
+					$img->setAttribute( 'data-lazy-video-height', $info->height );
+				}
+
 				$tag->parentNode->insertBefore( $img, $tag );
 				$this->lazyload_script( $this->get_tag_content( $tag ), "lazyload-video-{$this->instance}", $tag );
 				$tags->flag_removed();
