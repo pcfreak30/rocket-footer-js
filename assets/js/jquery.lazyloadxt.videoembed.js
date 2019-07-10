@@ -140,6 +140,8 @@
 		}
 
 		var videoType = $this.data('lazyVideoEmbedType');
+		var videoWidth = $this.data('lazyVideoWidth');
+		var videoHeight = $this.data('lazyVideoHeight');
 
 		if ($target.length) {
 			match = reComment.exec($target.html());
@@ -178,6 +180,9 @@
 							fluid_wrapper.parent().append(this);
 							fluid_wrapper.remove();
 							if ($.fn.fitVids) {
+								if (videoWidth && videoHeight) {
+									iframe.attr({ width: videoWidth, height: videoHeight });
+								}
 								$(this).parent().fitVids();
 							}
 						}
