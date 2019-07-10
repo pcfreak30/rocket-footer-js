@@ -50,6 +50,7 @@ class Elementor extends IntegrationAbstract {
 		add_action( 'elementor/widget/render_content', [ $this, 'lazyload' ] );
 		add_action( 'elementor/element/before_section_end', [ $this, 'add_lazyload_control' ], 10, 2 );
 		add_action( 'a3_lazy_load_skip_images_classes', [ $this, 'a3_skip_classes' ], 10, 2 );
+		add_action( 'rocket_async_css_lazy_load_responsive_image', [ $this, 'maybe_lazyload_image' ], 10, 2 );
 	}
 
 	public function a3_skip_classes( $classes ) {
@@ -65,6 +66,15 @@ class Elementor extends IntegrationAbstract {
 		}
 
 		return $classes;
+	}
+
+	public function maybe_lazyload_image( $value, $classes ) {
+		$classes = array_map( 'trim', explode( ' ', $classes ) );
+		if ( 0 < count( array_intersect( $this->no_lazyload_classes, $classes ) ) ) {
+			$value = false;
+		}
+
+		return $value;
 	}
 
 	/**
