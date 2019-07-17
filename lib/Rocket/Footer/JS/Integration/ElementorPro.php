@@ -24,7 +24,7 @@ class ElementorPro extends IntegrationAbstract {
 
 	public
 	function elementor_scripts() {
-		wp_add_inline_script( 'elementor-frontend', '(function(a){a(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/posts.cards",function(a,b){a(window).trigger("resize")},11)})})(jQuery);' );
+		wp_add_inline_script( 'elementor-frontend', '(function(a){a(window).on("elementor/frontend/init",function(){elementorFrontend.hooks.addAction("frontend/element_ready/posts.cards",function(a,b){b(window).trigger("resize")},11)})})(jQuery);' );
 		wp_add_inline_script( 'elementor-frontend', '(function(a) {
     a(window).on("elementor/frontend/init", function() {
         elementorFrontend.hooks.addAction("frontend/element_ready/slides.default", function(a, b) {
