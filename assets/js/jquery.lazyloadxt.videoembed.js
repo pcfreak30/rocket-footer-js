@@ -38,10 +38,6 @@
 				if (height) {
 					image.parent().attr('height', height);
 				}
-
-				$(el).siblings('.play').click(function () {
-					image.click();
-				})
 			}
 			// Force VC Composer Video element to have no padding and back up padding data
 			var vc_video_wrapper = $(el).closest('.wpb_video_wrapper');
@@ -118,6 +114,10 @@
 				}
 			}, true));
 		}
+	});
+
+	$(document).on('click', '[' + widgetAttr + '] + .play', function () {
+		$(this).siblings('[' + widgetAttr + ']').click();
 	});
 
 	// Avada/Fusion privacy box compatibility
