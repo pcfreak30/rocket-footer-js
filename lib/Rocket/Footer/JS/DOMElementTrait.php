@@ -73,4 +73,13 @@ trait DOMElementTrait {
 			$this->lazyLoad();
 		}
 	}
+
+	public function removeClass( $class ) {
+		$classes = explode( ' ', $this->getAttribute( 'class' ) );
+		$index   = array_search( $class, $classes );
+		if ( $index ) {
+			unset( $classes[ $index ] );
+		}
+		$this->setAttribute( 'class', implode( ' ', $classes ) );
+	}
 }
