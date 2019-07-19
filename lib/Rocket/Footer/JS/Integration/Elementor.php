@@ -26,6 +26,7 @@ class Elementor extends IntegrationAbstract {
 		'image',
 		'image-box',
 		'image-carousel',
+		'video',
 	];
 	private $no_lazyload_classes = [ 'no-lazyload' ];
 
@@ -47,7 +48,7 @@ class Elementor extends IntegrationAbstract {
 		add_action( 'elementor/frontend/before_render', [ $this, 'lazyload_attributes' ] );
 		add_action( 'elementor/frontend/widget/after_render', [ $this, 'maybe_remove_lazyload_filter' ] );
 		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'enqueue_styles' ] );
-		add_action( 'elementor/widget/render_content', [ $this, 'lazyload' ] );
+		add_action( 'elementor/widget/render_content', [ $this, 'lazyload' ], 10, 2 );
 		add_action( 'elementor/element/before_section_end', [ $this, 'add_lazyload_control' ], 10, 2 );
 		add_action( 'a3_lazy_load_skip_images_classes', [ $this, 'a3_skip_classes' ], 10, 2 );
 		add_action( 'rocket_async_css_lazy_load_responsive_image', [ $this, 'maybe_lazyload_image' ], 10, 2 );
@@ -113,15 +114,29 @@ class Elementor extends IntegrationAbstract {
 			}
 		}
 
-		if ( $lazyload && isset( $settings['background_lazyload'] ) && 'yes' === $settings['background_lazyload'] ) {
+		$lazyload_setting = isset( $settings['lazyload'] ) && 'yes' === $settings['lazyload'];
+
+		$background_lazyload = $lazyload && isset( $settings['background_lazyload'] ) && 'yes' === $settings['background_lazyload'];
+
+		if ( $background_lazyload ) {
 			$element->add_render_attribute( '_wrapper', 'data-lazyload-bg', 1 );
 			$element->add_render_attribute( '_wrapper', 'class', 'lazyload' );
 		}
+		if ( $lazyload_setting && 'video' === $element->get_name() ) {
+			$element->add_render_attribute( 'image-overlay', 'data-lazyload-bg', 1 );
+			$element->add_render_attribute( 'image-overlay', 'class', 'lazyload' );
+		}
 
-		if ( ! ( isset( $settings['lazyload'] ) && 'yes' === $settings['lazyload'] ) && in_array( $element->get_name(), apply_filters( 'rocket_footer_js_elementor_lazyload_widgets', $this->default_element_lazyload_widgets ) ) ) {
-			$this->lazy_load_widget_off = true;
-			add_filter( 'a3_lazy_load_run_filter', '__return_false' );
-			add_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
+		if ( in_array( $element->get_name(), apply_filters( 'rocket_footer_js_elementor_lazyload_widgets', $this->default_element_lazyload_widgets ) ) ) {
+			if ( ! $lazyload_setting ) {
+				$this->lazy_load_widget_off = true;
+				add_filter( 'a3_lazy_load_run_filter', '__return_false' );
+				add_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
+			} else {
+				if ( 'video' === $element->get_name() && ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
+					$this->lazy_load_widget_off = true;
+				}
+			}
 		}
 	}
 
@@ -165,7 +180,11 @@ CSS;
 	 *
 	 * @return mixed|void
 	 */
-	public function lazyload( $widget_content ) {
+	public function lazyload( $widget_content, Element_Base $element ) {
+		if ( $this->lazy_load_widget_off && 'video' === $element->get_name() ) {
+			$widget_content = str_replace( '<iframe ', '<iframe data-no-lazyload-thumbnail="1" ', $widget_content );
+		}
+
 		return apply_filters( 'a3_lazy_load_html', $widget_content );
 	}
 
@@ -198,24 +217,42 @@ CSS;
 				'default'   => 'yes',
 			] );
 		}
-		if ( in_array( $controls_stack->get_name(), apply_filters( 'rocket_footer_js_elementor_lazyload_widgets', $this->default_element_lazyload_widgets ) ) && 'section_image' === $section_id ) {
-			$controls_stack->add_control(
-				'lazyload_divider',
-				[
-					'type'      => Controls_Manager::DIVIDER,
-					'condition' => [
+		if ( in_array( $controls_stack->get_name(), apply_filters( 'rocket_footer_js_elementor_lazyload_widgets', $this->default_element_lazyload_widgets ) ) ) {
+			if ( in_array( $section_id, [ 'section_image', 'section_video' ] ) ) {
+				$video = 'video' === $controls_stack->get_name();
+				$controls_stack->add_control(
+					'lazyload_divider',
+					[
+						'type'      => Controls_Manager::DIVIDER,
+						'condition' => [
+							'image[url]!' => '',
+						],
+					]
+				);
+				$condition = [];
+				if ( ! $video ) {
+					$condition = [
 						'image[url]!' => '',
-					],
-				]
-			);
-			$controls_stack->add_control( 'lazyload', [
-				'label'     => __( 'Lazy Load', $this->plugin->safe_slug ),
-				'type'      => Controls_Manager::SWITCHER,
-				'condition' => [
-					'image[url]!' => '',
-				],
-				'default'   => 'yes',
-			] );
+					];
+				}
+				$controls_stack->add_control( 'lazyload', [
+					'label'     => __( 'Lazy Load', $this->plugin->safe_slug ),
+					'type'      => Controls_Manager::SWITCHER,
+					'condition' => $condition,
+					'default'   => 'yes',
+				] );
+
+				if ( $video ) {
+					$controls_stack->add_control( 'lazyload_thumbnail', [
+						'label'     => __( 'Lazy Load Thumbnail', $this->plugin->safe_slug ),
+						'type'      => Controls_Manager::SWITCHER,
+						'condition' => [
+							'lazyload' => 'yes',
+						],
+						'default'   => 'yes',
+					] );
+				}
+			}
 		}
 	}
 }
