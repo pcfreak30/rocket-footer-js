@@ -121,6 +121,7 @@ class Elementor extends IntegrationAbstract {
 
 		$lazyload_setting           = isset( $settings['lazyload'] ) && 'yes' === $settings['lazyload'];
 		$elementor_lazyload_setting = isset( $settings['lazy_load'] ) && 'yes' === $settings['lazy_load'];
+		$show_overlay               = isset( $settings['show_image_overlay'] ) && 'yes' === $settings['show_image_overlay'];
 
 		$background_lazyload = $lazyload && isset( $settings['background_lazyload'] ) && 'yes' === $settings['background_lazyload'];
 
@@ -137,7 +138,9 @@ class Elementor extends IntegrationAbstract {
 			if ( ! $lazyload_setting ) {
 				$this->lazy_load_widget_off = true;
 				add_filter( 'a3_lazy_load_run_filter', '__return_false' );
-				add_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
+				if ( ! ( $show_overlay && $elementor_lazyload_setting ) ) {
+					add_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
+				}
 			} else {
 				if ( 'video' === $element->get_name() && ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
 					$this->lazy_load_widget_thumbnail_off = true;
