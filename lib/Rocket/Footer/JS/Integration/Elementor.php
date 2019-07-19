@@ -19,6 +19,11 @@ class Elementor extends IntegrationAbstract {
 	 * @var bool
 	 */
 	private $lazy_load_widget_off = false;
+
+	/**
+	 * @var bool
+	 */
+	private $lazy_load_widget_thumbnail_off = false;
 	/**
 	 * @var array
 	 */
@@ -134,7 +139,7 @@ class Elementor extends IntegrationAbstract {
 				add_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
 			} else {
 				if ( 'video' === $element->get_name() && ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
-					$this->lazy_load_widget_off = true;
+					$this->lazy_load_widget_thumbnail_off = true;
 				}
 			}
 		}
@@ -150,10 +155,11 @@ class Elementor extends IntegrationAbstract {
 	 *
 	 */
 	public function maybe_remove_lazyload_filter() {
-		if ( $this->lazy_load_widget_off ) {
+		if ( $this->lazy_load_widget_off || $this->lazy_load_widget_thumbnail_off ) {
 			remove_filter( 'a3_lazy_load_run_filter', '__return_false' );
 			remove_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
-			$this->lazy_load_widget_off = false;
+			$this->lazy_load_widget_off           = false;
+			$this->lazy_load_widget_thumbnail_off = false;
 		}
 	}
 
@@ -181,8 +187,14 @@ CSS;
 	 * @return mixed|void
 	 */
 	public function lazyload( $widget_content, Element_Base $element ) {
-		if ( $this->lazy_load_widget_off && 'video' === $element->get_name() ) {
-			$widget_content = str_replace( '<iframe ', '<iframe data-no-lazyload-thumbnail="1" ', $widget_content );
+		if ( 'video' === $element->get_name() ) {
+			if ( $this->lazy_load_widget_off ) {
+				$widget_content = str_replace( '<iframe ', '<iframe data-no-lazyload="1" ', $widget_content );
+			}
+			if ( $this->lazy_load_widget_thumbnail_off ) {
+				$widget_content = str_replace( '<iframe ', '<iframe data-no-lazyload-thumbnail="1" ', $widget_content );
+			}
+
 		}
 
 		return apply_filters( 'a3_lazy_load_html', $widget_content );
