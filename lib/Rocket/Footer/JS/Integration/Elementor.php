@@ -142,6 +142,8 @@ class Elementor extends IntegrationAbstract {
 				if ( 'video' === $element->get_name() && ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
 					$this->lazy_load_widget_thumbnail_off = true;
 				}
+				$element->set_settings( 'show_play_icon', 'no' );
+				$element->set_settings( 'show_image_overlay', 'no' );
 			}
 		}
 	}
