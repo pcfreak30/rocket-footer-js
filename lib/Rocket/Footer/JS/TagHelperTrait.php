@@ -139,7 +139,7 @@ trait TagHelperTrait {
 			return false;
 		}
 
-		return false === trim( $tag->getAttribute( 'data-no-lazyload' ) );
+		return '1' === trim( $tag->getAttribute( 'data-no-lazyload' ) );
 	}
 
 	/**
