@@ -94,7 +94,7 @@ class Elementor extends IntegrationAbstract {
 	 * @param \Elementor\Element_Base $element
 	 */
 	public function lazyload_attributes( Element_Base $element ) {
-		$settings             = array_filter( $element->get_settings_for_display() );
+		$settings             = array_filter( $element->get_settings() );
 		$setting_keys_desktop = [
 			'background_image'          => true,
 			'background_overlay'        => true,
