@@ -119,7 +119,8 @@ class Elementor extends IntegrationAbstract {
 			}
 		}
 
-		$lazyload_setting = isset( $settings['lazyload'] ) && 'yes' === $settings['lazyload'];
+		$lazyload_setting           = isset( $settings['lazyload'] ) && 'yes' === $settings['lazyload'];
+		$elementor_lazyload_setting = isset( $settings['lazy_load'] ) && 'yes' === $settings['lazy_load'];
 
 		$background_lazyload = $lazyload && isset( $settings['background_lazyload'] ) && 'yes' === $settings['background_lazyload'];
 
@@ -127,7 +128,7 @@ class Elementor extends IntegrationAbstract {
 			$element->add_render_attribute( '_wrapper', 'data-lazyload-bg', 1 );
 			$element->add_render_attribute( '_wrapper', 'class', 'lazyload' );
 		}
-		if ( $lazyload_setting && 'video' === $element->get_name() ) {
+		if ( ! $lazyload_setting && $elementor_lazyload_setting && 'video' === $element->get_name() ) {
 			$element->add_render_attribute( 'image-overlay', 'data-lazyload-bg', 1 );
 			$element->add_render_attribute( 'image-overlay', 'class', 'lazyload' );
 		}
