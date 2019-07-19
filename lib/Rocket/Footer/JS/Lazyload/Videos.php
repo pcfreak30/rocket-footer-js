@@ -105,10 +105,13 @@ class Videos extends LazyloadAbstract {
 
 			$classes [] = 'lazyloaded-video';
 
+			$no_lazyload_thumbnail = '1' === $tag->getAttribute( 'data-no-lazyload-thumbnail' );
+
 			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
+				$new_tag       = $img;
 
 				$local_thumbnail = $this->plugin->util->download_remote_file( $thumbnail_url, null, false );
 				$this->maybe_generate_thumbnails( $local_thumbnail );
@@ -116,14 +119,19 @@ class Videos extends LazyloadAbstract {
 				$local_thumbnail = get_rocket_cdn_url( $local_thumbnail, [ 'css', 'js', 'css_and_js' ] );
 
 				if ( ! empty( $this->srcset_attr ) ) {
-					$img->setAttribute( 'data-srcset', $this->srcset_attr );
-					$img->setAttribute( 'data-sizes', $this->sizes_attr );
+					$img->setAttribute( 'srcset', $this->srcset_attr );
+					$img->setAttribute( 'sizes', $this->sizes_attr );
 				} else {
-					$img->setAttribute( 'data-src', $local_thumbnail );
+					$img->setAttribute( 'src', $local_thumbnail );
 				}
 
-				$img->setAttribute( 'width', $info->thumbnail_width );
-				$img->setAttribute( 'data-lazy-video-embed-type', $this->get_video_type( $src ) );
+				if ( ! $no_lazyload_thumbnail ) {
+					$img->setAttribute( 'width', $info->thumbnail_width );
+				}
+
+				$type = $this->get_video_type( $src );
+
+				$img->setAttribute( 'data-lazy-video-embed-type', $type );
 
 				$video_id = $this->get_video_id( $src );
 
@@ -132,6 +140,16 @@ class Videos extends LazyloadAbstract {
 				}
 
 				$img->setAttribute( 'data-lazy-video-embed', "lazyload-video-{$this->instance}" );
+				if ( $no_lazyload_thumbnail ) {
+					$img->removeClass( 'lazyload' );
+					$container = $this->create_tag( 'div' );
+					$container->setAttribute( 'data-lazy-video-embed-container', $type );
+					$container->appendChild( $img );
+					$play = $this->create_tag( 'div' );
+					$play->addClass( 'play' );
+					$container->appendChild( $play );
+					$new_tag = $container;
+				}
 
 				$linked = preg_grep( '/video-size-linked-to-[\w\__]+/', $classes );
 
@@ -148,7 +166,7 @@ class Videos extends LazyloadAbstract {
 					$img->setAttribute( 'data-lazy-video-height', $info->height );
 				}
 
-				$tag->parentNode->insertBefore( $img, $tag );
+				$tag->parentNode->insertBefore( $new_tag, $tag );
 				$this->lazyload_script( $this->get_tag_content( $tag ), "lazyload-video-{$this->instance}", $tag );
 				$tags->flag_removed();
 				$this->instance ++;
