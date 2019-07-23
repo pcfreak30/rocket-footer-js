@@ -98,17 +98,11 @@ class Videos extends LazyloadAbstract {
 			$src          = $this->maybe_translate_url( $src );
 			$info         = $oembed->get_data( $src );
 
-			$classes = $tag->getAttribute( 'class' );
-			$classes = explode( ' ', $classes );
-			$classes = array_map( 'trim', $classes );
-			$classes = array_filter( $classes );
-
-			$classes [] = 'lazyloaded-video';
-
 			$no_lazyload_thumbnail = '1' === $tag->getAttribute( 'data-no-lazyload-thumbnail' );
 
 			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
+				$tag->addClass( 'lazyloaded-video' );
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
 				$new_tag       = $img;
@@ -156,7 +150,7 @@ class Videos extends LazyloadAbstract {
 				if ( ! empty( $linked ) ) {
 					$linked_id = str_replace( 'video-size-linked-to-', '', end( $linked ) );
 					$img->setAttribute( 'data-size-linked-to', $linked_id );
-					unset( $classes[ array_search( $classes, end( $linked ) ) ] );
+					$tag->removeClass( end( $linked ) );
 				}
 
 				if ( isset( $info->width ) ) {
@@ -171,8 +165,6 @@ class Videos extends LazyloadAbstract {
 				$tags->flag_removed();
 				$this->instance ++;
 			}
-
-			$tag->setAttribute( 'class', implode( ' ', $classes ) );
 		}
 		$tags = $this->get_tag_collection( 'source' );
 		foreach ( $tags as $tag ) {
