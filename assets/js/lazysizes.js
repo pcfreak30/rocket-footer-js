@@ -327,7 +327,6 @@
 			}
 
 			inviewObserver.unobserve(elem);
-			preloadObserver.unobserve(elem);
 
 			lazyUnveil(elem, detail, isAuto, sizes, isImg);
 		};
@@ -382,7 +381,6 @@
 					lazyloadElems[ i ]._lazyAdd = true;
 
 					inviewObserver.observe(lazyloadElems[ i ]);
-					preloadObserver.observe(lazyloadElems[ i ]);
 
 					removeLazyClassElements.push(lazyloadElems[ i ]);
 					runLazyRemove = true;
@@ -405,9 +403,6 @@
 				lazyloadElems = document.getElementsByClassName(lazySizesCfg.lazyClass);
 
 				inviewObserver = new IntersectionObserver(unveilElements);
-				preloadObserver = new IntersectionObserver(lazyUnveilElement, {
-					rootMargin: lazySizesCfg.expand + 'px ' + (lazySizesCfg.expand * lazySizesCfg.hFac) + 'px',
-				});
 
 				new MutationObserver(addElements).observe(docElem, { childList: true, subtree: true, attributes: true });
 
@@ -507,8 +502,8 @@
 			customMedia: {},
 			init: true,
 			hFac: 0.8,
-			loadMode: 2,
-			expand: 400,
+			loadMode: 1,
+			expand: 0,
 		};
 
 		lazySizesCfg = window.lazySizesConfig || window.lazysizesConfig || {};
