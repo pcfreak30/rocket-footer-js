@@ -303,6 +303,8 @@ class Videos extends LazyloadAbstract {
 			'mime-type' => $file_info,
 		];
 
+		uasort( $image_sizes, [ $this, 'sort_sizes' ] );
+
 		$webp_module = $this->plugin->integration_manager->get_module( 'WebPExpress' );
 		if ( $webp_module ) {
 			$webp_module->disable_srcset_meta_filter();
@@ -335,6 +337,8 @@ class Videos extends LazyloadAbstract {
 			'file'      => $info['basename'],
 			'mime-type' => $file_info,
 		];
+
+		uasort( $image_sizes, [ $this, 'sort_sizes' ] );
 
 		$editor->multi_resize( $missing_image_sizes );
 
@@ -405,5 +409,13 @@ class Videos extends LazyloadAbstract {
 	 */
 	protected function is_match( $content, $src ) {
 		return false;
+	}
+
+	private function sort_sizes( $a, $b ) {
+		if ( $a['width'] == $b['width'] ) {
+			return 0;
+		}
+
+		return ( $a['width'] < $b['width'] ) ? - 1 : 1;
 	}
 }
