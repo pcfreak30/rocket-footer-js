@@ -12,11 +12,6 @@ use Rocket\Footer\JS\DOMElement;
  * @package Rocket\Footer\JS\Lazyload
  */
 class Videos extends LazyloadAbstract {
-
-	/**
-	 * @var array
-	 */
-	private $srcsets = [];
 	/**
 	 * @var string
 	 */
@@ -38,26 +33,10 @@ class Videos extends LazyloadAbstract {
 		return $upload_dir;
 	}
 
-	/**
-	 * @param $srcsets
-	 *
-	 * @return mixed
-	 */
-	public function save_srcsets( $srcsets ) {
+	public function sort_sizes( $sizes ) {
+		ksort( $sizes );
 
-		foreach ( $srcsets as $key => $srcset ) {
-			$srcsets[ $key ]['url'] = get_rocket_cdn_url( $srcsets[ $key ]['url'], [
-				'css',
-				'js',
-				'css_and_js',
-				'all',
-			] );
-		}
-
-
-		$this->srcsets = $srcsets;
-
-		return $srcsets;
+		return $sizes;
 	}
 
 	/**
@@ -275,14 +254,10 @@ class Videos extends LazyloadAbstract {
 		$file = trailingslashit( $path ) . $info['basename'];
 
 		$file_info = wp_check_filetype( $file );
-		$filetype  = null;
-		if ( $file_info ) {
-			$filetype = $file_info['type'];
-		}
 
 		list( $width, $height ) = getimagesize( $file );
 
-		add_filter( 'wp_calculate_image_srcset', [ $this, 'save_srcsets' ] );
+		add_filter( 'wp_calculate_image_srcset', [ $this, 'sort_sizes' ] );
 		add_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
 
 		$image_sizes = [];
@@ -302,8 +277,6 @@ class Videos extends LazyloadAbstract {
 			'file'      => $info['basename'],
 			'mime-type' => $file_info,
 		];
-
-		uasort( $image_sizes, [ $this, 'sort_sizes' ] );
 
 		$webp_module = $this->plugin->integration_manager->get_module( 'WebPExpress' );
 		if ( $webp_module ) {
@@ -338,8 +311,6 @@ class Videos extends LazyloadAbstract {
 			'mime-type' => $file_info,
 		];
 
-		uasort( $image_sizes, [ $this, 'sort_sizes' ] );
-
 		$editor->multi_resize( $missing_image_sizes );
 
 		$file              = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $file ) ) );
@@ -359,7 +330,7 @@ class Videos extends LazyloadAbstract {
 		], $info['basename'], [ 'sizes' => $image_sizes ] );
 
 		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
-
+		remove_filter( 'wp_calculate_image_srcset', [ $this, 'sort_sizes' ] );
 		do_action( 'rocket_footer_js_lazyload_video_after_calculate_srcset' );
 	}
 
@@ -409,13 +380,5 @@ class Videos extends LazyloadAbstract {
 	 */
 	protected function is_match( $content, $src ) {
 		return false;
-	}
-
-	private function sort_sizes( $a, $b ) {
-		if ( $a['width'] == $b['width'] ) {
-			return 0;
-		}
-
-		return ( $a['width'] < $b['width'] ) ? - 1 : 1;
 	}
 }
