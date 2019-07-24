@@ -124,12 +124,12 @@ class Videos extends LazyloadAbstract {
 					$new_tag = $container;
 				}
 
-				$linked = preg_grep( '/video-size-linked-to-[\w\__]+/', $classes );
+				preg_match( '/video-size-linked-to-[\w\__]+/', $tag->getAttribute( 'class' ), $linked );
 
 				if ( ! empty( $linked ) ) {
-					$linked_id = str_replace( 'video-size-linked-to-', '', end( $linked ) );
+					$linked_id = str_replace( 'video-size-linked-to-', '', $linked[0] );
 					$img->setAttribute( 'data-size-linked-to', $linked_id );
-					$tag->removeClass( end( $linked ) );
+					$tag->removeClass( $linked[0] );
 				}
 
 				if ( isset( $info->width ) ) {
