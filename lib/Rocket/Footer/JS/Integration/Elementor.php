@@ -24,6 +24,11 @@ class Elementor extends IntegrationAbstract {
 	 * @var bool
 	 */
 	private $lazy_load_widget_thumbnail_off = false;
+
+	/**
+	 * @var bool
+	 */
+	private $lazy_load_widget_thumbnail_size;
 	/**
 	 * @var array
 	 */
@@ -142,8 +147,15 @@ class Elementor extends IntegrationAbstract {
 					add_filter( 'wp_get_attachment_image_attributes', [ $this, 'no_lazyload_image' ] );
 				}
 			} else {
-				if ( 'video' === $element->get_name() && ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
-					$this->lazy_load_widget_thumbnail_off = true;
+				if ( 'video' === $element->get_name() ) {
+					if ( ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
+						$this->lazy_load_widget_thumbnail_off = true;
+					}
+					if ( ! empty( $settings['lazyload_thumbnail_size'] ) ) {
+						$this->lazy_load_widget_thumbnail_size = $settings['lazyload_thumbnail_size'];
+					} else {
+						$this->lazy_load_widget_thumbnail_size = null;
+					}
 				}
 				$element->set_settings( 'show_play_icon', 'no' );
 				$element->set_settings( 'show_image_overlay', 'no' );
@@ -199,6 +211,9 @@ CSS;
 			}
 			if ( $this->lazy_load_widget_thumbnail_off ) {
 				$widget_content = str_replace( '<iframe ', '<iframe data-no-lazyload-thumbnail="1" ', $widget_content );
+			}
+			if ( null !== $this->lazy_load_widget_thumbnail_size ) {
+				$widget_content = str_replace( '<iframe ', sprintf( '<iframe data-thumbnail-size="%s"', $this->lazy_load_widget_thumbnail_size ), $widget_content );
 			}
 
 		}
@@ -269,7 +284,16 @@ CSS;
 						'condition'   => [
 							'lazyload' => 'yes',
 						],
-						'default'   => 'yes',
+						'default'     => 'yes',
+					] );
+					$controls_stack->add_control( 'lazyload_thumbnail_size', [
+						'label'       => __( 'Lazy Load Thumbnail Custom Size', $this->plugin->safe_slug ),
+						'type'        => Controls_Manager::TEXT,
+						'description' => 'If this is set, it will override the sizes attribute of the generated video thumbnail. Useful in advanced or edge case situations',
+						'condition'   => [
+							'lazyload' => 'yes',
+						],
+						'default'     => '',
 					] );
 				}
 			}
