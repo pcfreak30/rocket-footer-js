@@ -254,17 +254,19 @@ CSS;
 					];
 				}
 				$controls_stack->add_control( 'lazyload', [
-					'label'     => __( 'Lazy Load', $this->plugin->safe_slug ),
-					'type'      => Controls_Manager::SWITCHER,
-					'condition' => $condition,
-					'default'   => 'yes',
+					'label'       => __( 'Lazy Load', $this->plugin->safe_slug ),
+					'type'        => Controls_Manager::SWITCHER,
+					'description' => 'Enable the lazyload, provided by Rocket Footer JS, for this element',
+					'condition'   => $condition,
+					'default'     => 'yes',
 				] );
 
 				if ( $video ) {
 					$controls_stack->add_control( 'lazyload_thumbnail', [
-						'label'     => __( 'Lazy Load Thumbnail', $this->plugin->safe_slug ),
-						'type'      => Controls_Manager::SWITCHER,
-						'condition' => [
+						'label'       => __( 'Lazy Load Thumbnail', $this->plugin->safe_slug ),
+						'type'        => Controls_Manager::SWITCHER,
+						'description' => 'Enable lazyloading the generated video thumbnail',
+						'condition'   => [
 							'lazyload' => 'yes',
 						],
 						'default'   => 'yes',
