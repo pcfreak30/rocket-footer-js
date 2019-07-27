@@ -78,6 +78,7 @@ class Videos extends LazyloadAbstract {
 			$info         = $oembed->get_data( $src );
 
 			$no_lazyload_thumbnail = '1' === $tag->getAttribute( 'data-no-lazyload-thumbnail' );
+			$thumbnail_size        = $tag->getAttribute( 'data-thumbnail-size' );
 
 			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
@@ -87,7 +88,7 @@ class Videos extends LazyloadAbstract {
 				$new_tag       = $img;
 
 				$local_thumbnail = $this->plugin->util->download_remote_file( $thumbnail_url, null, false );
-				$this->maybe_generate_thumbnails( $local_thumbnail );
+				$this->maybe_generate_thumbnails( $local_thumbnail, $thumbnail_size );
 				$local_thumbnail = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', $local_thumbnail );
 				$local_thumbnail = get_rocket_cdn_url( $local_thumbnail, [ 'css', 'js', 'css_and_js' ] );
 
@@ -238,7 +239,7 @@ class Videos extends LazyloadAbstract {
 	/**
 	 * @param $thumbnail_url
 	 */
-	private function maybe_generate_thumbnails( $thumbnail_url ) {
+	private function maybe_generate_thumbnails( $thumbnail_url, $srcset_size = null ) {
 		$path = trailingslashit( $this->plugin->get_cache_path() );
 		$info = pathinfo( parse_url( $thumbnail_url, PHP_URL_PATH ) );
 
@@ -291,10 +292,13 @@ class Videos extends LazyloadAbstract {
 			'width'  => $width,
 			'height' => $height,
 		] );
-		$this->sizes_attr  = wp_calculate_image_sizes( [
-			$width,
-			$height,
-		], $info['basename'], [ 'sizes' => $image_sizes ] );
+		if ( empty( $srcset_size ) ) {
+			$this->sizes_attr = wp_calculate_image_sizes( [
+				$width,
+				$height,
+			], $info['basename'], [ 'sizes' => $image_sizes ] );
+		}
+
 
 		if ( $webp_module ) {
 			$webp_module->enable_srcset_meta_filter();
@@ -313,8 +317,9 @@ class Videos extends LazyloadAbstract {
 
 		$editor->multi_resize( $missing_image_sizes );
 
-		$file              = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $file ) ) );
-		$file              = str_replace( site_url( '/' ), ABSPATH, $file );
+		$file = apply_filters( 'rocket_footer_js_lazyload_video_thumbnail', site_url( str_replace( ABSPATH, '/', $file ) ) );
+		$file = str_replace( site_url( '/' ), ABSPATH, $file );
+
 		$this->srcset_attr = wp_calculate_image_srcset( [
 			$width,
 			$height,
@@ -324,11 +329,16 @@ class Videos extends LazyloadAbstract {
 			'width'  => $width,
 			'height' => $height,
 		] );
-		$this->sizes_attr  = wp_calculate_image_sizes( [
-			$width,
-			$height,
-		], $info['basename'], [ 'sizes' => $image_sizes ] );
+		if ( empty( $srcset_size ) ) {
+			$this->sizes_attr = wp_calculate_image_sizes( [
+				$width,
+				$height,
+			], $info['basename'], [ 'sizes' => $image_sizes ] );
+		}
 
+		if ( ! empty( $srcset_size ) ) {
+			$this->sizes_attr = $srcset_size;
+		}
 		remove_filter( 'upload_dir', [ $this, 'modify_upload_dir' ] );
 		remove_filter( 'wp_calculate_image_srcset', [ $this, 'sort_sizes' ] );
 		do_action( 'rocket_footer_js_lazyload_video_after_calculate_srcset' );
