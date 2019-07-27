@@ -65,6 +65,39 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.2.0 ###
+
+* Bug: Add more compatibility fixes with a3 lazy load
+* Bug: Fix bugs with jQuery compatibility of lazySizes
+* Bug: Don't try and do processing during JSON/API requests
+* Bug/Enhancement: Misc fixes and improvements to the video lazyload
+* Bug: Remove the preload functionality from lazySizes
+* Feature: Integrate WebPExpress support to allow WebP to work with other integrations/modules and to enable a separate cache for webp when supported
+* Feature: Enable lazyload to be managed per element inside the Elementor Editor
+* Compatibility: Add compatibility css for elementor in the video lazyload
+* Compatibility: Add more Fusion logo options to be processed by CDN
+* Compatibility: Prevent divi from concatenating JS
+* Integration: Add compatibility with smart slider for lazy load
+* Integration: Add compatibility with EWWW to prevent image processing from running on LazyLoaded Video thumbnails due to the excessive processing time
+* Integration: Add compatibility With Essential Addons for Elementor
+* Integration: Ignore hubspot forms in JS rewrite module and add LazyLoad Compatibility with HubSpot
+* Integration: Add lazyload compatibility with Fusion portfolio elements
+* Integration: Add lazyload compatibility with Fusion's lazySizes
+* Integration: Add compatibility with Rank Math SEO
+* Enhancement: Add hooks to allow the minify cache key to be modified
+* Enhancement: Ensure picturefill JS script is loaded if CSS plugin is not active
+* Enhancement: Improve rendering of lazyloaded elements with lazySizes
+* Enhancement: Enable the video thumbnail to be a responsive image based on all image sizes registered, and support conditionally lazyloading it. Also support integration with WEBP.
+* Enhancement: Improve check for if lazy load should be enabled
+* Enhancement: Add filter to bypass reading/saving of cache
+* Enhancement: Refactor and improve the divi lazyload suypport for videos
+* Enhancement: Add webp support to MetaSlider
+* Enhancement: Add compatibility with the wp-rocket preloader to ensure that it will run
+* Enhancement: If the wp-rocket preloader is on, then run the preloader when site cache is cleared
+* Enhancement: Clear a post cache when the post is saved
+* Enhancement: Add support for a lazyloaded video thumbnail to not be lazyloaded via a data attribute, and expose that in the elementor editor
+* Enhancement: Allow a lazyloaded video thumbnail to have it's responsive size manually set and expose that in the Elementor editor
+
 ### 3.1.2 ###
 
 * Compatibility: Remove lazy load compatibility script for master slider as it is no longer needed
