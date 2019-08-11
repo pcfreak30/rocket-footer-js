@@ -10,6 +10,11 @@ use Elementor\Widget_Base;
 class ElementorPro extends IntegrationAbstract {
 
 	public function init() {
+		add_action( 'wp', [ $this, 'wp_action' ] );
+	}
+
+
+	public function wp_action() {
 		if ( ! class_exists( '\Elementor\Plugin' ) ) {
 			return;
 		}
