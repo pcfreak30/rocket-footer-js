@@ -121,6 +121,8 @@ class JS extends Plugin {
 
 	private $cache_hash;
 
+	private $excluded_file_regex;
+
 	/**
 	 * JS constructor.
 	 *
@@ -356,6 +358,9 @@ class JS extends Plugin {
 					$this->script_document->appendChild( $tag );
 					$src = $tag->getAttribute( 'src' );
 					if ( ! empty( $src ) ) {
+						if ( $this->is_file_excluded( $src ) ) {
+							continue;
+						}
 						$this->cache_list['external'][] = $src;
 					} else if ( ! empty( $tag->textContent ) ) {
 						$this->cache_list['inline'][] = $tag->textContent;
@@ -364,6 +369,43 @@ class JS extends Plugin {
 			}
 		}
 	}
+
+	private function is_file_excluded( $file ) {
+		$found = preg_match( '#^(' . $this->get_excluded_files() . ')$#', $file );
+
+		return ! empty( $found );
+	}
+
+	private function get_excluded_files() {
+
+		if ( ! $this->excluded_file_regex ) {
+			$excluded_files = get_rocket_option( 'exclude_js' );
+
+			/**
+			 * Filter JS files to exclude from minification/concatenation.
+			 *
+			 * @param array $js_files List of excluded JS files.
+			 *
+			 * @since 2.6
+			 *
+			 */
+			$excluded_files = apply_filters( 'rocket_exclude_js', $excluded_files );
+
+			if ( empty( $excluded_files ) ) {
+				return '';
+			}
+
+			foreach ( $excluded_files as $i => $excluded_file ) {
+				// Escape characters for future use in regex pattern.
+				$excluded_files[ $i ] = str_replace( '#', '\#', $excluded_file );
+			}
+
+			$this->excluded_file_regex = implode( '|', $excluded_files );
+		}
+
+		return $this->excluded_file_regex;
+	}
+
 
 	/**
 	 *
