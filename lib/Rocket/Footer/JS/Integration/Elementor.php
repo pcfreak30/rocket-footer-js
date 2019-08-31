@@ -45,6 +45,9 @@ class Elementor extends IntegrationAbstract {
 	 */
 	public function init() {
 		add_action( 'wp', [ $this, 'wp_action' ] );
+		if ( is_admin() ) {
+			add_action( 'wp_loaded', [ $this, 'wp_action' ] );
+		}
 	}
 
 	public function wp_action() {
