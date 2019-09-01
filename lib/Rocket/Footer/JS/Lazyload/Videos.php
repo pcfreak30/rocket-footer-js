@@ -79,9 +79,13 @@ class Videos extends LazyloadAbstract {
 
 			$no_lazyload_thumbnail = '1' === $tag->getAttribute( 'data-no-lazyload-thumbnail' );
 			$thumbnail_size        = $tag->getAttribute( 'data-thumbnail-size' );
+			$thumbnail_alt         = $tag->getAttribute( 'data-thumbnail-alt' );
 
 			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
+				if ( empty( $thumbnail_alt ) ) {
+					$thumbnail_alt = $info->title;
+				}
 				$tag->addClass( 'lazyloaded-video' );
 				$thumbnail_url = $this->maybe_translate_thumbnail_url( $info->thumbnail_url );
 				$img           = $this->create_tag( 'img' );
@@ -101,6 +105,10 @@ class Videos extends LazyloadAbstract {
 
 				if ( ! $no_lazyload_thumbnail ) {
 					$img->setAttribute( 'width', $info->thumbnail_width );
+				}
+
+				if ( $thumbnail_alt ) {
+					$img->setAttribute( 'alt', $thumbnail_alt );
 				}
 
 				$type = $this->get_video_type( $src );
