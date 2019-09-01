@@ -29,6 +29,11 @@ class Elementor extends IntegrationAbstract {
 	 * @var bool
 	 */
 	private $lazy_load_widget_thumbnail_size;
+
+	/**
+	 * @var
+	 */
+	private $lazy_load_widget_thumbnail_alt;
 	/**
 	 * @var array
 	 */
@@ -38,6 +43,9 @@ class Elementor extends IntegrationAbstract {
 		'image-carousel',
 		'video',
 	];
+	/**
+	 * @var array
+	 */
 	private $no_lazyload_classes = [ 'no-lazyload' ];
 
 	/**
@@ -50,6 +58,9 @@ class Elementor extends IntegrationAbstract {
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function wp_action() {
 		if ( ! class_exists( '\Elementor\Plugin' ) ) {
 			return;
@@ -71,6 +82,11 @@ class Elementor extends IntegrationAbstract {
 		add_action( 'rocket_async_css_lazy_load_responsive_image', [ $this, 'maybe_lazyload_image' ], 10, 2 );
 	}
 
+	/**
+	 * @param $classes
+	 *
+	 * @return array|string
+	 */
 	public function a3_skip_classes( $classes ) {
 		if ( is_string( $classes ) ) {
 			$classes = trim( $classes );
@@ -86,6 +102,12 @@ class Elementor extends IntegrationAbstract {
 		return $classes;
 	}
 
+	/**
+	 * @param $value
+	 * @param $classes
+	 *
+	 * @return bool
+	 */
 	public function maybe_lazyload_image( $value, $classes ) {
 		$classes = array_map( 'trim', explode( ' ', $classes ) );
 		if ( 0 < count( array_intersect( $this->no_lazyload_classes, $classes ) ) ) {
@@ -158,6 +180,11 @@ class Elementor extends IntegrationAbstract {
 					if ( ! ( isset( $settings['lazyload_thumbnail'] ) && 'yes' === $settings['lazyload_thumbnail'] ) ) {
 						$this->lazy_load_widget_thumbnail_off = true;
 					}
+					if ( ! empty( $settings['lazyload_thumbnail_alt'] ) ) {
+						$this->lazy_load_widget_thumbnail_alt = $settings['lazyload_thumbnail_alt'];
+					} else {
+						$this->lazy_load_widget_thumbnail_alt = null;
+					}
 					if ( ! empty( $settings['lazyload_thumbnail_size'] ) ) {
 						$this->lazy_load_widget_thumbnail_size = $settings['lazyload_thumbnail_size'];
 					} else {
@@ -170,6 +197,11 @@ class Elementor extends IntegrationAbstract {
 		}
 	}
 
+	/**
+	 * @param $attr
+	 *
+	 * @return mixed
+	 */
 	public function no_lazyload_image( $attr ) {
 		$attr['class'] .= ' no-lazyload';
 
@@ -221,6 +253,9 @@ CSS;
 			}
 			if ( null !== $this->lazy_load_widget_thumbnail_size ) {
 				$widget_content = str_replace( '<iframe ', sprintf( '<iframe data-thumbnail-size="%s"', $this->lazy_load_widget_thumbnail_size ), $widget_content );
+			}
+			if ( null !== $this->lazy_load_widget_thumbnail_alt ) {
+				$widget_content = str_replace( '<iframe ', sprintf( '<iframe data-thumbnail-alt="%s"', $this->lazy_load_widget_thumbnail_alt ), $widget_content );
 			}
 
 		}
@@ -297,6 +332,15 @@ CSS;
 						'label'       => __( 'Lazy Load Thumbnail Custom Size', $this->plugin->safe_slug ),
 						'type'        => Controls_Manager::TEXT,
 						'description' => 'If this is set, it will override the sizes attribute of the generated video thumbnail. Useful in advanced or edge case situations',
+						'condition'   => [
+							'lazyload' => 'yes',
+						],
+						'default'     => '',
+					] );
+					$controls_stack->add_control( 'lazyload_thumbnail_alt', [
+						'label'       => __( 'Lazy Load Thumbnail Alt Text', $this->plugin->safe_slug ),
+						'type'        => Controls_Manager::TEXT,
+						'description' => 'If this is set, will override the alt attribute for SEO to the thumbnail image. Default is what is given via oEmbed',
 						'condition'   => [
 							'lazyload' => 'yes',
 						],
