@@ -30,7 +30,8 @@ class Manager extends Component {
 
 	public function init() {
 		add_action( 'after_rocket_clean_domain', [ $this, 'purge_cache' ], 10, 0 );
-		add_action( 'after_rocket_clean_domain', 'run_rocket_sitemap_preload', 10, 0 );
+		add_action( 'after_rocket_clean_domain', [ $this, 'do_preload' ], 10, 0 );
+		add_action( 'wp_rocket_start_preload', 'run_rocket_sitemap_preload', 10, 0 );
 		add_action( 'after_rocket_clean_post', [ $this, 'purge_post' ] );
 		add_action( 'after_rocket_clean_term', [ $this, 'purge_term' ] );
 		add_action( 'after_rocket_clean_file', [ $this, 'purge_url' ] );
@@ -41,6 +42,15 @@ class Manager extends Component {
 		}
 		$this->store->set_expire( apply_filters( 'rocket_footer_js_cache_expire_period', $interval ) );
 		$this->store->set_max_branch_length( apply_filters( 'rocket_footer_js_max_branch_length', 50 ) );
+	}
+
+	function do_preload() {
+		if ( wp_doing_cron() ) {
+			run_rocket_sitemap_preload();
+
+			return;
+		}
+		wp_schedule_single_event( time(), 'wp_rocket_start_preload' );
 	}
 
 	/**
