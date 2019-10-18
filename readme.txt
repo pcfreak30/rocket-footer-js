@@ -65,6 +65,18 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.2.1 ###
+
+* Bug: For elementor module, if in admin, functions should still run
+* Bug: Encode both scripts and styles in DOM processing due to further edge cases found
+* Enhancement: Add a3 lazy load excludes as a consideration for determining if lazy load is on
+* Enhancement: Defer init checks for Elementor modules so that lazy load excludes can be processed
+* Enhancement: Add support for wp-rocket file excludes
+* Enhancement: For elementor module, add an option for a video thumbnail to have a custom alt attribute
+* Enhancement: For video lazyload, add support for custom alt attribute, and fall back to oembed title
+* Enhancement: Ensure wp-rocket preload only runs on cron by conditionally deferring it
+* Integration: Add lazyload compatibility for WP Ultimate Post Grid
+
 ### 3.2.0 ###
 
 * Bug: Add more compatibility fixes with a3 lazy load
