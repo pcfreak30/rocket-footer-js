@@ -243,7 +243,7 @@ class JS extends Plugin {
 		/** @noinspection NotOptimalIfConditionsInspection */
 		if ( get_rocket_option( 'minify_js' ) && ! ( defined( 'DONOTMINIFYJS' ) && DONOTMINIFYJS ) && ! is_rocket_post_excluded_option( 'minify_js' ) ) {
 			/** @noinspection UsageOfSilenceOperatorInspection */
-			if ( ! @$this->document->loadHTML( mb_convert_encoding( $buffer, 'HTML-ENTITIES', 'UTF-8' ) ) ) {
+			if ( ! @$this->document->loadHTML( $buffer ) ) {
 				return $buffer;
 			}
 

@@ -14,6 +14,7 @@ class DOMDocument extends \DOMDocument {
 	public function loadHTML( $source, $options = 0 ) {
 		$source = $this->pre_process_scripts( $source );
 		$source = $this->pre_process_styles( $source );
+		$source = mb_convert_encoding( $source, 'HTML-ENTITIES', 'UTF-8' );
 
 		return @parent::loadHTML( $source, $options );
 	}
