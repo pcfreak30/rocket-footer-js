@@ -23,6 +23,9 @@ class Backgroundimages extends LazyloadAbstract {
 		}
 		$xpath = new \DOMXPath( $this->document );
 		foreach ( $xpath->query( '//*[@style]' ) as $tag ) {
+			if ( $this->is_no_lazyload( $tag ) ) {
+				continue;
+			}
 			preg_match_all( '/url\\(\\s*([\'"]?(.*?)[\'"]?|[^\\)\\s]+)\\s*\\)/i', $tag->getAttribute( 'style' ), $matches );
 			if ( ! empty( $matches ) && ! empty( $matches[1] ) ) {
 				$match = array_shift( $matches[2] );
