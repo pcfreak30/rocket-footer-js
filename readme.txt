@@ -65,6 +65,11 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.2.2 ###
+
+* Enhancement: Skip processing background image if it is flagged for no lazy load
+* Enhancement: Centralize multibyte encoding for entities into the DOMDocument class so that style tags do not get processed
+
 ### 3.2.1 ###
 
 * Bug: For elementor module, if in admin, functions should still run
