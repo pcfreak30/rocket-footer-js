@@ -48,6 +48,7 @@ class FusionFramework extends IntegrationAbstract {
 				$this,
 				'add_fusion_image_srcset_filter',
 			] );
+			add_filter( 'rocket_footer_js_load_script_image_hacks', '__return_true' );
 		}
 	}
 
