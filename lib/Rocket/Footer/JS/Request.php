@@ -93,13 +93,21 @@ class Request extends Component {
 			}
 
 			wp_enqueue_script( 'rocket-footer-js-lazysizes', plugins_url( 'assets/js/lazysizes.js', $this->plugin->get_plugin_file(), $lazysize_deps ) );
-			wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), [ $dep ] );
-			wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), [ $dep ] );
-			wp_enqueue_script( 'jquery-lazyloadxt.video', plugins_url( 'assets/js/jquery.lazyloadxt.video.js', $this->plugin->get_plugin_file() ), [ $dep ] );
-			wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), [ $dep ] );
-			wp_enqueue_script( 'jquery.lazyloadxt.imagefixes', plugins_url( 'assets/js/jquery.lazyloadxt.imagefixes.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			if ( apply_filters( 'rocket_footer_js_load_script_lazy_load_widgets', true ) ) {
+				wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			}
+			if ( apply_filters( 'rocket_footer_js_load_script_lazy_load_video_embed', true ) ) {
+				wp_enqueue_script( 'jquery-lazyloadxt.videoembed', plugins_url( 'assets/js/jquery.lazyloadxt.videoembed.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+				wp_enqueue_style( 'rocket-footer-js-video-lazyload', plugins_url( 'assets/css/video-lazyload.css', $this->plugin->get_plugin_file() ) );
+			}
+			if ( apply_filters( 'rocket_footer_js_load_script_lazy_load_bg', true ) ) {
+				wp_enqueue_script( 'jquery-lazyloadxt.bg', plugins_url( 'assets/js/jquery.lazyloadxt.bg.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			}
+			if ( apply_filters( 'rocket_footer_js_load_script_image_hacks', false ) ) {
+				wp_enqueue_script( 'jquery.lazyloadxt.imagefixes', plugins_url( 'assets/js/jquery.lazyloadxt.imagefixes.js', $this->plugin->get_plugin_file() ), [ $dep ] );
+			}
 			wp_enqueue_style( 'rocket-footer-js-lazyload', plugins_url( 'assets/css/lazyload.css', $this->plugin->get_plugin_file() ) );
-			wp_enqueue_style( 'rocket-footer-js-video-lazyload', plugins_url( 'assets/css/video-lazyload.css', $this->plugin->get_plugin_file() ) );
+
 		}
 
 	}
