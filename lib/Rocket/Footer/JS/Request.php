@@ -68,6 +68,8 @@ class Request extends Component {
 			$dep = 'jquery-lazyloadxt';
 		}
 
+		$suffix = ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? 'min.' : '';
+
 		if ( wp_script_is( $dep, 'registered' ) ) {
 			wp_deregister_style( 'jquery-lazyloadxt-fadein-css' );
 			wp_deregister_style( 'jquery-lazyloadxt-spinner-css' );
@@ -75,8 +77,8 @@ class Request extends Component {
 			/** @var \_WP_Dependency $script */
 			$script = wp_scripts()->registered[ $dep ];
 			wp_deregister_script( $dep );
-			wp_enqueue_script( 'rocket-footer-js-video-mutation-observer-polyfill', plugins_url( 'assets/js/polyfill/mutation-observer.js', $this->plugin->get_plugin_file() ) );
-			wp_enqueue_script( 'rocket-footer-js-video-intersection-observer-polyfill', plugins_url( 'assets/js/polyfill/intersection-observer.js', $this->plugin->get_plugin_file() ) );
+			wp_enqueue_script( 'rocket-footer-js-video-mutation-observer-polyfill', plugins_url( "assets/js/polyfill/mutation-observer.{$suffix}js", $this->plugin->get_plugin_file() ) );
+			wp_enqueue_script( 'rocket-footer-js-video-intersection-observer-polyfill', plugins_url( "assets/js/polyfill/intersection-observer.{$suffix}js", $this->plugin->get_plugin_file() ) );
 			wp_enqueue_script( 'jquery-lazyloadxt-dummy', plugins_url( 'assets/js/lazysizes.lazyloadxt.compat.js', $this->plugin->get_plugin_file(), [ 'jquery' ] ) );
 			foreach ( $script->extra as $key => $data ) {
 				wp_script_add_data( $dep, $key, $data );
@@ -92,7 +94,7 @@ class Request extends Component {
 				$lazysize_deps[] = 'rocket-footer-js-picturefill-polyfill';
 			}
 
-			wp_enqueue_script( 'rocket-footer-js-lazysizes', plugins_url( 'assets/js/lazysizes.js', $this->plugin->get_plugin_file(), $lazysize_deps ) );
+			wp_enqueue_script( 'rocket-footer-js-lazysizes', plugins_url( "assets/js/lazysizes.{$suffix}js", $this->plugin->get_plugin_file(), $lazysize_deps ) );
 			if ( apply_filters( 'rocket_footer_js_load_script_lazy_load_widgets', true ) ) {
 				wp_enqueue_script( 'jquery-lazyloadxt.widget', plugins_url( 'assets/js/jquery.lazyloadxt.widget.js', $this->plugin->get_plugin_file() ), [ $dep ] );
 			}
