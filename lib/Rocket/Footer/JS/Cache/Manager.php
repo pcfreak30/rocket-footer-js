@@ -65,22 +65,33 @@ class Manager extends Component {
 	 * @param \WP_Post $post
 	 */
 	public function purge_post( $post ) {
-		$this->store->delete_cache_branch( [ 'cache', "post_{$post->ID}" ] );
+		$path = [ 'cache', "post_{$post->ID}" ];
+		$this->delete_cache_file( $path );
+	}
+
+	private function delete_cache_file( $path ) {
+		$cache = $this->store->get_cache_fragment( $path );
+		if ( ! empty( $cache ) && ! empty( $cache['filename'] ) ) {
+			$this->plugin->wp_filesystem->delete( $cache['filename'] );
+		}
+		$this->store->delete_cache_branch( $path );
 	}
 
 	/**
 	 * @param \WP_Term $term
 	 */
 	public function purge_term( $term ) {
-		$this->store->delete_cache_branch( [ 'cache', "term_{$term->term_id}" ] );
+		$path = [ 'cache', "term_{$term->term_id}" ];
+		$this->delete_cache_file( $path );
 	}
 
 	/**
 	 * @param string $url
 	 */
 	public function purge_url( $url ) {
-		$url = md5( $url );
-		$this->store->delete_cache_branch( [ 'cache', "url_{$url}" ] );
+		$url  = md5( $url );
+		$path = [ 'cache', "url_{$url}" ];
+		$this->delete_cache_file( $path );
 	}
 
 	public function clear_minify_url( $url ) {
