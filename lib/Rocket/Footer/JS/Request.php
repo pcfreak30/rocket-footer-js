@@ -39,7 +39,11 @@ class Request extends Component {
 		remove_filter( 'rocket_buffer', 'rocket_defer_js', 14 );
 		add_action( 'save_post', 'rocket_clean_post' );
 		add_action( 'shutdown', [ $this, 'maybe_ajax_spoof' ], - 1 );
+		add_filter( 'rocket_lazyload_script_tag', [ $this, 'strip_no_minify' ] );
+	}
 
+	public function strip_no_minify( $script ) {
+		return str_replace( 'data-no-minify="1"', '', $script );
 	}
 
 	public function maybe_ajax_spoof() {
