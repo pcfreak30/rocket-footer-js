@@ -74,6 +74,10 @@ class Manager extends Component {
 		$this->do_purge_cache();
 	}
 
+	private function clear_admin_cache_flag() {
+		delete_transient( "{$this->plugin->get_safe_slug()}_cache_purging" );
+	}
+
 	private function set_admin_cache_flag() {
 		set_transient( $this->get_admin_cache_flag_name(), true, DAY_IN_SECONDS );
 	}
@@ -83,15 +87,15 @@ class Manager extends Component {
 		$this->store->delete_cache_branch();
 		$this->delete_minify_files();
 		$this->clear_admin_cache_flag();
+		if ( doing_action( 'rocket_footer_js_purge_cache' ) ) {
+			remove_action( 'after_rocket_clean_domain', [ $this, 'purge_cache' ] );
+		}
+		rocket_clean_domain();
 		$this->do_preload();
 	}
 
 	private function delete_minify_files() {
 		rocket_rrmdir( $this->plugin->get_cache_path() );
-	}
-
-	private function clear_admin_cache_flag() {
-		delete_transient( "{$this->plugin->get_safe_slug()}_cache_purging" );
 	}
 
 	function do_preload() {
