@@ -80,7 +80,7 @@ class HubSpotForms extends LazyloadAbstract {
 	protected function do_lazyload_off( $content, $src ) {
 		$this->set_no_minify();
 
-		$nodes = $this->xpath->query( '//script[comtains(@src, "js.hsforms.net")]' );
+		$nodes = $this->xpath->query( '//script[contains(@src, "js.hsforms.net")]' );
 		/** @var \Rocket\Footer\JS\DOMElement $node */
 		foreach ( $nodes as $node ) {
 			$this->set_no_minify( $node );
