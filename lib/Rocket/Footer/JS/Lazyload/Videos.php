@@ -80,9 +80,12 @@ class Videos extends LazyloadAbstract {
 			$no_lazyload_thumbnail = '1' === $tag->getAttribute( 'data-no-lazyload-thumbnail' );
 			$thumbnail_size        = $tag->getAttribute( 'data-thumbnail-size' );
 			$thumbnail_alt         = $tag->getAttribute( 'data-thumbnail-alt' );
-
-			$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 			if ( ! empty( $info ) && 'video' === $info->type ) {
+				if ( $tag->hasAttribute( 'autoplay' ) ) {
+					continue;
+				}
+
+				$tag->setAttribute( ( $data_src ? 'data-' : '' ) . 'src', $this->maybe_set_autoplay( $original_src, $tag ) );
 				if ( empty( $thumbnail_alt ) ) {
 					$thumbnail_alt = $info->title;
 				}
