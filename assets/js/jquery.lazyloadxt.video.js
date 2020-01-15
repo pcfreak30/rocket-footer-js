@@ -9,6 +9,10 @@
 	options.selector += ',video,iframe[data-src]';
 	options.videoPoster = 'data-poster';
 
+	function load () {
+		this.dispatchEvent(new Event('load'));
+	}
+
 	$(document).on('lazyshow', 'video', function (e, $el) {
 		var srcAttr = $el.lazyLoadXT.srcAttr,
 			isFuncSrcAttr = $.isFunction(srcAttr),
@@ -23,8 +27,8 @@
 					$child.attr('src', src);
 					changed = true;
 				}
-			});
-
+			}).on('loadeddata', load);
+		$el.on('loadeddata', load);
 		// reload video
 		if (changed) {
 			this.load();
