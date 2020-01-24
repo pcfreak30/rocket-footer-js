@@ -32,6 +32,13 @@
 		// reload video
 		if (changed) {
 			this.load();
+			// Video.JS compatibility
+			var vjs, vsrc;
+			if (typeof videojs !== 'undefined' && (vjs = $el.closest('.video-js'))) {
+				if (((vsrc = $el.attr('src')) && vsrc) || (((vsrc = $el.children('source').attr('src')) && vsrc))) {
+					videojs(vjs.get(0)).src(vsrc)
+				}
+			}
 		}
 		$el.triggerHandler('load')
 		if ($el.hasClass('wp-video-shortcode-lazyload') || $el.hasClass('wp-audio-shortcode-lazyload')) {
