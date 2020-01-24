@@ -239,6 +239,13 @@ class Videos extends LazyloadAbstract {
 				$urls[]           = http_build_url( $size_url );
 			}
 		}
+		if ( 'i.vimeocdn.com' === $url['host'] ) {
+			$size_url         = $url;
+			$video_id         = basename( pathinfo( $url['path'], PATHINFO_DIRNAME ) );
+			$ext              = pathinfo( $url['path'], PATHINFO_EXTENSION );
+			$size_url['path'] = "/video/{$video_id}/{$size}.{$ext}";
+			$urls[]           = http_build_url( $size_url );
+		}
 		if ( ! empty( $urls ) ) {
 			return $urls;
 		}
@@ -366,6 +373,9 @@ class Videos extends LazyloadAbstract {
 		if ( 'youtube.com' === $url['host'] || 'www.youtube.com' === $url['host'] ) {
 			$type = 'youtube';
 		}
+		if ( 'vimeo.com' === $url['host'] || 'www.vimeo.com' === $url['host'] || 'player.vimeo.com' === $url['host'] ) {
+			$type = 'vimeo';
+		}
 		if ( null !== $type ) {
 			return $type;
 		}
@@ -388,6 +398,10 @@ class Videos extends LazyloadAbstract {
 			parse_str( $url['query'], $query );
 
 			return $query['v'];
+		}
+
+		if ( 'vimeo.com' === $url['host'] || 'www.vimeo.com' === $url['host'] ) {
+			return pathinfo( $url['path'], PATHINFO_FILENAME );
 		}
 
 		return false;
