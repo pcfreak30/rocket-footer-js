@@ -47,6 +47,7 @@ class Manager extends \ComposePress\Core\Abstracts\Manager {
 		'Ewww',
 		'EssentialAddonsElementor',
 		'WPUltimatePostGrid',
+		'VisualComposer',
 	];
 
 }
