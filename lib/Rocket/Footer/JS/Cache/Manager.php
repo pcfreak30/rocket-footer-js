@@ -87,9 +87,7 @@ class Manager extends Component {
 		$this->store->delete_cache_branch();
 		$this->delete_minify_files();
 		$this->clear_admin_cache_flag();
-		if ( doing_action( 'rocket_footer_js_purge_cache' ) ) {
-			remove_action( 'after_rocket_clean_domain', [ $this, 'purge_cache' ] );
-		}
+		remove_action( 'after_rocket_clean_domain', [ $this, 'purge_cache' ] );
 		rocket_clean_domain();
 		$this->do_preload();
 	}
