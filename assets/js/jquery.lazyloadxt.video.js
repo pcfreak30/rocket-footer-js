@@ -10,7 +10,7 @@
 	options.videoPoster = 'data-poster';
 
 	function load () {
-		this.dispatchEvent(new Event('load'));
+		this.dispatchEvent(new CustomEvent('load'));
 	}
 
 	$(document).on('lazyshow', 'video', function (e, $el) {
