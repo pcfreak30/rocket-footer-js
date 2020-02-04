@@ -83,6 +83,7 @@ class Request extends Component {
 			wp_deregister_script( $dep );
 			wp_enqueue_script( 'rocket-footer-js-video-mutation-observer-polyfill', plugins_url( "assets/js/polyfill/mutation-observer.{$suffix}js", $this->plugin->get_plugin_file() ) );
 			wp_enqueue_script( 'rocket-footer-js-video-intersection-observer-polyfill', plugins_url( "assets/js/polyfill/intersection-observer.{$suffix}js", $this->plugin->get_plugin_file() ) );
+			wp_enqueue_script( 'rocket-footer-js-custom-event-polyfill', plugins_url( "assets/js/polyfill/custom-event.{$suffix}js", $this->plugin->get_plugin_file() ) );
 			wp_enqueue_script( 'jquery-lazyloadxt-dummy', plugins_url( 'assets/js/lazysizes.lazyloadxt.compat.js', $this->plugin->get_plugin_file(), [ 'jquery' ] ) );
 			foreach ( $script->extra as $key => $data ) {
 				wp_script_add_data( $dep, $key, $data );
@@ -91,6 +92,7 @@ class Request extends Component {
 			$lazysize_deps = [
 				'rocket-footer-js-video-mutation-observer-polyfill',
 				'rocket-footer-js-video-intersection-observer-polyfill',
+				'rocket-footer-js-custom-event-polyfill',
 			];
 
 			if ( ! is_plugin_active( 'rocket-async-css/rocket-async-css.php' ) ) {
