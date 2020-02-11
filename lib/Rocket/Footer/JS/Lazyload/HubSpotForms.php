@@ -71,6 +71,8 @@ class HubSpotForms extends LazyloadAbstract {
 		$this->instance ++;
 
 		$tag->remove();
+		$this->tags->flag_removed();
+		$this->tags->rewind();
 	}
 
 	/**
