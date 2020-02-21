@@ -114,9 +114,16 @@ class Manager extends Component {
 	}
 
 	private function delete_cache_file( $path ) {
-		$cache = $this->store->get_cache_fragment( $path );
-		if ( ! empty( $cache ) && ! empty( $cache['filename'] ) ) {
-			$this->plugin->wp_filesystem->delete( $cache['filename'] );
+		$cache = $this->store->get_cache_fragment( array_merge( $path, [ 'cache_1' ] ) );
+		if ( ! empty( $cache ) ) {
+			foreach ( $cache as $item ) {
+				$item = explode( '_', $item );
+				$item = end( $item );
+				$item = $this->store->get_cache_fragment( array_merge( $path, [ $item ] ) );
+				if ( ! empty( $item['filename'] ) ) {
+					$this->plugin->wp_filesystem->delete( $item['filename'] );
+				}
+			}
 		}
 		$this->store->delete_cache_branch( $path );
 	}
