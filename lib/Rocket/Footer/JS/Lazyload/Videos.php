@@ -241,9 +241,10 @@ class Videos extends LazyloadAbstract {
 		}
 		if ( 'i.vimeocdn.com' === $url['host'] ) {
 			$size_url         = $url;
-			$video_id         = basename( pathinfo( $url['path'], PATHINFO_DIRNAME ) );
+			$video_id         = explode( '_', pathinfo( $url['path'], PATHINFO_FILENAME ) );
+			$video_id         = $video_id[0];
 			$ext              = pathinfo( $url['path'], PATHINFO_EXTENSION );
-			$size_url['path'] = "/video/{$video_id}/{$size}.{$ext}";
+			$size_url['path'] = "/video/{$video_id}.{$ext}";
 			$urls[]           = http_build_url( $size_url );
 		}
 		if ( ! empty( $urls ) ) {
