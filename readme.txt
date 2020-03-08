@@ -65,6 +65,22 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+### 3.2.3 ###
+
+* Bug: Fix typo in HubSpotForms module and fix broken code
+* Bug: Handle edge case of HTML5 video not fully lazyloading due to jQuery not triggering on loadeddata event
+* Feature: Add a pseudo css API to allow any elements background image to be lazyloaded
+* Enhancement: Add filters around enqueuing auxiliary scripts & default to not load the imagefixes script so that modules can flag it on at runtime
+* Enhancement: Add micro-optimization by serving preminified versions of polyfills and lazysizes
+* Enhancement: Improve cache management by deleting cache files when the objects are purged to handle edge cases
+* Enhancement: Add support for purging cache via cron, using rocket_footer_js_background_cache_purge_item_threshold filter, and preload cache if enabled after
+* Enhancement: Videos Module: Only set src/data-src if this is a video. If video is autoplay before we process it, skip it
+* Enhancement: Videos Module: Add vimeo support
+* Compatibility: Videos Module: Add videojs compatibility
+* Compatibility: Add visual composer compatibility to lazy load background images
+* Compatibility: Add custom event polyfill
+* Compatibility: Add compatibility with wp-rocket's lazyload
+
 ### 3.2.2 ###
 
 * Enhancement: Skip processing background image if it is flagged for no lazy load
